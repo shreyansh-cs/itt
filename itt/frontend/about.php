@@ -1,17 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About Us - I.T.T Group of Education</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
- <?php 
-  require_once "header.php"; 
-  echo getMyHeader();
- ?>
-  <div class="about-container">
+<?php 
+ob_start();
+$title = "About Us - I.T.T Group of Education";
+?>
+<div class="about-container">
     <!-- English Section -->
     <section class="about-section about-en">
       <h2>About Us</h2>
@@ -39,10 +30,11 @@
       <p>हम पारंपरिक शिक्षण को आधुनिक तकनीक के साथ मिलाकर एक समग्र शिक्षण अनुभव प्रदान करते हैं।</p>
     </section>
   </div>
+
   <?php 
-    require_once 'footer.php';
-    echo getFooter();
+  $content = ob_get_contents();
+  ob_end_clean();
+  require_once 'master.php'
   ?>
-  <script src="script.js"></script>
-</body>
-</html>
+
+

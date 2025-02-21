@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['full_name'] = $full_name;
             $_SESSION['user_type'] = $user_type;
             $_SESSION['user_class'] = $user_class;
-            header("Location: ../frontend/test-series.php");
+            header("Location: ../frontend/index.php");
             return;
         } else {
             echo "Invalid credentials.";
