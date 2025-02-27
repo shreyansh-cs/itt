@@ -4,7 +4,7 @@ include '../backend/utils.php';
 ob_start();
 session_start();
 $title = "I.T.T Group of Education - Home";
-$debug=0;
+$debug=1;
 
 $type = $_SESSION['user_type'];
 
