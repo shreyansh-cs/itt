@@ -4,7 +4,7 @@ include '../backend/utils.php';
 ob_start();
 session_start();
 $title = "I.T.T Group of Education - Home";
-$debug=1;
+$debug=0;
 
 $class = $_SESSION['user_class'];
 $stream = "";
@@ -28,6 +28,8 @@ if(isset($_POST['chapters']))
   if($debug)
     echo $chapter.",";
 }
+
+echo $_SESSION['user_type'];
 ?>
 <form action="" id="notesForm" name="notesForm" method="post">
     <table>

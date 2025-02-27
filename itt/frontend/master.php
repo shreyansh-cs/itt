@@ -15,6 +15,7 @@
    $id = $_SESSION['user_id'];
    $full_name = $_SESSION['full_name'];
    $class = $_SESSION['user_class'];
+   $type = $_SESSION['user_type'];
    ?>
     <header>
         <div class="logo">
@@ -27,7 +28,16 @@
        <ul>
        <li><a href="index.php">Home</a></li>
        <li><a href="about.php">About Us</a></li>
-       <li><a href="courses.php">Courses</a></li>
+       <?php 
+            if($type == "admin") 
+            {
+               echo "<li><a href='admin.php'>Admin</a></li>";
+            }
+            else
+            {
+                echo "<li><a href='courses.php'>Courses</a></li>";
+            }
+        ?>
        <li><a href="test-series.php">Online Test</a></li>
        <li><a href="contact.php">Contact</a></li> 
     <?php

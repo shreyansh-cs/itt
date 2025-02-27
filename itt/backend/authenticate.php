@@ -15,7 +15,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($stmt->num_rows == 1) {
         $stmt->bind_result($id, $full_name, $hashed_password, $user_type,$user_class);
         $stmt->fetch();
-        if (password_verify($password, $hashed_password)) {
+        //if (password_verify($password, $hashed_password)) {
+        if($password == $hashed_password){
             $_SESSION['user_id'] = $id;
             $_SESSION['full_name'] = $full_name;
             $_SESSION['user_type'] = $user_type;

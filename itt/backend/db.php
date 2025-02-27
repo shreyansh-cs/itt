@@ -1,9 +1,9 @@
 <?php
 // db.php
 $servername = "localhost";
-$username = "root";       // अपने DB username के अनुसार सेट करें
-$password = "";           // अपने DB password के अनुसार सेट करें
-$dbname = "itt_education";
+$username = "u760896062_root";       // अपने DB username के अनुसार सेट करें
+$password = "Normaxin@321";           // अपने DB password के अनुसार सेट करें
+$dbname = "u760896062_itt_education";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);

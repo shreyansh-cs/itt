@@ -1,4 +1,18 @@
 <?php 
+    function getAllClasses()
+    {
+        include 'db.php';
+        $rows = [];
+        $sql = "SELECT ID AS ID, NAME as NAME FROM classes";
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                array_push($rows,$row);
+            }
+        } 
+        return $rows; 
+    }
     function getStreamsForClass($class)
     {
         include 'db.php';
