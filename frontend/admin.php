@@ -65,10 +65,13 @@ if(isset($_POST['chapters']))
           <select id="streams" name="streams" onchange="submitForm('notesForm')">
             <option value='0'>Select</option>
           <?php
+          if(!empty($class))
+          {
             $rows = getStreamsForClass($class); 
             foreach ($rows as $row) {
               echo "<option value='".$row['ID']."'". checkSelected($row['ID'],$stream) .">".$row['NAME']."</option>";
             }
+          }
           ?>
           </select>
       </td>
