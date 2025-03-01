@@ -73,7 +73,7 @@
         return $rows; 
     }
 
-    function getBlobFromNote($note)
+    function getPDFPathFromNote($note)
     {
         include 'db.php';
         $rows = [];
@@ -114,5 +114,20 @@
                 return "selected";
             }
         }
+    }
+
+    function insertNotes($chapter_id,$notes_title,$notesText,$pdf_file_path,&$error/*OUT*/ )
+    {
+        include 'db.php';
+       // SQL query without prepared statement
+        $sql = "INSERT INTO notes(NAME,DETAILS,TEXT,PDF,CHAPTER_ID) VALUES ('$notes_title','','$notesText', '$pdf_file_path',$chapter_id)";
+        // Execute the query
+        if ($conn->query($sql) === TRUE) {
+            $error = "<br/>New record created successfully";
+            return true;
+        } else {
+            $error = "<br/>Error: " . $sql . "<br>" . $conn->error;
+            return false;
+        } 
     }
 ?>
