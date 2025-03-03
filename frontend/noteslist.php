@@ -16,7 +16,7 @@ $title = "I.T.T Group of Education - Home";
     {
         echo "<td id='notescolumn'>";
         $rows = getNotesForChapter($class,$stream,$subject,$chapter);
-        echo "<table border='$border'><th>Title</th><th>Text</th><th>Notes Download</th>";//table and headers start
+        echo "<table border='$border'><th>Title</th><th>Text</th><th>Notes Download</th><th>Action</th>";//table and headers start
         //Each row
         foreach ($rows as $row) {
             echo "<tr>"; //row start
@@ -31,6 +31,10 @@ $title = "I.T.T Group of Education - Home";
 
             echo "<td>";
             echo "<a target='_blank' href='download.php?noteid=".$row['ID']."'>DOWNLOAD PDF</a>";
+            echo "</td>";
+
+            echo "<td>";
+            echo "<a target='_blank' href='delete.php?class=$class&stream=$stream&subject=$subject&chapter=$chapter&noteid=".$row['ID']."'>Delete</a>";
             echo "</td>";
 
             echo "</tr>"; //row end

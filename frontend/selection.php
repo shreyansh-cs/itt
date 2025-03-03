@@ -3,8 +3,7 @@ include "showerror.php";
 include '../backend/utils.php';
 include "session.php";
 
-$type = $_SESSION['user_type'];
-$debug = 1;
+$debug = 0;
 
 //values from URL get priority
 if(isset($_GET['class']) && !empty($_GET['class']))
@@ -27,49 +26,70 @@ if(isset($_GET['chapter']) && !empty($_GET['chapter']))
     $chapter=$_GET['chapter'];
 }
 
+$user_type = "";
+if(isset($_SESSION['user_type']))
+{ 
+  $user_type = $_SESSION['user_type'];
+  if($user_type == "student")
+  {
+    //extract class from session
+    $class = $_SESSION['user_class'];
+  }
+}
+
 //Not look for POST values if any
 if(!isset($class))
   $class = "0";
 
-if(isset($_POST['classes']))
+if(isset($_POST['class']))
 {
-  $class = $_POST['classes'];
+  $class = $_POST['class'];
   if($debug)
     echo $class.",";
 }
 
 if(!isset($stream))
   $stream = "";
-if(isset($_POST['streams']))
+if(isset($_POST['stream']))
 {
-  $stream = $_POST['streams'];
+  $stream = $_POST['stream'];
   if($debug)
     echo $stream.",";
 }
 
 if(!isset($subject))
   $subject = "";
-if(isset($_POST['subjects']))
+if(isset($_POST['subject']))
 {
-  $subject = $_POST['subjects'];
+  $subject = $_POST['subject'];
   if($debug)
     echo $subject.",";
 }
 
 if(!isset($chapter))
   $chapter = "";
-if(isset($_POST['chapters']))
+if(isset($_POST['chapter']))
 {
-  $chapter = $_POST['chapters'];
+  $chapter = $_POST['chapter'];
   if($debug)
     echo $chapter.",";
 }
+
+$msg = "";
+if(isset($_SESSION['msg']))
+{
+  $msg = $_SESSION['msg'];
+  //clear after showing
+  $_SESSION['msg']="";
+}
+
+echo "<div style='color:red'>$msg</div>";
 ?>
 <form action="" id="notesForm" name="notesForm" method="post">
     <table>
       <tr>
         <td> 
-          <select id="classes" name="classes" onchange="submitForm('notesForm')">
+          <select id="class" name="class" onchange="submitForm('notesForm')">
             <option value='0'>Select</option>
           <?php
             $rows = getAllClasses(); 
@@ -80,7 +100,7 @@ if(isset($_POST['chapters']))
           </select>
         </td>
       <td> 
-          <select id="streams" name="streams" onchange="submitForm('notesForm')">
+          <select id="stream" name="stream" onchange="submitForm('notesForm')">
             <option value='0'>Select</option>
           <?php
             $rows = getStreamsForClass($class); 
@@ -95,7 +115,7 @@ if(isset($_POST['chapters']))
       { 
       ?>
         <td> 
-          <select id="subjects" name="subjects" onchange="submitForm('notesForm')">
+          <select id="subject" name="subject" onchange="submitForm('notesForm')">
             <option value='0'>Select</option>
           <?php
             $rows = getSubjectsForStream($class,$stream);
@@ -113,7 +133,7 @@ if(isset($_POST['chapters']))
       { 
       ?>
           <td> 
-          <select id="chapters" name="chapters" onchange="submitForm('notesForm')">
+          <select id="chapter" name="chapter" onchange="submitForm('notesForm')">
             <option value='0'>Select</option>
           <?php
             $rows = getChaptersForSubject($class,$stream,$subject);
@@ -132,9 +152,6 @@ if(isset($_POST['chapters']))
 <script>
   function submitForm(id) 
   {
-      // Trigger form submission
-      //document.getElementById('notescolumn').remove();
-      //document.getElementById('videocolumn').remove();
       document.getElementById(id).submit();
   }
 </script>

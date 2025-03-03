@@ -4,15 +4,6 @@ include 'db.php';
 include '../backend/utils.php';
 session_start();
 
-function GetUniqueNumber()
-{
-    // Get current timestamp in microseconds
-    $timestamp = microtime(true);
-    // Convert timestamp to a unique number (combining date/time and microseconds)
-    $uniqueNumber = str_replace('.', '', $timestamp);
-    return $uniqueNumber;
-}
-
 $debug = 1;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -36,14 +27,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Handle the PDF file upload
     if (isset($_FILES['pdf_file']) && $_FILES['pdf_file']['error'] == 0) {
-        // Define the target directory
-        //$target_dir = dirname(getcwd())."/uploads";
+        // Define the target directory - itt/uploads/
         $target_dir="../uploads/";
         if (!file_exists($target_dir)) 
         {
             if (!mkdir($target_dir, 0777, true)) 
             {
-                die("<br/>Failed to create directory. Error: " . error_get_last()['message']);
+                redirectError("<br/>Failed to create directory. Error: " . error_get_last()['message']);
             }
         }
 
@@ -52,7 +42,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Check if the uploaded file is a valid PDF
         $file_ext = strtolower(pathinfo($pdf_file, PATHINFO_EXTENSION));
-        //$pdf_file_path = $target_dir . basename($pdf_file);
         $pdf_file_path = $target_dir . GetUniqueNumber(). "." .$file_ext;
 
         if($debug)
@@ -61,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         //Do you want to limit any extension, do it here
         if (strtoupper($file_ext) != 'PDF') {
-            die("Only PDF files are allowed.");
+            redirectError("Only PDF allowed");
         }
 
         // Move the uploaded PDF to the target directory
@@ -70,25 +59,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $error = "";
             if(insertNotes($chapter,$notes_title,$notesText,$pdf_file_path,$error)) 
             {
-                //success
+                //success - Enable this if you want to see return from insertNotes
+                //echo $error; 
                 header("Location: ../frontend/noteslist.php?class=$class&stream=$stream&subject=$subject&chapter=$chapter");
-                echo $error;
             } 
             else 
             {
-                echo $error;
+                redirectError($error);
             }
         } 
         else 
         {
-            echo "<br/>Error uploading the file.";
+            redirectError("Error uploading the file.");
         }
     } 
     else 
     {
-        echo "Please upload a valid PDF file.";
+        redirectError("Please upload a valid PDF file.");
     }
 }
-$conn->close();
-
 ?>
