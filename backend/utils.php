@@ -390,7 +390,7 @@
         $mail = new PHPMailer(true); 
         $subject = "Welcome to ITT Icon " . htmlspecialchars($username);
         $replyEmail = "support@itticon.site";
-        $homepage = "https://itticon.site/itt/frontend/";
+        $homepage = "https://itticon.site/itt/frontend/index.php";
         $message = "
         <html>
         <head>
