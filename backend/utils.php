@@ -377,4 +377,40 @@
         }
     }
 
+    function sendWelcomeMail($username, $email,&$error)
+    {
+        // Email Subject and Body
+        $subject = "Welcome to Our Website, " . htmlspecialchars($username);
+        $replyEmail = "support@itticon.site";
+        $message = "
+        <html>
+        <head>
+            <title>Welcome to Our Website</title>
+        </head>
+        <body>
+            <h2>Dear " . htmlspecialchars($username) . ",</h2>
+            <p>Thank you for registering with us. We're excited to have you on board!</p>
+            <p>We encourage you to start exploring the amazing features we offer. If you need any help, feel free to reach out to us.</p>
+            <p>Best regards,<br>Your Website Team</p>
+        </body>
+        </html>
+        ";
+
+        // Headers for HTML email format
+        $headers = "MIME-Version: 1.0" . "\r\n";
+        $headers .= "Content-Type: text/html; charset=UTF-8" . "\r\n";
+        $headers .= "From: $replyEmail" . "\r\n"; // Sender's Email Address
+        $headers .= "Reply-To: $replyEmail" . "\r\n"; // Support Email Address
+
+        // Send email
+        if (mail($email, $subject, $message, $headers)) {
+            $error = "Welcome email sent successfully to " . htmlspecialchars($email);
+            return true;
+        } else {
+            $error = "Failed to send welcome email to $email";
+            return false;
+        }
+        
+    }
+
 ?>

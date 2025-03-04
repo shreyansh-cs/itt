@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $error = "";
 
     //validate the feilds
-    if(!validateRegister($full_name,$father_name,$email,$phone,$error))
+    if($ok && !validateRegister($full_name,$father_name,$email,$phone,$error))
     {
         $msg = $error; //show list of errors
         $ok=false;
@@ -97,15 +97,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Execute the query
             if ($conn->query($sql) === TRUE) 
             {
-                $conn->close();
-                //redirect to home page
-                redirect("/itt/frontend/login.php");
+                
             } 
             else 
             {
+                $ok = false;
                 $msg = "Error in creating new user";
             }
-            $conn->close(); 
+            $conn->close();
+        }
+
+        if($ok && sendWelcomeMail($full_name,$email,$error))
+        {
+            //redirect to home page
+            redirect("/itt/frontend/login.php");
+        }
+        else
+        {
+            $ok = false;
+            $msg = "SendMailError-".$error;
         }
     }
 }
