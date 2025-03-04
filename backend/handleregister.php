@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if($debug)
             echo "<br/>CWD=".getcwd();
 
-        $target_dir = "../uploads/images/";
+        $target_dir = "../../uploads/images/";
         if (!file_exists($target_dir)) {
             mkdir($target_dir, 0777, true);
         }

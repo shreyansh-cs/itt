@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Handle the PDF file upload
     if (isset($_FILES['pdf_file']) && $_FILES['pdf_file']['error'] == 0) {
         // Define the target directory - itt/uploads/
-        $target_dir="../uploads/";
+        $target_dir="../../uploads/notes/";
         if (!file_exists($target_dir)) 
         {
             if (!mkdir($target_dir, 0777, true)) 
