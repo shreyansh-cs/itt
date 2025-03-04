@@ -4,6 +4,14 @@ ob_start();
 session_start();
 $title = "I.T.T Group of Education - Home";
 
+include_once '../backend/utils.php';
+
+if(!isAdminLoggedIn())
+{
+    redirectError("Restricted Page - This action is not allowed");
+    exit;
+}
+
 include_once 'selection.php';
 
 //Check if we need to show the upload form

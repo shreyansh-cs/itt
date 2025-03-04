@@ -8,7 +8,7 @@ $title = "I.T.T Group of Education - Home";
     <!-- 'Join Now' बटन के साथ-साथ एक 'Online Test' बटन भी जोड़ा गया है -->
     <a href="courses.php" class="btn">Courses</a>
     <a href="usernoteslist.php" class="btn" style="margin-left: 10px;">Notes</a>
-    <a href="videolist.php" class="btn" style="margin-left: 10px;">Video Tutorials</a>
+    <a href="uservideolist.php" class="btn" style="margin-left: 10px;">Video Tutorials</a>
     <a href="onlinetest.php" class="btn" style="margin-left: 10px;">Online Tests</a>
   </section>
 

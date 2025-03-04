@@ -7,6 +7,7 @@ $title = "I.T.T Group of Education - Home";
 ?>
 
 <?php 
+    include_once '../backend/utils.php';
     $border = "1";
     include_once 'selection.php';
     echo "<table border='$border'>";
@@ -40,7 +41,11 @@ $title = "I.T.T Group of Education - Home";
     }
     echo "</tr>";
     echo "</table>";
-    echo "<br/><br/><h2><a target='_blank' href='uploadnotesvideo.php?class=$class&stream=$stream&subject=$subject&chapter=$chapter' style='text-decoration:underline'>Add New Notes</a></h2>";
+
+    if(isAdminLoggedIn())
+    {
+        echo "<br/><br/><h2><a target='_blank' href='uploadnotesvideo.php?class=$class&stream=$stream&subject=$subject&chapter=$chapter' style='text-decoration:underline'>Add New Notes</a></h2>";
+    }
 ?>
 
 <?php 
