@@ -8,14 +8,39 @@
 </head>
 <body>
   <?php 
-   if (session_status() == PHP_SESSION_NONE) {
-        // Session has not started
-        session_start();  // Start the session
+   include_once 'session.php';
+   include_once 'protectedpage.php';
+
+   //session is not valid and 
+    if(!isSessionValid() && isProtectedPage())
+    {
+        header("Location: /itt/frontend/login.php");
     }
-   $id = $_SESSION['user_id'];
-   $full_name = $_SESSION['full_name'];
-   $class = $_SESSION['user_class'];
-   $type = $_SESSION['user_type'];
+
+   $id = "";
+   if(isset($_SESSION['user_id']))
+   {
+        $id = $_SESSION['user_id'];
+   }
+   
+   $full_name = "";
+   if(isset($_SESSION['full_name']))
+   {
+        $full_name = $_SESSION['full_name'];
+   }
+
+   $class = "";
+   if(isset($_SESSION['user_class']))
+   {
+        $class = $_SESSION['user_class'];
+   }
+
+   $type = "";
+   if(isset($_SESSION['user_type']))
+   {
+        $type = $_SESSION['user_type'];
+   }
+   
    ?>
     <header>
         <div class="logo">
@@ -28,26 +53,21 @@
        <ul>
        <li><a href="index.php">Home</a></li>
        <li><a href="about.php">About Us</a></li>
-       <?php 
-            if($type == "admin") 
-            {
-               echo "<li><a href='admin.php'>Admin</a></li>";
-            }
-            else
-            {
-                echo "<li><a href='courses.php'>Courses</a></li>";
-            }
-        ?>
-       <li><a href="test-series.php">Online Test</a></li>
-       <li><a href="contact.php">Contact</a></li> 
+       <li><a href='courses.php'>Courses</a></li>
+       <li><a href="onlinetest.php">Online Test</a></li>
+       <li><a href="contact.php">Contact Us</a></li> 
     <?php
-       if(!isset($id))
+       if(!isSessionValid())
        {
            echo "<li><a href=\"login.php\">Login</a></li>";
        }
        else
        {
-           echo "<li><a href=\"../backend/logout.php\">Logout (Class {$class})</a></li>";
+           echo "<li><a href='../backend/logout.php'>Logout (Class {$class})</a></li>";
+           if($type == "admin")
+           {
+            echo "<li><a href='../frontend/noteslist.php'>Admin</a></li>";
+           }
        }
     ?>
         </ul>
