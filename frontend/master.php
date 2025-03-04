@@ -9,7 +9,7 @@
 <body>
   <?php 
    include_once 'session.php';
-   include_once 'protectedpage.php';
+   include_once '../backend/utils.php';
 
    //session is not valid and 
     if(!isSessionValid() && isProtectedPage())

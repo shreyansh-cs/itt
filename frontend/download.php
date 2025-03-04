@@ -1,6 +1,6 @@
 <?php
-include "showerror.php";
-include '../backend/utils.php';
+include_once "showerror.php";
+include_once '../backend/utils.php';
 if(isset($_GET['noteid']))
 {
     $noteid = $_GET['noteid'];//noteid

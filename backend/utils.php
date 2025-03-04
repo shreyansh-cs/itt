@@ -272,4 +272,54 @@
         $uniqueNumber = str_replace('.', '', $timestamp);
         return $uniqueNumber;
     }
+
+    function isSessionValid()
+      {
+        include '../frontend/session.php';
+        if(isset($_SESSION['user_id']) && isset($_SESSION['user_type']))
+        {
+          return true;
+        }
+        return false;
+      }
+
+      function isProtectedPage()
+      {
+        //Page accessible without login
+        $protectedURI = [
+            "login.php",
+            "register.php",
+            "index.php",
+            "about.php",
+            "contact.php",
+        ];
+        $currentURI = $_SERVER['REQUEST_URI'];
+        $protected = true;//default is protected
+        foreach ($protectedURI as $uri) 
+        {
+            if(strpos($currentURI,$uri))
+            {
+                $protected = false;
+                break;
+            }   
+        }
+        //protected page
+        return $protected;
+      }
+
+    function isAdminLoggedIn()
+    {
+        include '../frontend/session.php';
+        if(!isSessionValid())
+            return false;
+
+        $user_type = $_SESSION['user_type'];
+
+        if($user_type == "admin")
+        {
+            return true;
+        }
+
+        return false;
+    }
 ?>

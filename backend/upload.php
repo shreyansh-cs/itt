@@ -1,7 +1,7 @@
 <?php
 // login.php
-include 'db.php';
-include '../backend/utils.php';
+include_once 'db.php';
+include_once '../backend/utils.php';
 session_start();
 
 $debug = 1;

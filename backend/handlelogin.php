@@ -1,7 +1,7 @@
 <?php
 // login.php
-include 'db.php';
-include 'utils.php';
+include_once 'db.php';
+include_once 'utils.php';
 $msg = "";
 $email_or_phone="";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {

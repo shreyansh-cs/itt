@@ -1,6 +1,6 @@
 <?php 
 ob_start();
-$title = "I.T.T Group of Education - Home";
+$title = "Online Test";
 ?>
 <h1> Coming Soon... </h1>
 

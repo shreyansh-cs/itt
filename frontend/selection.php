@@ -1,7 +1,7 @@
 <?php 
-include "showerror.php";
-include '../backend/utils.php';
-include "session.php";
+include_once "showerror.php";
+include_once '../backend/utils.php';
+include_once "session.php";
 
 $debug = 0;
 
