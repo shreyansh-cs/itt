@@ -391,7 +391,7 @@
             <h2>Dear " . htmlspecialchars($username) . ",</h2>
             <p>Thank you for registering with us. We're excited to have you on board!</p>
             <p>We encourage you to start exploring the amazing features we offer. If you need any help, feel free to reach out to us.</p>
-            <p>Best regards,<br>Your Website Team</p>
+            <p>Best regards,<br>ITT Icon </p>
         </body>
         </html>
         ";
