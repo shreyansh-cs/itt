@@ -25,8 +25,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $ok = true;
     $error = "";
 
+    //validate the feilds
+    if(!validateRegister($full_name,$father_name,$email,$phone,$error))
+    {
+        $msg = $error; //show list of errors
+        $ok=false;
+    }
+
     //Check if user already exist
-    if(doesUserAlreadyExist($email,$phone,$error))
+    if($ok && doesUserAlreadyExist($email,$phone,$error))
     {
         $msg = "User Already Exists with this Phone / Email";
         $ok = false;

@@ -322,4 +322,59 @@
 
         return false;
     }
+
+    function validateRegister($name,$father_name,$email,$mobile,&$error)
+    {
+        // Validation variables
+        $errors = [];
+
+        // Validate name (must be alphabetic and 3-50 characters long)
+        if (empty($name)) {
+            $errors[] = "Name is required.";
+        } elseif (!preg_match("/^[a-zA-Z\s]+$/", $name)) {
+            $errors[] = "Name must contain only letters and spaces.";
+        } elseif (strlen($name) < 3 || strlen($name) > 50) {
+            $errors[] = "Name must be between 3 and 50 characters.";
+        }
+
+        // Validate father's name (must be alphabetic and 3-50 characters long)
+        if (empty($father_name)) {
+            $errors[] = "Father's name is required.";
+        } elseif (!preg_match("/^[a-zA-Z\s]+$/", $father_name)) {
+            $errors[] = "Father's name must contain only letters and spaces.";
+        } elseif (strlen($father_name) < 3 || strlen($father_name) > 50) {
+            $errors[] = "Father's name must be between 3 and 50 characters.";
+        }
+
+        // Validate email (must be a valid email address)
+        if (empty($email)) {
+            $errors[] = "Email is required.";
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = "Invalid email format.";
+        }
+
+        // Validate mobile number (must be 10 digits long)
+        if (empty($mobile)) 
+        {
+            $errors[] = "Mobile number is required.";
+        } elseif (!preg_match("/^\d{10}$/", $mobile)) 
+        {
+            $errors[] = "Mobile number must be exactly 10 digits.";
+        }
+
+        // If there are errors, display them
+        if (!empty($errors)) 
+        {
+            $error = "<ul>";
+            foreach ($errors as $err) 
+            {
+                $error .= "<li>" . htmlspecialchars($err) . "</li>";
+            }
+            $error .= "</ul>";
+            return false;
+        } else {
+            return true;
+        }
+    }
+
 ?>
