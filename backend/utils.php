@@ -377,10 +377,18 @@
         }
     }
 
+    use PHPMailer\PHPMailer\PHPMailer; 
+    use PHPMailer\PHPMailer\Exception; 
     function sendWelcomeMail($username, $email,&$error)
     {
-        // Email Subject and Body
-        $subject = "Welcome to Our Website, " . htmlspecialchars($username);
+        require '../PHPMailer/src/Exception.php';
+        require '..//PHPMailer/src/PHPMailer.php';
+        require '../PHPMailer/src/SMTP.php';
+
+
+        //Include PHPMailer 
+        $mail = new PHPMailer(true); 
+        $subject = "Welcome to ITT Icon " . htmlspecialchars($username);
         $replyEmail = "support@itticon.site";
         $message = "
         <html>
@@ -395,22 +403,28 @@
         </body>
         </html>
         ";
-
-        // Headers for HTML email format
-        $headers = "MIME-Version: 1.0" . "\r\n";
-        $headers .= "Content-Type: text/html; charset=UTF-8" . "\r\n";
-        $headers .= "From: $replyEmail" . "\r\n"; // Sender's Email Address
-        $headers .= "Reply-To: $replyEmail" . "\r\n"; // Support Email Address
-
-        // Send email
-        if (mail($email, $subject, $message, $headers)) {
-            $error = "Welcome email sent successfully to " . htmlspecialchars($email);
+        try 
+        {
+            $mail->isSMTP(); 
+            $mail->Host = 'smtp.hostinger.com'; 
+            $mail->SMTPAuth = true; 
+            $mail->Username = "$replyEmail"; 
+            $mail->Password = 'Normaxin@321'; 
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; 
+            $mail->Port = 587; 
+            $mail->setFrom("$replyEmail", 'ITT Support'); 
+            $mail->addAddress($email); 
+            $mail->isHTML(true); $mail->Subject = $subject; 
+            $mail->Body = $message; 
+            $mail->send(); 
+            $error =  'Email sent successfully!'; 
             return true;
-        } else {
-            $error = "Failed to send welcome email to $email";
-            return false;
+        } 
+        catch (Exception $e) 
+        { 
+           $error = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"; 
+           return false;
         }
-        
     }
 
 ?>
