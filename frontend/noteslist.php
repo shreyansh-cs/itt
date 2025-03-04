@@ -7,6 +7,10 @@ $title = "I.T.T Group of Education - Home";
 ?>
 
 <?php 
+
+    //restrict page
+    include_once 'restrictedpage.php';
+    
     include_once '../backend/utils.php';
     $border = "1";
     include_once 'selection.php';
@@ -46,7 +50,7 @@ $title = "I.T.T Group of Education - Home";
     echo "</tr>";
     echo "</table>";
 
-    if(if(isAdminLoggedIn()))
+    if(isAdminLoggedIn())
     {
         echo "<br/><br/><h2><a target='_blank' href='uploadnotesvideo.php?class=$class&stream=$stream&subject=$subject&chapter=$chapter' style='text-decoration:underline'>Add New Notes</a></h2>";
     }

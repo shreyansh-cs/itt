@@ -4,13 +4,8 @@ ob_start();
 session_start();
 $title = "I.T.T Group of Education - Home";
 
-include_once '../backend/utils.php';
-
-if(!isAdminLoggedIn())
-{
-    redirectError("Restricted Page - This action is not allowed");
-    exit;
-}
+//restrict page
+include_once 'restrictedpage.php';
 
 include_once 'selection.php';
 

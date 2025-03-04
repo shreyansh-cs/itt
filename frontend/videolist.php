@@ -7,6 +7,8 @@ $title = "I.T.T Group of Education - Home";
 ?>
 
 <?php 
+    //restrict page
+    include_once 'restrictedpage.php';
     $border = "2";
     include_once 'selection.php';
     echo "<table  border='$border'>";

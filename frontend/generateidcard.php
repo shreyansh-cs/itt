@@ -1,6 +1,7 @@
 <?php 
 ob_start();
 $title = "Generate ID Card";
+include_once 'restrictedpage.php'
 ?>
 <h1> Coming Soon... </h1>
 
