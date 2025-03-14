@@ -96,6 +96,11 @@ header .logo h1 {
     text-align: left;
 }
 
+.message{
+    text-align: left;
+    color: red;
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
     nav ul {

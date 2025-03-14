@@ -1,16 +1,44 @@
 <?php 
+include_once 'showerror.php';
 ob_start();
-$title = "Register";
+$title = "Forgot Password";
+include_once 'session.php';
+include_once '../backend/handleforgot.php';
 ?>
-  <div class="container" id="forgot-form" style="display: none;">
-    <h2>Forgot Password</h2>
-    <form action='../backend/handleforgot.php'>
-      <input type="text" placeholder="Enter Email or Phone" required>
-      <button type="submit">Reset Password</button>
+<div class='message'><?php echo $msg; ?></div>
+<!-- Login Form -->
+<div class="container" id="login-form">
+    <form action="" method="POST">
+      <table class='login'>
+        <tr>
+          <th class='first'></th>
+          <th class='second'>Recover Password</th>
+        </tr>
+        <tr>
+          <td class='first'>Email</td>
+          <td class='second'><input type="text" name="email" <?php echo "value='$email'"; ?> placeholder="Email" required></td>
+        </tr>
+          <td class='first'>&nbsp;</td>
+          <td class='second'><button type="submit">Recover</button></td>
+        </tr>
+        <tr>
+          <td class='first'>
+          &nbsp;
+          </td>
+          <td class='second'> 
+            <p>Already have an account? <a href="login.php" > Login </a></p>
+          </td>
+        </tr>
+        <tr>
+          <td class='first'>
+          &nbsp;
+          </td>
+          <td class='second'>
+          <a href='register.php'>New User? Sign Up</a>
+          </td>
+        </tr>
+      </table>
     </form>
-    <div class="links">
-      <p><a href='login.php'>Back to Login</a></p>
-    </div>
   </div>
 
   <?php 

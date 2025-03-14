@@ -218,6 +218,29 @@
     }
 
     //Both param can be email or phone
+    function doesEmailExist($email,&$username,&$password,&$error)
+    {
+        include 'db.php';
+        $sql = "SELECT email as EMAIL, phone as PHONE, password as PASSWORD from users where email='$email'";
+        //echo $sql;
+        $ok = false;
+        $result = $conn->query($sql);
+        if ( $result && $result->num_rows > 0) 
+        {
+                $ok = true;
+                $row = $result->fetch_assoc();
+                $username = $row['PHONE'];//get phone to send email
+                $password = $row['PASSWORD'];
+
+        }
+        else
+        {
+            $error = "User does not exist";
+        }    
+        return $ok;
+    }
+
+    //Both param can be email or phone
     function doesUserAlreadyExist($param1,$param2,&$error)
     {
         include 'db.php';
@@ -403,6 +426,57 @@
             <p>After <a href='https://itticon.site/itt/frontend/login.php'>Login</a>, We encourage you to start exploring the amazing courses we offer.</p>
             <p>If you need any help, feel free to reach out to us.</p>
             <div>Please login using below details.</div>
+            <h3>UserName:</h3><h2>$phone</h2>
+            <h3>Password:</h3><h2>$password</h2>
+            <p>Best regards,<br><a href='$homepage'>Team ITT</a></p>
+        </body>
+        </html>
+        ";
+        try 
+        {
+            $mail->isSMTP(); 
+            $mail->Host = 'smtp.hostinger.com'; 
+            $mail->SMTPAuth = true; 
+            $mail->Username = "$replyEmail"; 
+            $mail->Password = 'Normaxin@321'; 
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; 
+            $mail->Port = 587; 
+            $mail->setFrom("$replyEmail", 'ITT Support'); 
+            $mail->addAddress($email); 
+            $mail->isHTML(true); $mail->Subject = $subject; 
+            $mail->Body = $message; 
+            $mail->send(); 
+            $error =  'Email sent successfully!'; 
+            return true;
+        } 
+        catch (Exception $e) 
+        { 
+           $error = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"; 
+           return false;
+        }
+    }
+
+    function sendPasswordResetMail($email,$phone,$password,&$error)
+    {
+        require '../PHPMailer/src/Exception.php';
+        require '..//PHPMailer/src/PHPMailer.php';
+        require '../PHPMailer/src/SMTP.php';
+
+
+        //Include PHPMailer 
+        $mail = new PHPMailer(true); 
+        $subject = "Reset Password";
+        $replyEmail = "support@itticon.site";
+        $base = "https://itticon.site/";
+        $homepage = $base."itt/frontend/index.php";
+        $loginpage = $base."itt/frontend/login.php";
+        $message = "
+        <html>
+        <head>
+            <title>Welcome to Our Website</title>
+        </head>
+        <body>
+            <div>Please <a href='$loginpage'>login</a> using below details.</div>
             <h3>UserName:</h3><h2>$phone</h2>
             <h3>Password:</h3><h2>$password</h2>
             <p>Best regards,<br><a href='$homepage'>Team ITT</a></p>
