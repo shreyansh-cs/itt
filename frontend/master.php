@@ -83,7 +83,7 @@
     </main>
 
     <footer>
-        <p>&copy; 2025 Website Name. All Rights Reserved.</p>
+        <p>&copy; 2025 I.T.T. Group of Institutions. All Rights Reserved.</p>
     </footer>
 
     <script src="/itt/frontend/scripts/script.js"></script>
