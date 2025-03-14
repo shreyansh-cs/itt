@@ -292,6 +292,7 @@
             "index.php",
             "about.php",
             "contact.php",
+            "forgot.php",
         ];
         $currentURI = $_SERVER['REQUEST_URI'];
         $protected = true;//default is protected
@@ -379,7 +380,7 @@
 
     use PHPMailer\PHPMailer\PHPMailer; 
     use PHPMailer\PHPMailer\Exception; 
-    function sendWelcomeMail($username, $email,&$error)
+    function sendWelcomeMail($username, $email,$mobile,$password,&$error)
     {
         require '../PHPMailer/src/Exception.php';
         require '..//PHPMailer/src/PHPMailer.php';
@@ -401,6 +402,9 @@
             <p>Thank you for registering with us. We're excited to have you on board!</p>
             <p>After <a href='https://itticon.site/itt/frontend/login.php'>Login</a>, We encourage you to start exploring the amazing courses we offer.</p>
             <p>If you need any help, feel free to reach out to us.</p>
+            <div>Please login using below details.</div>
+            <div>UserName:<b>$mobile</b></div>
+            <div>Password:<b>$password</b></div>
             <p>Best regards,<br><a href='$homepage'>Team ITT</a></p>
         </body>
         </html>
