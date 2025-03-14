@@ -27,19 +27,15 @@ include_once '../backend/handlelogin.php';
           <td class='second'><button type="submit">Login</button></td>
         </tr>
         <tr>
-          <td class='first'>
-          &nbsp;
-          </td>
+          <td class='first'>&nbsp;</td>
           <td class='second'>
           <a href='forgot.php'>Forgot Password?</a>
           </td>
         </tr>
         <tr>
-          <td class='first'>
-          &nbsp;
-          </td>
+          <td class='first'>&nbsp;</td>
           <td class='second'>
-          <a href='register.php'>New User? Sign Up</a>
+          New User? <a href='register.php'>Sign Up</a>
           </td>
         </tr>
       </table>

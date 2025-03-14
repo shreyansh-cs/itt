@@ -26,16 +26,12 @@ include_once '../backend/handleforgot.php';
           &nbsp;
           </td>
           <td class='second'> 
-            <p>Already have an account? <a href="login.php" > Login </a></p>
+            Already have an account? <a href="login.php" > Login </a>
           </td>
         </tr>
         <tr>
-          <td class='first'>
-          &nbsp;
-          </td>
-          <td class='second'>
-          <a href='register.php'>New User? Sign Up</a>
-          </td>
+          <td class='first'>&nbsp;</td>
+          <td class='second'>New User? <a href='register.php'>Sign Up</a></td>
         </tr>
       </table>
     </form>
