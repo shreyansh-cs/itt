@@ -63,12 +63,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $size = $_FILES["photo"]["size"]/ (1024*1024);
         if($size >  10) 
         {
-            $msg = "Upload image > 10 MB";
+            $msg = "Uploaded image > 10 MB";
             $ok = false;
         }
         // Allow only JPG, JPEG, PNG, GIF files
         if($ok && (strtoupper($imageFileType) != "JPG" && strtoupper($imageFileType) != "PNG" && strtoupper($imageFileType) != "JPEG")) {
             $msg = "Sorry, only JPG, JPEG & PNG  files are allowed.";
+            $ok = false;
         }
         if ($ok) 
         {
