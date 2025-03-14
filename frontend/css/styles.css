@@ -101,6 +101,14 @@ header .logo h1 {
     color: red;
 }
 
+.courses .first {
+    text-align: left;
+}
+
+.courses .second {
+    text-align: left;
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
     nav ul {
