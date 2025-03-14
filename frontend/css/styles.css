@@ -101,13 +101,99 @@ header .logo h1 {
     color: red;
 }
 
-.courses .first {
+/* .courses .first {
     text-align: left;
 }
 
 .courses .second {
     text-align: left;
+} */
+
+/*courses page css start */
+table.courses {
+    /*border-width: 2px;
+    border-style: dotted;
+    width: 100%;*/
+    margin-top: 30px;
+    border-collapse: collapse;
 }
+
+table.courses td {
+    text-align: left;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+table.courses td.first {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+table.courses td.second {
+    font-size: 16px;
+    color: #7f8c8d;
+}
+
+table.courses td a.course-link {
+    text-decoration: none;
+    color: #2980b9;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+table.courses td a.course-link:hover {
+    color: #e74c3c;
+}
+/*courses page css end */
+
+/*About page css start*/
+.about-section {
+    text-align: left;
+    background-color: #fff;
+    padding: 30px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.about-section h2 {
+    font-size: 28px;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+.about-section h3 {
+    font-size: 22px;
+    color: #16a085;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.about-section p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #555;
+}
+/*About page css end*/
+
+/*contact us page css start*/
+.contact-info {
+    margin-top: 40px;
+    margin-left: 40px;
+    text-align: left;
+}
+
+.contact-info p {
+    font-size: 16px;
+    color: #555;
+}
+/*contact us page css end*/
+
+/*index page css start*/
+
+/*index page css end*/
+
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {

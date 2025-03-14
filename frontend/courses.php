@@ -7,18 +7,18 @@ $title = "Courses";
   <td class='first'>
   <a href="usernoteslist.php" class="course-link">Notes and Videos</a>
   </td>
-  <td class='second'>Comprehensive courses covering all subjects. Click here to view Notes & Video Lectures.</td>
+  <td class='second'>Comprehensive courses covering all subjects.</td>
   <tr>
   <td class='first'>
   <a href="computercoaching.php" class="course-link">Computer Coaching</a>
   </td>
-  <td class='second'>Specialized computer coaching including CCA, DCA, CFA, DTP, DOA, DCP, ADIT, ADCA, and DHT. Click for Notes.</td>
+  <td class='second'>Specialized computer coaching including CCA, DCA, CFA, DTP, DOA, DCP, ADIT, ADCA, and DHT.</td>
   </tr>
   <tr>
   <td class='first'>
   <a href="competitiveexam.php" class="course-link">Competitive Exam Preparation</a>
   </td>
-  <td class='second'>Focused coaching for competitive exams with expert guidance and study materials. Click for Notes & Videos.</td>
+  <td class='second'>Focused coaching for competitive exams with expert guidance and study materials.</td>
   </tr>
   </table>
 
