@@ -426,8 +426,8 @@
             <p>After <a href='https://itticon.site/itt/frontend/login.php'>Login</a>, We encourage you to start exploring the amazing courses we offer.</p>
             <p>If you need any help, feel free to reach out to us.</p>
             <div>Please login using below details.</div>
-            <h3>UserName:</h3><h2>$phone</h2>
-            <h3>Password:</h3><h2>$password</h2>
+            <h3>UserName:$phone</h3>
+            <h3>Password:$password</h3>
             <p>Best regards,<br><a href='$homepage'>Team ITT</a></p>
         </body>
         </html>
@@ -477,8 +477,8 @@
         </head>
         <body>
             <div>Please <a href='$loginpage'>login</a> using below details.</div>
-            <h3>UserName:</h3><h2>$phone</h2>
-            <h3>Password:</h3><h2>$password</h2>
+            <h3>UserName:$phone</h3>
+            <h3>Password:$password</h3>
             <p>Best regards,<br><a href='$homepage'>Team ITT</a></p>
         </body>
         </html>
