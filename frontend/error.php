@@ -1,7 +1,7 @@
 <?php 
 //include_once 'showerror.php';
 ob_start();
-$title = "I.T.T Group of Education - Home";
+$title = "Error";
 ?>
 
 <?php 

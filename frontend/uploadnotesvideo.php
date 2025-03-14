@@ -2,7 +2,7 @@
 include_once "showerror.php";
 ob_start();
 session_start();
-$title = "I.T.T Group of Education - Home";
+$title = "Upload Data (Notes & Video)";
 
 //restrict page
 include_once 'restrictedpage.php';

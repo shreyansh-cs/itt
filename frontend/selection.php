@@ -82,8 +82,10 @@ if(isset($_SESSION['msg']))
   //clear after showing
   $_SESSION['msg']="";
 }
-
+if(!empty($msg))
+{
 echo "<div style='color:red'>$msg</div>";
+}
 ?>
 <form action="" id="notesForm" name="notesForm" method="post">
     <table>

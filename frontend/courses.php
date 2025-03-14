@@ -1,6 +1,6 @@
 <?php 
 ob_start();
-$title = "I.T.T Group of Education - Courses";
+$title = "Courses";
 ?>
   <table>
   <tr>

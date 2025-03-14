@@ -1,6 +1,6 @@
 <?php 
 ob_start();
-$title = "About Us - I.T.T Group of Education";
+$title = "About Us";
 ?>
 <div class="about-container">
     <!-- English Section -->

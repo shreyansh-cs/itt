@@ -1,6 +1,6 @@
 <?php 
 ob_start();
-$title = "Contact Us - I.T.T Group of Education";
+$title = "Contact Us";
 ?>
 <h1> Coming Soon... </h1>
 
