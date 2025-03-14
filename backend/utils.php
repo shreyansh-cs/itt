@@ -380,7 +380,7 @@
 
     use PHPMailer\PHPMailer\PHPMailer; 
     use PHPMailer\PHPMailer\Exception; 
-    function sendWelcomeMail($username, $email,$mobile,$password,&$error)
+    function sendWelcomeMail($username, $email,$phone,$password,&$error)
     {
         require '../PHPMailer/src/Exception.php';
         require '..//PHPMailer/src/PHPMailer.php';
@@ -403,8 +403,8 @@
             <p>After <a href='https://itticon.site/itt/frontend/login.php'>Login</a>, We encourage you to start exploring the amazing courses we offer.</p>
             <p>If you need any help, feel free to reach out to us.</p>
             <div>Please login using below details.</div>
-            <div>UserName:<b>$mobile</b></div>
-            <div>Password:<b>$password</b></div>
+            <h3>UserName:$phone</h3>
+            <h3>Password:$password</h3>
             <p>Best regards,<br><a href='$homepage'>Team ITT</a></p>
         </body>
         </html>

@@ -107,7 +107,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $conn->close();
         }
 
-        if($ok && sendWelcomeMail($full_name,$email,$mobile,$password,$error))
+        if($ok && sendWelcomeMail($full_name,$email,$phone,$password,$error))
         {
             //redirect to home page
             redirect("/itt/frontend/login.php");
