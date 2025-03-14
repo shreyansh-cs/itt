@@ -25,6 +25,8 @@ if(isset($_GET['noteid']))
             // Set the headers to download the file as a PDF
             header('Content-Type: application/pdf');
             header('Content-Disposition: inline; filename="' . $name . '"');
+            header('Content-Transfer-Encoding: binary');
+            header('Accept-Ranges: bytes');
             header('Content-Length: ' . strlen($fileData));
 
             // Output the file data (binary data)
