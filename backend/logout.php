@@ -2,5 +2,5 @@
     // logout.php
     session_start();
     session_destroy();
-    header("Location: ../frontend/login.php");
+    header("Location: /itt/frontend/login.php");
 ?>
