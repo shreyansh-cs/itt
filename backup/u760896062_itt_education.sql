@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Feb 21, 2025 at 03:16 PM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.0.28
+-- Host: 127.0.0.1:3306
+-- Generation Time: Mar 14, 2025 at 07:56 AM
+-- Server version: 10.11.10-MariaDB-log
+-- PHP Version: 7.2.34
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `itt_education`
+-- Database: `u760896062_itt_education`
 --
 
 -- --------------------------------------------------------
@@ -33,6 +33,14 @@ CREATE TABLE `chapters` (
   `DETAILS` varchar(200) NOT NULL,
   `SUBJECT_ID` int(2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `chapters`
+--
+
+INSERT INTO `chapters` (`ID`, `NAME`, `DETAILS`, `SUBJECT_ID`) VALUES
+(6, 'Parimeya sankhya', '', 77),
+(7, 'linear equation', '', 77);
 
 -- --------------------------------------------------------
 
@@ -75,10 +83,17 @@ CREATE TABLE `notes` (
   `ID` int(10) NOT NULL,
   `NAME` varchar(200) NOT NULL,
   `DETAILS` varchar(200) NOT NULL,
-  `PDF` longblob DEFAULT NULL,
+  `PDF` varchar(500) DEFAULT NULL,
   `TEXT` text DEFAULT NULL,
   `CHAPTER_ID` int(2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `notes`
+--
+
+INSERT INTO `notes` (`ID`, `NAME`, `DETAILS`, `PDF`, `TEXT`, `CHAPTER_ID`) VALUES
+(5, 'new notes', '', '../../uploads/notes/17410512859286.pdf', 'notes text', 6);
 
 -- --------------------------------------------------------
 
@@ -157,7 +172,9 @@ CREATE TABLE `streamubjectmap` (
 INSERT INTO `streamubjectmap` (`STREAM_ID`, `SUBJECT_ID`) VALUES
 (31, 68),
 (31, 69),
-(31, 70);
+(31, 70),
+(29, 77),
+(30, 67);
 
 -- --------------------------------------------------------
 
@@ -294,7 +311,7 @@ CREATE TABLE `users` (
   `email` varchar(255) NOT NULL,
   `phone` varchar(15) NOT NULL,
   `dob` date NOT NULL,
-  `photo` blob DEFAULT NULL,
+  `photo` varchar(500) DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `user_type` varchar(50) NOT NULL,
   `user_class` varchar(2) NOT NULL
@@ -305,8 +322,25 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`ID`, `full_name`, `father_name`, `email`, `phone`, `dob`, `photo`, `password`, `user_type`, `user_class`) VALUES
-(1, 'ashutosh kushwaha', 'fathers name', 'amitkumarsingh725800@gmail.com', '909010228', '2025-02-14', 0x75706c6f6164732f616161612e706e67, '$2y$10$T8ynF4kp1D0RC7LywoyAh.w.Ri0JswzcvkLd.GzoxA1Vq6SPP6Wje', 'student', '8'),
-(2, 'first', 'father', 'email@gmail.com', '8888888888', '2025-02-14', 0x75706c6f6164732f616161612e706e67, '$2y$10$wthsvlEBY8GtBxoE.jC7Yu9H9vruGm/JpajVkEpM8GhW.fsVXYtVC', 'student', '8');
+(9, 'shreyansh kumar', 'hridyanand tiwari', 'shreyansh.cs@gmail.com', '9650777075', '1986-08-30', '../../uploads/images/_image.jpg', '1234', 'admin', '5'),
+(10, 'Anish kumar', 'Manoj Prasad ', 'anishkushwaha8541@gmail.com', '7479648528', '2009-01-01', '../../uploads/images/IMG_20241203_073124_144.jpg', 'anishku123', 'student', '12'),
+(11, 'Ravi kumar ', 'Brij Kishore pandit ', 'bp187029@gmail.com', '9801494319', '2008-03-11', '../../uploads/images/IMG_20250301_201950_110.webp', 'kumar112008', 'student', '12'),
+(12, 'Prince kumar', 'Umashankar prasad', 'prince@123gmail.com', '9973576247', '2000-02-28', '../../uploads/images/Screenshot_2024-11-25-18-37-47-809_com.whatsapp.jpg', 'prince@123', 'student', '12'),
+(13, 'ABHISHEK KUMAR ', 'Sharma ram', 'abhishek364674@gmail.com', '8877735212', '2009-01-01', '../../uploads/images/b42d224670ba0ef7228e1bb1d8613d85.jpg', 'abhi8877', 'student', '12'),
+(14, 'Suraj kushwaha', 'Munna prasad', 'surajrazz9669@gmail.com', '9835954518', '2010-01-23', '../../uploads/images/1000137777.jpg', '7703939664suraj', 'student', '12'),
+(15, 'Aryan Singh ', 'Manoj Kumar Mukund ', 'rinkusingh0428@gmail.com', '6200823754', '2009-05-16', '../../uploads/images/1000024364.webp', 'Aryan999', 'student', '12'),
+(16, 'Aryan Singh ', 'Manoj Kumar Mukund ', 'aryansinghr837@gmail.com', '9708206287', '2009-05-16', '../../uploads/images/1000024364.webp', 'Aryqn999', 'student', '12'),
+(17, 'Satya Kumari ', 'Mukesh kumar prasad', 'nikhilprasad7765@gmail.com', '7061116577', '2007-08-02', '../../uploads/images/IMG_20250227_082234.jpg', 'satyakumari', 'student', '12'),
+(18, 'Shiwam singh ', 'Om Pratap Singh ', 'shiwamkum11@gmail.com', '9693392903', '2008-06-07', '../../uploads/images/IMG20250302135348.jpg', '9973443768', 'student', '12'),
+(19, 'Dipsi kumari', 'Ramkeshwar prasad', 'rohitkumat5393@gmail.com', '9905748994', '2008-05-01', '../../uploads/images/IMG_20250304_14585801.jpg', 'Rohit Kumar', 'student', '12'),
+(20, 'Xyx devi', 'Fulmatiya deva', 'abc@gmail.com', '9876543210', '1906-03-08', '../../uploads/images/1000048116.jpg', 'unic.123', 'student', '10'),
+(21, 'Anshu kumar ', 'Brijmohan kumar ray', 'anshukumarray000@gmail.com', '8651836818', '2010-01-04', '../../uploads/images/Image_Editor.png', 'anshu12345', 'student', '12'),
+(22, 'ASHUTOSH KUMAR KUSHAWAHA', 'UMASHANKAR PRASAD', 'ashutoshsir1997@gmail.com', '7290003122', '1997-10-15', '../../uploads/images/1678544537646468-0.jpg', 'ashutosh@123', 'student', '12'),
+(23, 'Rahul kumar ', 'Rajkishor Prasad ', 'krritik841408@gmail.com', '8651766082', '2008-02-13', '../../uploads/images/1000019108.jpg', 'Rahul@##7352', 'student', '12'),
+(24, 'Shiwam Kumar', 'Dilip prasad', 'shiwamkumar2833@gmail.com', '7250434241', '2010-11-03', '../../uploads/images/20250304_201912.jpg', 'Shiwam7250', 'student', '10'),
+(25, 'VISHAWAJIT KUMAR ', 'SANTOSH PANDIT', 'santoshpanditpandit821@gmail.com', '8084480870', '2010-07-24', '../../uploads/images/1711425875562.jpg', 'VISHAWAJIT@123', 'student', '10'),
+(26, 'Prince Sharma', 'SANTOSH SHARMA ', 'f76521806@gmail.com', '9229772914', '2025-03-10', '../../uploads/images/1000037722.webp', 'prince4415', 'student', '12'),
+(27, 'Prince Sharma', 'Santosh sharma ', 'priyanshu7755z@gmail.com', '8651681214', '2007-09-30', '../../uploads/images/1000039032.jpg', 'prince4415_', 'student', '12');
 
 -- --------------------------------------------------------
 
@@ -389,7 +423,7 @@ ALTER TABLE `videos`
 -- AUTO_INCREMENT for table `chapters`
 --
 ALTER TABLE `chapters`
-  MODIFY `ID` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `ID` int(2) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `classes`
@@ -401,7 +435,7 @@ ALTER TABLE `classes`
 -- AUTO_INCREMENT for table `notes`
 --
 ALTER TABLE `notes`
-  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `ID` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `streams`
@@ -419,7 +453,7 @@ ALTER TABLE `subjects`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `videos`

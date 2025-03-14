@@ -9,9 +9,12 @@ $title = "Register";
   </div>
   <!-- Sign Up Form -->
   <div class="container" id="signup-form">
-    <h2>Sign Up</h2>
     <form action="" method="POST" enctype="multipart/form-data">
-        <table>
+        <table class='register'>
+            <tr>
+            <th>Sign Up</th>
+            </tr>
+            <tr>
             <tr>
                 <td>
                     <select name='class' id='class'>

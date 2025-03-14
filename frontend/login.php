@@ -8,34 +8,37 @@ include_once '../backend/handlelogin.php';
 <div style='color:red'><?php echo $msg; ?></div>
 <!-- Login Form -->
 <div class="container" id="login-form">
-    <h2>Login</h2>
     <form action="" method="POST">
-      <table>
+      <table class='login'>
         <tr>
-          <td>Email or Phone</td>
-          <td><input type="text" name="email_or_phone" <?php echo "value='$email_or_phone'"; ?> placeholder="Email or Phone" required></td>
+          <th></th>
+          <th>Login</th>
         </tr>
         <tr>
-          <td>Password</td>
-          <td> <input type="password" name="password" placeholder="Password" required></td>
+          <td class='first'>Email or Phone</td>
+          <td class='second'><input type="text" name="email_or_phone" <?php echo "value='$email_or_phone'"; ?> placeholder="Email or Phone" required></td>
         </tr>
         <tr>
-          <td>&nbsp;</td>
-          <td><button type="submit">Login</button></td>
+          <td class='first'>Password</td>
+          <td class='second'> <input type="password" name="password" placeholder="Password" required></td>
         </tr>
         <tr>
-          <td>
+          <td class='first'>&nbsp;</td>
+          <td class='second'><button type="submit">Login</button></td>
+        </tr>
+        <tr>
+          <td class='first'>
           &nbsp;
           </td>
-          <td>
+          <td class='second'>
           <a href='forgot.php'>Forgot Password?</a>
           </td>
         </tr>
         <tr>
-          <td>
+          <td class='first'>
           &nbsp;
           </td>
-          <td>
+          <td class='second'>
           <a href='register.php'>New User? Sign Up</a>
           </td>
         </tr>
