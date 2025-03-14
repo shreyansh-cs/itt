@@ -84,7 +84,7 @@ if(isset($_SESSION['msg']))
 }
 if(!empty($msg))
 {
-echo "<div style='color:red'>$msg</div>";
+  echo "<div style='color:red'>$msg</div>";
 }
 ?>
 <form action="" id="notesForm" name="notesForm" method="post">
