@@ -2,7 +2,7 @@
 ob_start();
 $title = "I.T.T Group of Education - Home";
 ?>
-<section class="hero">
+<div class="home">
     <h1>Welcome to I.T.T Group of Education</h1>
     <p>Your Gateway to Quality Learning</p>
     <p> 
@@ -12,13 +12,11 @@ $title = "I.T.T Group of Education - Home";
       build a strong academic foundation, we are here to guide you every step of the way.
     </p>
 
-
-    <!-- 'Join Now' बटन के साथ-साथ एक 'Online Test' बटन भी जोड़ा गया है -->
-    <a href="courses.php" class="btn">Courses</a>
-    <a href="usernoteslist.php" class="btn" style="margin-left: 10px;">Notes</a>
-    <a href="uservideolist.php" class="btn" style="margin-left: 10px;">Video Tutorials</a>
-    <a href="onlinetest.php" class="btn" style="margin-left: 10px;">Online Tests</a>
-  </section>
+    <a href="courses.php" class="home_link">Courses</a>
+    <a href="usernoteslist.php" class="home_link">Notes</a>
+    <a href="uservideolist.php" class="home_link">Video Tutorials</a>
+    <a href="onlinetest.php" class="home_link">Online Tests</a>
+</div>
 
   <?php 
   $content = ob_get_contents();

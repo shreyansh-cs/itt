@@ -46,7 +46,7 @@
     <header>
         <div class="logo">
         <img src="../images/icon.jpeg"  alt="I.T.T Group of Education Logo">
-        <h1>I.T.T. Group of Institutions </h1>
+        <h1>I.T.T. Group of Education</h1>
         </div>
         <nav class="navbar">
             <ul>
@@ -83,7 +83,7 @@
     </main>
 
     <footer>
-        <p>&copy; 2025 I.T.T. Group of Institutions. All Rights Reserved.</p>
+        <p>&copy; 2025 I.T.T. Group of Education. All Rights Reserved.</p>
     </footer>
 
     <script src="/itt/frontend/scripts/script.js"></script>
