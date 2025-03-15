@@ -12,7 +12,7 @@ $title = "Admin Notes";
     include_once 'restrictedpage.php';
     
     include_once '../backend/utils.php';
-    $border = "1";
+    $border = "0";
     include_once 'selection.php';
     echo "<table border='$border'>";
     echo "<tr>";
@@ -48,12 +48,11 @@ $title = "Admin Notes";
         echo "</td>";
     }
     echo "</tr>";
-    echo "</table>";
-
     if(isAdminLoggedIn())
     {
-        echo "<br/><br/><h2><a target='_blank' href='uploadnotesvideo.php?class=$class&stream=$stream&subject=$subject&chapter=$chapter' style='text-decoration:underline'>Add New Notes</a></h2>";
+        echo "<tr><td><a target='_blank' href='uploadnotesvideo.php?class=$class&stream=$stream&subject=$subject&chapter=$chapter'>Add New Notes</tr></td>";
     }
+    echo "</table>";
 ?>
 
 <?php 

@@ -8,8 +8,11 @@ $title = "Upload Data (Notes & Video)";
 include_once 'restrictedpage.php';
 
 include_once 'selection.php';
-
+$border = "0";
 //Check if we need to show the upload form
+echo "<table border='$border'>";
+echo "<tr>";
+
 if(!empty($chapter))
 {
 ?>
@@ -48,7 +51,9 @@ if(!empty($chapter))
     </form>
 <?php 
 }
-echo "<br/><br/><h2><a target='_blank' href='noteslist.php?class=$class&stream=$stream&subject=$subject&chapter=$chapter' style='text-decoration:underline'>Notes List</a></h2>";
+echo "</tr>";
+echo "<tr><td><a target='_blank' href='noteslist.php?class=$class&stream=$stream&subject=$subject&chapter=$chapter'>Notes List</a></tr></td>";
+echo "</table>";
 ?>
 <script>
 function OnSubmit() 

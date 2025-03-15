@@ -1,6 +1,6 @@
 <?php
 // db.php
-$servername = "localhost";
+$servername = "193.203.184.227";
 $username = "u760896062_root";       // अपने DB username के अनुसार सेट करें
 $db_password = "Normaxin@321";           // अपने DB password के अनुसार सेट करें
 $dbname = "u760896062_itt_education";
