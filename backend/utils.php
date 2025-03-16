@@ -11,6 +11,7 @@
                 array_push($rows,$row);
             }
         } 
+        $conn->close();
         return $rows; 
     }
     function getStreamsForClass($class)
@@ -25,6 +26,7 @@
                 array_push($rows,$row);
             }
         } 
+        $conn->close();
         return $rows;
     }
 
@@ -41,6 +43,7 @@
                 array_push($rows,$row);
             }
         } 
+        $conn->close();
         return $rows;
     }
 
@@ -56,6 +59,7 @@
                 array_push($rows,$row);
             }
         } 
+        $conn->close();
         return $rows;
     }
 
@@ -70,6 +74,7 @@
                 array_push($rows,$row);
             }
         } 
+        $conn->close();
         return $rows;
     }
 
@@ -84,7 +89,8 @@
             while($row = $result->fetch_assoc()) {
                 array_push($rows,$row);
             }
-        } 
+        }
+        $conn->close(); 
         return $rows; 
     }
 
@@ -100,6 +106,7 @@
                 array_push($rows,$row);
             }
         } 
+        $conn->close();
         return $rows; 
     }
 
@@ -114,7 +121,8 @@
             while($row = $result->fetch_assoc()) {
                 array_push($rows,$row);
             }
-        } 
+        }
+        $conn->close(); 
         return $rows; 
     }
 
@@ -147,6 +155,7 @@
             $error = "Error: " . $sql . $conn->error;
             $ret = false;
         } 
+        $conn->close();
         return $ret;
     }
 
@@ -170,6 +179,7 @@
             $error = "Error: " . $sql . $conn->error;
             $ret = false;
         } 
+        $conn->close();
         return $ret;
     }
 
@@ -193,6 +203,7 @@
             $error = "Error: " . $sql . $conn->error;
             $ret = false;
         } 
+        $conn->close();
         return $ret;
     }
 
@@ -233,6 +244,7 @@
                 $ok = false;
             }
         }
+        $conn->close();
         return $ok;
     }
 
@@ -255,7 +267,8 @@
         else
         {
             $error = "User does not exist";
-        }    
+        } 
+        $conn->close();   
         return $ok;
     }
 
@@ -282,7 +295,7 @@
                     $ok = true;
             }
         }
-    
+        $conn->close();
         return $ok;
     }
 
