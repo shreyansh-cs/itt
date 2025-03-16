@@ -343,6 +343,9 @@ table.courses td a.course-link:hover {
 .bottomlink a{
     text-align: left;
 }
+.dropdown {
+    text-align: left;
+}
 
 /*upload page css start*/
 
@@ -392,6 +395,20 @@ table.courses td a.course-link:hover {
     .home a {
         padding: 12px 25px;
         font-size: 16px;
+    }
+
+    .logo img{
+        width: 30px;
+        height: 30px;
+        margin-right: 20px;
+        float: left;
+    }
+
+    header .logo h1 {
+        margin: 0;
+        font-size: 14px;
+        display: inline-block;
+        vertical-align: middle;
     }
     /*index page css end*/
 }

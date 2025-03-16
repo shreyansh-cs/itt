@@ -104,7 +104,7 @@ if(!empty($msg))
 <form action="" id="notesForm" name="notesForm" method="post">
     <table>
       <tr>
-        <td> 
+        <td class='dropdown'> 
           <select id="class" name="class" onchange="submitForm('notesForm')">
             <option value='0'>Select</option>
           <?php
@@ -115,7 +115,9 @@ if(!empty($msg))
           ?>
           </select>
         </td>
-      <td> 
+      </tr>
+      <tr>
+      <td class='dropdown'> 
           <select id="stream" name="stream" onchange="submitForm('notesForm')">
             <option value='0'>Select</option>
           <?php
@@ -126,11 +128,13 @@ if(!empty($msg))
           ?>
           </select>
       </td>
+      </tr>
       <?php
       if(!empty($stream))
       { 
       ?>
-        <td> 
+        <tr>
+        <td class='dropdown'> 
           <select id="subject" name="subject" onchange="submitForm('notesForm')">
             <option value='0'>Select</option>
           <?php
@@ -141,6 +145,7 @@ if(!empty($msg))
           ?>
           </select>
         </td>
+        </tr>
       <?php 
       }
       ?>
@@ -148,7 +153,8 @@ if(!empty($msg))
       if(!empty($subject))
       { 
       ?>
-        <td> 
+        <tr>
+        <td class='dropdown'> 
           <select id="section" name="section" onchange="submitForm('notesForm')">
             <option value='0'>Select</option>
           <?php
@@ -159,6 +165,7 @@ if(!empty($msg))
           ?>
           </select>
         </td>
+        </tr>
       <?php 
       }
       ?>
@@ -166,7 +173,8 @@ if(!empty($msg))
       if(!empty($section))
       { 
       ?>
-          <td> 
+          <tr>
+          <td class='dropdown'> 
           <select id="chapter" name="chapter" onchange="submitForm('notesForm')">
             <option value='0'>Select</option>
           <?php
@@ -177,10 +185,10 @@ if(!empty($msg))
           ?>
           </select>
           </td>
+          </tr>
       <?php 
       }
       ?>
-  </tr>
   </table>
 </form>
 <script>
