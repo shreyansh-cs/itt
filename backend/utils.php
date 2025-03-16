@@ -200,7 +200,7 @@
     function authUser($email_or_phone,$password,&$row/*OUT*/,&$error)
     {
         include 'db.php';
-        $sql = "SELECT id as ID, full_name as FULL_NAME, password as PASSWORD, user_type as USER_TYPE, user_class as USER_CLASS from users where email='$email_or_phone' OR phone='$email_or_phone'";
+        $sql = "SELECT id as ID, full_name as FULL_NAME, password as PASSWORD, user_type as USER_TYPE, user_class as USER_CLASS, verified AS VERIFIED from users where email='$email_or_phone' OR phone='$email_or_phone'";
         $ok = false;
         $result = $conn->query($sql);
         if ($result && $result->num_rows == 1) 
@@ -220,13 +220,17 @@
 
         if($ok)
         {
-            //check password
-            $ok=false; //by default not matched
-            echo $row['PASSWORD'];
-            echo $password;
-            if($row['PASSWORD'] == $password)
+            $ok=true; //by default matched
+            if($row['VERIFIED'] == 0)
             {
-                $ok = true;
+                $error = "User is not verified"; 
+                $ok=false;
+            }
+            
+            if($ok && $row['PASSWORD'] != $password)
+            {
+                $error = "Username / Password not matching"; 
+                $ok = false;
             }
         }
         return $ok;
