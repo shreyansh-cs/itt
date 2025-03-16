@@ -37,7 +37,7 @@ if(!empty($chapter))
                 <input type="hidden" id="class" name="class" value="<?php echo $class; ?>"/>
                 <input type="hidden" id="stream" name="stream" value="<?php echo $stream; ?>"/>
                 <input type="hidden" id="subject" name="subject" value="<?php echo $subject; ?>"/>
-                <input type="hidden" id="section" name="secion" value="<?php echo $section; ?>"/>
+                <input type="hidden" id="section" name="section" value="<?php echo $section; ?>"/>
                 <input type="hidden" id="chapter" name="chapter" value="<?php echo $chapter; ?>"/>
                 </td>
                 </td>

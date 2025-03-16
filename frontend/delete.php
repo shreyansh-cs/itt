@@ -43,6 +43,7 @@ if(empty($noteid) && empty($videoid))
 $class="";
 $stream="";
 $subject="";
+$section="";
 $chapter="";
 
 if(!empty($noteid) || !empty($videoid))
@@ -50,6 +51,7 @@ if(!empty($noteid) || !empty($videoid))
     $class=$_GET['class'];
     $stream=$_GET['stream'];
     $subject=$_GET['subject'];
+    $section=$_GET['section'];
     $chapter=$_GET['chapter'];
 }
 
@@ -60,7 +62,7 @@ if(!empty($noteid))
     if(deleteNote($noteid,$error))
     {
         setStatusMsg($error);
-        header("Location: /itt/frontend/noteslist.php?class=$class&stream=$stream&subject=$subjectt&section=$section&chapter=$chapter");
+        header("Location: /itt/frontend/noteslist.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter");
     }
     else
     {

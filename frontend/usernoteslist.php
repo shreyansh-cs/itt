@@ -40,7 +40,7 @@ $title = "Notes";
     echo "</td></tr>";
     if(isAdminLoggedIn())
     {
-        echo "<tr><td class='bottomlink'><a target='_blank' href='uploadnotesvideo.php?class=$class&stream=$stream&subject=$subjectt&section=$section&chapter=$chapter' style='text-decoration:underline'>Add New Notes</a></td></tr>";
+        echo "<tr><td class='bottomlink'><a target='_blank' href='uploadnotesvideo.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter' style='text-decoration:underline'>Add New Notes</a></td></tr>";
     }
     echo "</table>";
 ?>
