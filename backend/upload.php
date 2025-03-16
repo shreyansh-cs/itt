@@ -13,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $class = $_POST['class'];
     $stream=$_POST['stream'];
     $subject=$_POST['subject'];
+    $section=$_POST['section'];
     $chapter=$_POST['chapter'];
 
 
@@ -61,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             {
                 //success - Enable this if you want to see return from insertNotes
                 //echo $error; 
-                header("Location: ../frontend/noteslist.php?class=$class&stream=$stream&subject=$subject&chapter=$chapter");
+                header("Location: ../frontend/noteslist.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter");
             } 
             else 
             {

@@ -12,14 +12,13 @@ $title = "Admin Notes";
     include_once 'restrictedpage.php';
     
     include_once '../backend/utils.php';
-    $border = "0";
+    $border = "1";
     include_once 'selection.php';
-    echo "<table border='$border'>";
-    echo "<tr>";
+    echo "<table border='0'>";
+    echo "<tr><td>";
 
     if(!empty($chapter))
     {
-        echo "<td id='notescolumn'>";
         $rows = getNotesForChapter($class,$stream,$subject,$chapter);
         echo "<table border='$border'><th>Title</th><th>Text</th><th>Notes Download</th><th>Action</th>";//table and headers start
         //Each row
@@ -39,18 +38,17 @@ $title = "Admin Notes";
             echo "</td>";
 
             echo "<td>";
-            echo "<a target='_blank' href='delete.php?class=$class&stream=$stream&subject=$subject&chapter=$chapter&noteid=".$row['ID']."'>Delete</a>";
+            echo "<a target='_blank' href='delete.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter&noteid=".$row['ID']."'>Delete</a>";
             echo "</td>";
 
             echo "</tr>"; //row end
         }
         echo "</table>";//end table
-        echo "</td>";
     }
-    echo "</tr>";
+    echo "</tr></td>";
     if(isAdminLoggedIn())
     {
-        echo "<tr><td><a target='_blank' href='uploadnotesvideo.php?class=$class&stream=$stream&subject=$subject&chapter=$chapter'>Add New Notes</tr></td>";
+        echo "<tr><td class='bottomlink'><a target='_blank' href='uploadnotesvideo.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter'>Add New Notes</td></tr>";
     }
     echo "</table>";
 ?>

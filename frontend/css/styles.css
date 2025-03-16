@@ -339,6 +339,15 @@ table.courses td a.course-link:hover {
   }
 /*login page css end*/
 
+/*quick link at the bottom of the form*/
+.bottomlink a{
+    text-align: left;
+}
+
+/*upload page css start*/
+
+/*upload page css end*/
+
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {

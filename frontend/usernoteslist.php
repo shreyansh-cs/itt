@@ -11,11 +11,10 @@ $title = "Notes";
     $border = "1";
     include_once 'selection.php';
     echo "<table border='$border'>";
-    echo "<tr>";
+    echo "<tr><td>";
 
     if(!empty($chapter))
     {
-        echo "<td id='notescolumn'>";
         $rows = getNotesForChapter($class,$stream,$subject,$chapter);
         echo "<table border='$border'><th>Title</th><th>Text</th><th>Notes Download</th>";//table and headers start
         //Each row
@@ -37,15 +36,13 @@ $title = "Notes";
             echo "</tr>"; //row end
         }
         echo "</table>";//end table
-        echo "</td>";
     }
-    echo "</tr>";
-    echo "</table>";
-
+    echo "</td></tr>";
     if(isAdminLoggedIn())
     {
-        echo "<br/><br/><h2><a target='_blank' href='uploadnotesvideo.php?class=$class&stream=$stream&subject=$subject&chapter=$chapter' style='text-decoration:underline'>Add New Notes</a></h2>";
+        echo "<tr><td class='bottomlink'><a target='_blank' href='uploadnotesvideo.php?class=$class&stream=$stream&subject=$subjectt&section=$section&chapter=$chapter' style='text-decoration:underline'>Add New Notes</a></td></tr>";
     }
+    echo "</table>";
 ?>
 
 <?php 

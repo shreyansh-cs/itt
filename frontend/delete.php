@@ -60,7 +60,7 @@ if(!empty($noteid))
     if(deleteNote($noteid,$error))
     {
         setStatusMsg($error);
-        header("Location: /itt/frontend/noteslist.php?class=$class&stream=$stream&subject=$subject&chapter=$chapter");
+        header("Location: /itt/frontend/noteslist.php?class=$class&stream=$stream&subject=$subjectt&section=$section&chapter=$chapter");
     }
     else
     {
@@ -74,7 +74,7 @@ if(!empty($videoid))
     if(deleteVideo($videoid,$error))
     {
         setStatusMsg($error);
-        header("Location: /itt/frontend/videolist.php?class=$class&stream=$stream&subject=$subject&chapter=$chapter");
+        header("Location: /itt/frontend/videolist.php?class=$class&stream=$stream&subject=$subjectt&section=$section&chapter=$chapter");
     }
     else
     {

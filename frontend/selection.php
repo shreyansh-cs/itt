@@ -21,6 +21,11 @@ if(isset($_GET['subject']) && !empty($_GET['subject']))
     $subject=$_GET['subject'];
 }
 
+if(isset($_GET['section']) && !empty($_GET['section']))
+{
+    $section=$_GET['section'];
+}
+
 if(isset($_GET['chapter']) && !empty($_GET['chapter']))
 {
     $chapter=$_GET['chapter'];
@@ -64,6 +69,15 @@ if(isset($_POST['subject']))
   $subject = $_POST['subject'];
   if($debug)
     echo $subject.",";
+}
+
+if(!isset($section))
+  $section = "";
+if(isset($_POST['section']))
+{
+  $section = $_POST['section'];
+  if($debug)
+    echo $section.",";
 }
 
 if(!isset($chapter))
@@ -134,11 +148,29 @@ if(!empty($msg))
       if(!empty($subject))
       { 
       ?>
+        <td> 
+          <select id="section" name="section" onchange="submitForm('notesForm')">
+            <option value='0'>Select</option>
+          <?php
+            $rows = getSectionsForSubject($class,$stream,$subject);
+            foreach ($rows as $row) {
+              echo "<option value='".$row['ID']."'". checkSelected($row['ID'],$section) .">".$row['NAME']."</option>";
+            }
+          ?>
+          </select>
+        </td>
+      <?php 
+      }
+      ?>
+      <?php
+      if(!empty($section))
+      { 
+      ?>
           <td> 
           <select id="chapter" name="chapter" onchange="submitForm('notesForm')">
             <option value='0'>Select</option>
           <?php
-            $rows = getChaptersForSubject($class,$stream,$subject);
+            $rows = getChaptersForSection($class,$stream,$subject,$section);
             foreach ($rows as $row) {
               echo "<option value='".$row['ID']."'". checkSelected($row['ID'],$chapter) .">".$row['NAME']."</option>";
             }

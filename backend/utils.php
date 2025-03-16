@@ -44,11 +44,26 @@
         return $rows;
     }
 
-    function getChaptersForSubject($class,$stream,$subject)
+    function getSectionsForSubject($class,$stream,$subject)
     {
         include 'db.php';
         $rows = [];
-        $sql = "SELECT ID AS ID, NAME as NAME FROM chapters where SUBJECT_ID=$subject";
+        $sql = "SELECT ID as ID, NAME as NAME from sections where SUBJECT_ID=$subject";
+        echo $sql;
+        $result = $conn->query($sql);
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                array_push($rows,$row);
+            }
+        } 
+        return $rows;
+    }
+
+    function getChaptersForSection($class,$stream,$subject,$section)
+    {
+        include 'db.php';
+        $rows = [];
+        $sql = "SELECT ID AS ID, NAME as NAME FROM chapters where SECTION_ID=$section";
         $result = $conn->query($sql);
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
@@ -62,7 +77,7 @@
     {
         include 'db.php';
         $rows = [];
-        $sql = "SELECT ID AS ID, NAME as NAME, DETAILS AS DETAILS, PDF AS PDF, TEXT AS TEXT FROM notes where CHAPTER_ID=$chapter";
+        $sql = "SELECT ID AS ID, NAME as NAME, PDF AS PDF, TEXT AS TEXT FROM notes where CHAPTER_ID=$chapter";
         //echo $sql;
         $result = $conn->query($sql);
         if ( $result && $result->num_rows > 0) {
@@ -120,7 +135,7 @@
     {
         include 'db.php';
         $ret = false;
-        $sql = "INSERT INTO notes(NAME,DETAILS,TEXT,PDF,CHAPTER_ID) VALUES ('$notes_title','','$notesText', '$pdf_file_path',$chapter_id)";
+        $sql = "INSERT INTO notes(NAME,TEXT,PDF,CHAPTER_ID) VALUES ('$notes_title','$notesText', '$pdf_file_path',$chapter_id)";
         // Execute the query
         if ($conn->query($sql) === TRUE) 
         {

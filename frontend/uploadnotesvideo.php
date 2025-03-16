@@ -8,42 +8,43 @@ $title = "Upload Data (Notes & Video)";
 include_once 'restrictedpage.php';
 
 include_once 'selection.php';
-$border = "0";
+$border = "1";
 //Check if we need to show the upload form
-echo "<table border='$border'>";
-echo "<tr>";
+echo "<table border='0'>";
+echo "<tr><td>";
 
 if(!empty($chapter))
 {
 ?>
     <form action="../backend/upload.php" method="POST" id="uploadnotes" name="uploadnotes" enctype="multipart/form-data" onSubmit="OnSubmit()">
-        <table>
+        <table class='upload' border="$border">
             <tr>
-                <td>Notes Title:</td>
-                <td>
+                <td class='first'>Notes Title:</td>
+                <td class='second'>
                 <input type="text" name="notes_title" id="notes_title">
                 </td>
             </tr>
             <tr>
-                <td>Enter Text:</td>
-                <td>
+                <td class='first'>Enter Text:</td>
+                <td class='second'>
                 <textarea name="notes_text" id="notes_text" rows="4" cols="50"></textarea>
                 </td>
             </tr>
             <tr>
-                <td>Upload PDF</td>
-                <td>
+                <td class='first'>Upload PDF</td>
+                <td class='second'>
                 <input type="file" name="pdf_file" id="pdf_file" accept="application/pdf">
                 <input type="hidden" id="class" name="class" value="<?php echo $class; ?>"/>
                 <input type="hidden" id="stream" name="stream" value="<?php echo $stream; ?>"/>
                 <input type="hidden" id="subject" name="subject" value="<?php echo $subject; ?>"/>
+                <input type="hidden" id="section" name="secion" value="<?php echo $section; ?>"/>
                 <input type="hidden" id="chapter" name="chapter" value="<?php echo $chapter; ?>"/>
                 </td>
                 </td>
             </tr>
             <tr>
-                <td>&nbsp;</td>
-                <td> 
+                <td class='first'>&nbsp;</td>
+                <td class='second'> 
                     <input type="submit" value="Submit">
                 </td>
             </tr>
@@ -51,8 +52,8 @@ if(!empty($chapter))
     </form>
 <?php 
 }
-echo "</tr>";
-echo "<tr><td><a target='_blank' href='noteslist.php?class=$class&stream=$stream&subject=$subject&chapter=$chapter'>Notes List</a></tr></td>";
+echo "</tr></td>";
+echo "<tr><td class='bottomlink'><a target='_blank' href='noteslist.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter'>Notes List</a></td></tr>";
 echo "</table>";
 ?>
 <script>
