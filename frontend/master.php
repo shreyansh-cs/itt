@@ -63,7 +63,7 @@
                 }
                 else
                 {
-                    echo "<li><a href='/itt/backend/logout.php'>Logout (${full_name})</a></li>";
+                    echo "<li><a href='/itt/backend/logout.php'>Logout ({$full_name})</a></li>";
                     if($type == "admin")
                     {
                         echo "<li><a href='/itt/frontend/noteslist.php'>Admin</a></li>";
