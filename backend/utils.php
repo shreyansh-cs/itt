@@ -207,17 +207,25 @@
         return $ret;
     }
 
+        // Function to generate token
+    function generateToken($length = 64) 
+    {
+        return bin2hex(random_bytes($length));  // Generates a secure random token
+    }
+
     //Both param can be email or phone
     function authUser($email_or_phone,$password,&$row/*OUT*/,&$error)
     {
         include 'db.php';
         $sql = "SELECT id as ID, full_name as FULL_NAME, password as PASSWORD, user_type as USER_TYPE, user_class as USER_CLASS, verified AS VERIFIED from users where email='$email_or_phone' OR phone='$email_or_phone'";
+        //echo $sql;
         $ok = false;
         $result = $conn->query($sql);
         if ($result && $result->num_rows == 1) 
         {
             //only one row of user
             $row = $result->fetch_assoc();
+            //echo '<pre>'; print_r($row); echo '</pre>';
             $ok = true;
         }
         else if($result && $result->num_rows == 0)
@@ -234,7 +242,7 @@
             $ok=true; //by default matched
             if($row['VERIFIED'] == 0)
             {
-                $error = "User is not verified"; 
+                $error = "UserID is not verified"; 
                 $ok=false;
             }
             
@@ -243,9 +251,91 @@
                 $error = "Username / Password not matching"; 
                 $ok = false;
             }
+            //Generate token
+            else
+            {
+                // Password is correct, generate token
+                //Check if a token already exists
+                $token = "";
+                clearExpiredTokens($row['ID'],$error); //clear expired tokens
+                if(getValidToken($row['ID'],$token,$error))
+                {
+                    $row['TOKEN']=$token; //return the token
+                }
+                else
+                {
+                    $token = generateToken();
+
+                    // Save token in the database
+                    $userId = $row['ID'];
+                    $expiry_interval = "1";//1 hour
+                    $sql = "INSERT INTO api_tokens (user_id, token, expires_at) VALUES ($userId, '$token', ADDDATE(NOW(), INTERVAL {$expiry_interval} HOUR))";
+                    $result = $conn->query($sql);
+                    if($result && $conn->affected_rows > 0)
+                    {
+                        $row['TOKEN']=$token; //return the token
+                    }
+                    else
+                    {
+                        $ok=false;
+                        $error = "Unable to generate new token";
+                    }
+                }
+            }
         }
         $conn->close();
         return $ok;
+    }
+
+    function clearExpiredTokens($userid,&$error)
+    {
+        include 'db.php';
+        $pdo = new PDO("mysql:host=$servername;dbname=$dbname", $username, $db_password);
+        $query = "DELETE FROM api_tokens WHERE user_id = ? and expires_at <= NOW()";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$userid]);
+
+        $affectedRows = $stmt->rowCount();
+        $error =  "Expired Tokens: " . $affectedRows;
+    }
+
+    function getValidToken($userid,&$token,&$error)
+    {
+        include 'db.php';
+        $pdo = new PDO("mysql:host=$servername;dbname=$dbname", $username, $db_password);
+
+        // Check token validity
+        $query = "SELECT token as TOKEN FROM api_tokens WHERE user_id = ? AND expires_at > NOW()";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$userid]);
+        $apiToken = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($apiToken) {
+            //echo  "<pre>".print_r($apiToken)."</pre>";
+            $token = $apiToken['TOKEN'];// Token is valid, return it
+            return true;
+        }
+
+        return false;  //token does not exist
+    }
+
+    function authenticateByToken($token,&$row,&$error) 
+    {
+        include 'db.php';
+
+        // Check token validity
+        $sql = "SELECT id as ID, expires_at as EXPIRES_AT FROM api_tokens WHERE token = '$token' and expires_at > NOW()";
+        $result = $conn->query($sql);
+
+        if ($result && $result->num_rows > 0)
+        {
+            //First one if there are multiple rows
+            //echo  "<pre>".print_r($row)."</pre>";
+            $row = $result->fetch_assoc();
+            return true;//valid token
+        }
+        $error = "Invalid Token";
+        return false;
     }
 
     //Both param can be email or phone
