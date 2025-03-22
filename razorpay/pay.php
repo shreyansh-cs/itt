@@ -1,7 +1,7 @@
 <?php
 
-require('config.php');
-require('razorpay-php/Razorpay.php');
+include_once 'config.php';
+include_once 'razorpay-php/Razorpay.php';
 if (session_status() == PHP_SESSION_NONE) {
     // Session has not started
     session_start();  // Start the session
