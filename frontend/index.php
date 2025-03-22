@@ -16,6 +16,7 @@ $title = "I.T.T Group of Education - Home";
     <a href="usernoteslist.php" class="home_link">Notes</a>
     <a href="uservideolist.php" class="home_link">Video Tutorials</a>
     <a href="onlinetest.php" class="home_link">Online Tests</a>
+    <a href="buy.php" class="home_link">Buy Package</a>
 </div>
 
   <?php 

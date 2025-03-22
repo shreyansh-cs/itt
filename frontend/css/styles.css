@@ -347,6 +347,25 @@ table.courses td a.course-link:hover {
     text-align: left;
 }
 
+#rzp-button1
+{
+    background-color: green;
+    padding: 10px;
+    color: white;
+}
+
+.pay_success
+{
+    color: white;
+    background-color: green;
+}
+
+.pay_failure
+{
+    color: white;
+    background-color: red;
+}
+
 /*upload page css start*/
 
 /*upload page css end*/

@@ -217,7 +217,7 @@
     function authUser($email_or_phone,$password,&$row/*OUT*/,&$error)
     {
         include 'db.php';
-        $sql = "SELECT id as ID, full_name as FULL_NAME, password as PASSWORD, user_type as USER_TYPE, user_class as USER_CLASS, verified AS VERIFIED from users where email='$email_or_phone' OR phone='$email_or_phone'";
+        $sql = "SELECT id as ID, full_name as FULL_NAME, password as PASSWORD, user_type as USER_TYPE, user_class as USER_CLASS, verified AS VERIFIED, email as EMAIL, phone as PHONE from users where email='$email_or_phone' OR phone='$email_or_phone'";
         //echo $sql;
         $ok = false;
         $result = $conn->query($sql);
@@ -384,6 +384,22 @@
             {
                     $ok = true;
             }
+        }
+        $conn->close();
+        return $ok;
+    }
+
+    function getPackageDetails($class,&$row,&$error)
+    {
+        include 'db.php';
+        $rows = [];
+        $sql = "SELECT ID as ID, NAME as NAME, PRICE as PRICE from packages where ID = (SELECT PACKAGE_ID as PACKAGE_ID from classes where ID=$class)";
+        $ok = false;
+        $result = $conn->query($sql);
+        if ( $result && $result->num_rows > 0) 
+        {
+                $row = $result->fetch_assoc();
+                $ok = true;
         }
         $conn->close();
         return $ok;

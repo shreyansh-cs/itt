@@ -15,6 +15,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['full_name'] = $row['FULL_NAME'];
         $_SESSION['user_type'] = $row['USER_TYPE'];
         $_SESSION['user_class'] = $row['USER_CLASS'];
+        $_SESSION['email'] = $row['EMAIL'];
+        $_SESSION['phone'] = $row['PHONE'];
         $_SESSION['api_token'] = $row['TOKEN'];
 
         //echo "<pre>".print_r($row)."</pre>";
