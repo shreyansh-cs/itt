@@ -1,4 +1,5 @@
 <?php 
+include 'showerror.php';
 ob_start();
 $title = "Buy Package";
 ?>
