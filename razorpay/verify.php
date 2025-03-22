@@ -42,13 +42,11 @@ if (empty($_POST['razorpay_payment_id']) === false)
 
     if ($success === true)
     {
-        $html = "<p class='pay_success'>Your payment was successful</p>
-                <p class='pay_success'>Payment ID: {$_POST['razorpay_payment_id']}</p>";
+        $html = "<div class='pay_success'>Your payment was successful - Txn ID: {$_POST['razorpay_payment_id']}</div>";
     }
     else
     {
-        $html = "<p class='pay_failure'>Your payment failed</p>
-                <p class='pay_failure'>{$error}</p>";
+        $html = "<div class='pay_failure'>Your payment failed - {$error}</div>";
     }
 
     echo $html;

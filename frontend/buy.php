@@ -4,6 +4,7 @@ ob_start();
 $title = "Buy Package";
 ?>
 
+<div class='payment_contatiner'>
 <?php
 include_once 'session.php';
 include_once 'restrictedpage.php'; //restricted page
@@ -21,7 +22,8 @@ if(getPackageDetails($class,$row,$error))
     $package_id = $row['ID'];
     $package_name = $row['NAME'];
     $package_price = $row['PRICE'];
-    echo "<div class='payment'>Selected Package - <b>{$package_name}</b> - Rs <b>{$package_price}</b></div>";
+
+    echo "<div class='payment_details'>Selected Package - <b>{$package_name}</b> - Rs <b>{$package_price}</b></div>";
 
     //Values for pay.php
     $_amount = $package_price;
@@ -41,7 +43,7 @@ if(getPackageDetails($class,$row,$error))
     include_once '../razorpay/verify.php';
 }
 ?>
-
+</div>
 <?php 
 $content = ob_get_contents();
 ob_end_clean();

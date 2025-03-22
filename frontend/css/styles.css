@@ -347,6 +347,18 @@ table.courses td a.course-link:hover {
     text-align: left;
 }
 
+.payment_contatiner
+{
+    text-align: left;
+    margin:10px;
+}
+
+.payment_details
+{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
 #rzp-button1
 {
     background-color: green;
@@ -356,12 +368,16 @@ table.courses td a.course-link:hover {
 
 .pay_success
 {
+    display: inline-flex;
+    margin-top: 10px;
     color: white;
     background-color: green;
 }
 
 .pay_failure
 {
+    display: inline-flex;
+    margin-top: 10px;
     color: white;
     background-color: red;
 }
