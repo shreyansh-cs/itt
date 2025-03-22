@@ -5,9 +5,9 @@ $title = "Buy Package";
 ?>
 
 <?php
-include 'session.php';
-include 'restrictedpage.php'; //restricted page
-include 'backend/utils.php';
+include_once 'session.php';
+include_once 'restrictedpage.php'; //restricted page
+include_once '../backend/utils.php';
 
 $class = "";
 if(isset($_SESSION['user_class']))
