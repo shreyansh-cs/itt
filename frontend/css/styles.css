@@ -372,6 +372,7 @@ table.courses td a.course-link:hover {
     margin-top: 10px;
     color: white;
     background-color: green;
+    padding: 5px;
 }
 
 .pay_failure
