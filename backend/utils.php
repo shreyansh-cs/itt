@@ -409,7 +409,7 @@
     {
         include 'db.php';
         $rows = [];
-        $sql = "SELECT id AS ID, user_id as USER_ID, created_on as CREATED_ON, updated_on as UPDATED_ON, package_id as PACKAGE_ID, status as STATUS FROM pay_receipts where user_id=$user_id";
+        $sql = "SELECT r.id AS ID, r.user_id as USER_ID, r.created_on as CREATED_ON, r.updated_on as UPDATED_ON, r.package_id as PACKAGE_ID, p.NAME as PACKAGE_NAME, p.PRICE as PACKAGE_PRICE, r.status as STATUS FROM pay_receipts AS r ,packages AS p WHERE r.package_id = p.ID and r.user_id = $user_id ORDER BY r.id DESC";
         $result = $conn->query($sql);
 
         $ok = true;
@@ -590,6 +590,68 @@
         }
         $conn->close();
         return $ok;
+    }
+
+    function getClassForThisUser()
+    {
+        //Do we need to query DB, for now get from session
+        include_once '../frontend/session.php';
+        return $_SESSION['user_class'];
+    }
+
+    function getUserIDForThisUser()
+    {
+        //Do we need to query DB, for now get from session
+        include_once '../frontend/session.php';
+        return $_SESSION['user_id'];
+    }
+
+    function doesUserHasSubscription(&$error)
+    {
+        include 'db.php';
+        $package_details = [];
+        if(!getPackageDetails(getClassForThisUser(),$package_details,$error))
+        {
+            $error = "Unable to get package details for this class";
+            return false;
+        }
+
+        $user_id = getUserIDForThisUser();
+        if(empty($user_id))
+        {
+            $error = "user id is empty";
+            return false;
+        }
+
+        //Try to get all receipts for this package id and see if any of them status is success or not
+        $sql = "SELECT status as STATUS from pay_receipts WHERE user_id={$user_id} AND package_id={$package_details['ID']}";
+        //echo $sql;
+        $result = $conn->query($sql);
+
+        $ok = false;
+        if(!$result || $result->num_rows <= 0)
+        {
+            $error = "No valid packages in receipts";
+            return false;
+        }
+
+        while($row = $result->fetch_assoc()) 
+        {
+            //check if any row is success
+            if($row['STATUS'] == "success")
+            {
+                $ok = true;
+                break;
+            }
+        }
+
+        if($ok == false)
+        {
+            $error = "No matching success trxn for this package";
+        }
+
+        $conn->close();
+        return $ok;  
     }
 
     function redirectError($error)

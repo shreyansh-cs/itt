@@ -210,11 +210,11 @@ function handlePostPayment($order_id,&$mesg)
 
     if ($success === true)
     {
-        $mesg = "<div class='pay_success'>Status {$output}, Receipt#{$razor_receipt_id}, Order ID {$razorpay_order_id},Txn - {$razorpay_payment_id}</div>";
+        $mesg = "<div class='pay_success'>Status {$output}</div>";
     }
     else
     {
-        $mesg = "<div class='pay_failure'>Failed -  Order ID {$razorpay_order_id} </div>";
+        $mesg = "<div class='pay_failure'>Failed - Order-ID {$razorpay_order_id}, TxnID {$razorpay_payment_id} </div>";
     }
     return true;
     //echo $html;

@@ -30,9 +30,17 @@ $title = "Notes";
             echo "</td>";
 
             echo "<td>";
-            echo "<a target='_blank' href='download.php?noteid=".$row['ID']."'>DOWNLOAD PDF</a>";
+            if(doesUserHasSubscription($error))
+            {
+                
+                echo "<a target='_blank' href='download.php?noteid=".$row['ID']."'>DOWNLOAD PDF</a>";
+                
+            }
+            else
+            {
+                echo "<a target='_blank' href='receipts.php'>Buy Package</a>";
+            }
             echo "</td>";
-
             echo "</tr>"; //row end
         }
         echo "</table>";//end table

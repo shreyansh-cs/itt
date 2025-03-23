@@ -28,6 +28,7 @@ $package_price = "";
 $receipt_id= "";
 $payment_initiated = false;
 
+//Get the current package set for this class
 if(getPackageDetails($class,$row,$error))
 {
     $package_id = $row['ID'];
@@ -37,6 +38,7 @@ if(getPackageDetails($class,$row,$error))
 
 if(isset($_POST['init_payment']))
 {
+    //Create receipt based on current package for this class
     if(createReceipt($user_id,$package_id,$row,$error))
     {
         $receipt_id = $row['ID'];
@@ -79,12 +81,15 @@ unset($_SESSION['razorpay_order_id']);
 
 $error="";
 $init_form_display = "block";
+//Get all receipts even if some other package was set earlier for this class
+//Don't delete any package from packages table - Anyway foreigh key won't allow it
 if(getReceiptsForThisUser($user_id,$rows,$error))
 {
     echo "<table class='receipts' border='1'>";
     echo "<tr>";
     echo "<th>Receipt #</th>";
     echo "<th>Package #</th>";
+    echo "<th>Package Name</th>";
     echo "<th>Price</th>";
     echo "<th>Status</th>";
     //echo "<th>Created ON</th>";
@@ -93,9 +98,9 @@ if(getReceiptsForThisUser($user_id,$rows,$error))
     foreach ($rows as $row){
         echo "<tr>";
         echo "<td>{$row['ID']}</td>";
-        //echo "<td>{$row['PACKAGE_ID']}</td>";
-        echo "<td>{$package_name}</td>";
-        echo "<td>{$package_price}</td>";
+        echo "<td>{$row['PACKAGE_ID']}</td>";
+        echo "<td>{$row['PACKAGE_NAME']}</td>";
+        echo "<td>{$row['PACKAGE_PRICE']}</td>";
         $status_color = getStatusColor($row['STATUS']);
         echo "<td style='background-color:$status_color'>{$row['STATUS']}</td>";
         //echo "<td>{$row['CREATED_ON']}</td>";
@@ -103,7 +108,7 @@ if(getReceiptsForThisUser($user_id,$rows,$error))
         echo "</tr>";
     }
     echo "<tr>";
-    echo "<td colspan='5' align='left'>";
+    echo "<td colspan='6' align='left'>";
     echo "<form method='post' style='display:{$init_form_display}'>";
     echo "<button class='btn_init_payment' id='init_payment' name='init_payment'>Pay {$package_price}</button>";
     echo "</form>";
