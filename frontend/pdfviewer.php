@@ -54,15 +54,19 @@ else
         // Set the workerSrc (PDF.js requires this to load PDFs properly)
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';
 
+        /*
         // Function to render the PDF
         function renderPDF(url) {
             var loadingTask = pdfjsLib.getDocument(url);
             loadingTask.promise.then(function(pdf) {
                 console.log('PDF loaded');
+
+                const numPages = pdfDoc.numPages;
+                console.log('Number of pages:', numPages);
                 
                 // Fetch the first page
                 pdf.getPage(1).then(function(page) {
-                    var scale = 1.5;  // Set scale for zoom
+                    var scale = 1.0;  // Set scale for zoom
                     var viewport = page.getViewport({ scale: scale });
 
                     var canvas = document.getElementById('pdf-canvas');
@@ -85,7 +89,43 @@ else
             });
         }
 
-        renderPDF(url);  // Render the PDF from the URL
+        renderPDF(url);  // Render the PDF from the URL pdfjsLib*/
+
+        pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+        const pdfDoc = pdfDoc_;
+        const numPages = pdfDoc.numPages;
+        console.log('Number of pages:', numPages);
+
+        // Render all pages
+        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+            renderPage(pdfDoc, pageNum);
+        }
+        });
+
+        function renderPage(pdfDoc, pageNum) {
+            pdfDoc.getPage(pageNum).then(function(page) {
+            const scale = 1.5; // Set the scale for rendering
+            const viewport = page.getViewport({ scale: scale });
+
+            // Prepare the canvas element to render the page
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            document.body.appendChild(canvas); // Add canvas to the body or to your desired container
+
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+
+            // Render the page onto the canvas
+            const renderContext = {
+            canvasContext: ctx,
+            viewport: viewport
+            };
+            page.render(renderContext).promise.then(function() {
+            console.log('Page ' + pageNum + ' rendered');
+            });
+        });
+        }
+
     </script>
 </body>
 </html>
