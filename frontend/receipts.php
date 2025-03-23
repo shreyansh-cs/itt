@@ -7,7 +7,6 @@ $title = "Receipts";
 <div class='receipts_contatiner'>
 <?php
 include_once 'session.php';
-include_once 'restrictedpage.php'; //restricted page
 include_once '../backend/utils.php';
 include_once './paymenthandler.php';
 
@@ -88,7 +87,7 @@ if(getReceiptsForThisUser($user_id,$rows,$error))
     echo "<th>Package #</th>";
     echo "<th>Price</th>";
     echo "<th>Status</th>";
-    echo "<th>Created ON</th>";
+    //echo "<th>Created ON</th>";
     echo "<th>Updated ON</th>";
     echo "</tr>";
     foreach ($rows as $row){
@@ -97,15 +96,16 @@ if(getReceiptsForThisUser($user_id,$rows,$error))
         //echo "<td>{$row['PACKAGE_ID']}</td>";
         echo "<td>{$package_name}</td>";
         echo "<td>{$package_price}</td>";
-        echo "<td>{$row['STATUS']}</td>";
-        echo "<td>{$row['CREATED_ON']}</td>";
+        $status_color = getStatusColor($row['STATUS']);
+        echo "<td style='background-color:$status_color'>{$row['STATUS']}</td>";
+        //echo "<td>{$row['CREATED_ON']}</td>";
         echo "<td>{$row['UPDATED_ON']}</td>";
         echo "</tr>";
     }
     echo "<tr>";
-    echo "<td colspan='6' align='left'>";
+    echo "<td colspan='5' align='left'>";
     echo "<form method='post' style='display:{$init_form_display}'>";
-    echo "<button id='init_payment' name='init_payment'>Init Payment</button>";
+    echo "<button class='btn_init_payment' id='init_payment' name='init_payment'>Pay {$package_price}</button>";
     echo "</form>";
     if($payment_initiated)
     {

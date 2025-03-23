@@ -110,7 +110,17 @@ if(!empty($msg))
           <?php
             $rows = getAllClasses(); 
             foreach ($rows as $row) {
-              echo "<option value='".$row['ID']."'". checkSelected($row['ID'],$class) .">".$row['NAME']."</option>";
+              if(!isAdminLoggedIn())
+              {
+                if($row['ID'] == $class)
+                {
+                  echo "<option value='".$row['ID']."'". checkSelected($row['ID'],$class) .">".$row['NAME']."</option>";
+                }
+              }
+              else
+              {
+                echo "<option value='".$row['ID']."'". checkSelected($row['ID'],$class) .">".$row['NAME']."</option>";
+              }
             }
           ?>
           </select>

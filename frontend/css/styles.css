@@ -383,6 +383,19 @@ table.courses td a.course-link:hover {
     background-color: red;
 }
 
+.btn_init_payment
+{
+    display: inline-block;
+    font-size: 18px;
+    color: #fff;
+    background-color: #1abc9c;
+    padding: 15px 30px;
+    margin: 10px 15px;
+    text-decoration: none;
+    border-radius: 50px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
 /*upload page css start*/
 
 /*upload page css end*/

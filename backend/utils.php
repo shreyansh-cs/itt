@@ -480,6 +480,22 @@
 
     }
 
+    function doesTransactionAlreadyExist($payment_id,&$error)
+    {
+        include 'db.php';
+        $rows = [];
+        $sql = "select * from pay_transactions where id='$payment_id'";
+        $ok = false;
+        $result = $conn->query($sql);
+        if ($result && $result->num_rows > 0) 
+        {
+            //$row = $result->fetch_assoc();
+            $ok = true;
+        }
+        $conn->close();
+        return $ok;
+    }
+
     function savePaymentDetailsDB($arr,&$error)
     {
         include 'db.php';
@@ -512,19 +528,32 @@
             $payment_status = $payment['status'];
             $payment_error_code = $payment['error_code'];
             $payment_merchant_id = $payment['notes']['merchant_order_id'];
-            $sql_transaction = "INSERT into pay_transactions(id,amount,status,order_id,error_code,notes_merchant_order_id) values('$payment_id',$payment_amount,'$payment_status','$payment_order_id','$payment_error_code',$payment_merchant_id)";
+
+            //If it already exist update it's status
+            if(doesTransactionAlreadyExist($payment_id,$error))
+            {
+                $sql_transaction = "UPDATE pay_transactions set status='$payment_status' where id='$payment_id'";
+            }
+            else
+            {
+                $sql_transaction = "INSERT into pay_transactions(id,amount,status,order_id,error_code,notes_merchant_order_id) values('$payment_id',$payment_amount,'$payment_status','$payment_order_id','$payment_error_code',$payment_merchant_id)";
+            }
         }
 
-        $receipt_status = "fail";
-        //in case we don't have status from transaction table, use what we have from orders
-        if(empty($payment_status))
-        {
-            $receipt_status = $order_status;
-        }
-
-        else if($order_status == "paid" && $payment_status == "captured")
+        $receipt_status = "unknown";
+        
+        //success
+        if($order_status == "paid" && $payment_status == "captured")
         {
             $receipt_status = "success";
+        }
+        else if(!empty($payment_status))
+        {
+            $receipt_status = $payment_status; 
+        }
+        else if(!empty($order_status))
+        {
+            $receipt_status = $order_status; 
         }
         else
         {
@@ -801,6 +830,21 @@
            $error = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"; 
            return false;
         }
+    }
+
+    function getStatusColor($status)
+    {
+        if($status == "success")
+        {
+            return "green";
+        }
+
+        if($status == "failed")
+        {
+            return "red";
+        }
+
+        return "yellow";
     }
 
 ?>
