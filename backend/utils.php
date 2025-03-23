@@ -405,6 +405,164 @@
         return $ok;
     }
 
+    function getReceiptsForThisUser($user_id,&$rows,&$error)
+    {
+        include 'db.php';
+        $rows = [];
+        $sql = "SELECT id AS ID, user_id as USER_ID, created_on as CREATED_ON, updated_on as UPDATED_ON, package_id as PACKAGE_ID, status as STATUS FROM pay_receipts where user_id=$user_id";
+        $result = $conn->query($sql);
+
+        $ok = true;
+        if($result == false)
+        {
+            $ok = false;
+            $error = "Error executing - ".$sql;
+        }
+
+
+        if ($ok && $result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                array_push($rows,$row);
+            }
+        } 
+        $conn->close();
+        return $ok;  
+    }
+
+    function createReceipt($user_id,$package_id,&$row,&$error)
+    {
+        include 'db.php';
+        $ok = false;
+        $sql = "INSERT INTO pay_receipts(user_id,package_id,status) VALUES ($user_id,$package_id,'initiated')";
+        // Execute the query
+        if ($conn->query($sql) === TRUE) 
+        {
+            $ok = true;
+            $last_id = $conn->insert_id;//last inserted id
+            $row['ID'] = $last_id;
+        } 
+        else 
+        {
+            $error = "Error: " . $sql . $conn->error;
+            $ok = false;
+        } 
+        $conn->close();
+        return $ok;
+    }
+
+    function createNewOrderInDB($order_id,$order_amount,$order_receipt,&$error)
+    {
+        include 'db.php';
+        $ok = false;
+        $sql_order = "INSERT into pay_orders(id,amount,receipt_id,status) values('$order_id',$order_amount,$order_receipt,'created')";
+
+        //echo $sql_order;
+
+        $conn->begin_transaction();
+
+        try
+        {
+            if ($conn->query($sql_order) === FALSE) {
+                throw new Exception("Error creating entry into pay_orders table".$sql_order);
+            }
+            $conn->commit();
+            $ok = true;
+        }
+        catch (Exception $e) 
+        {
+            // An error occurred, rollback the transaction
+            $conn->rollback();
+            $error = $e->getMessage();
+            $ok = false;
+        }
+        $conn->close();
+        return $ok;
+
+    }
+
+    function savePaymentDetailsDB($arr,&$error)
+    {
+        include 'db.php';
+        $ok = false;
+        //1. update status into pay_orders
+        //2. Create entry into pay_transactions
+        //3. update status in pay_receipts 
+        $order = $arr['order'];
+        $order_id = $order['id'];
+        $order_amount = $order['amount'];
+        $order_receipt = $order['receipt'];
+        $order_status = $order['status'];
+
+        //Should we reconcile amount, receipt from existing order_id
+
+        $sql_order = "UPDATE pay_orders set status='$order_status' where id = '$order_id'";
+        //(id,amount,receipt_id,status) values('$order_id',$order_amount,$order_receipt,'$order_status')";
+
+        //There was no trasaction for order
+        $payment_status = "";
+        $payment_merchant_id = "";
+        $update_txn = false; // when we don't have transaction details, only orders is what we have
+        if($arr['payment']['count'] > 0)
+        {
+            $update_txn = true;
+            $payment = $arr['payment']['items'][0];
+            $payment_id = $payment['id'];
+            $payment_amount = $payment['amount'];
+            $payment_order_id = $payment['order_id'];
+            $payment_status = $payment['status'];
+            $payment_error_code = $payment['error_code'];
+            $payment_merchant_id = $payment['notes']['merchant_order_id'];
+            $sql_transaction = "INSERT into pay_transactions(id,amount,status,order_id,error_code,notes_merchant_order_id) values('$payment_id',$payment_amount,'$payment_status','$payment_order_id','$payment_error_code',$payment_merchant_id)";
+        }
+
+        $receipt_status = "fail";
+        //in case we don't have status from transaction table, use what we have from orders
+        if(empty($payment_status))
+        {
+            $receipt_status = $order_status;
+        }
+
+        else if($order_status == "paid" && $payment_status == "captured")
+        {
+            $receipt_status = "success";
+        }
+        else
+        {
+            //unlikely to have this case
+        }
+
+        $sql_receipt = "UPDATE pay_receipts set status='$receipt_status' WHERE id = $order_receipt";
+
+        $conn->begin_transaction();
+
+        try
+        {
+            if ($conn->query($sql_order) === FALSE) {
+                throw new Exception("Error updating pay_orders table".$sql_order);
+            }
+
+            if ($update_txn && $conn->query($sql_transaction) === FALSE) {
+                throw new Exception("Error updating pay_transactions table".$sql_transaction);
+            }
+
+            if ($conn->query($sql_receipt) === FALSE) {
+                throw new Exception("Error updating pay_receipts table".$sql_receipt);
+            }
+        
+            // If everything is successful, commit the transaction
+            $conn->commit();
+            $ok = true;
+        }
+        catch (Exception $e) {
+            // An error occurred, rollback the transaction
+            $conn->rollback();
+            $error = $e->getMessage();
+            $ok = false;
+        }
+        $conn->close();
+        return $ok;
+    }
+
     function redirectError($error)
     {
         include '../frontend/session.php';
