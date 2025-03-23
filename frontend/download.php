@@ -21,7 +21,8 @@ else
     <style>
         /* Style for the PDF viewer */
         #pdf-viewer {
-            width: 100%;
+            text-align: center;
+            width: 90%;
             height: auto;
             /*overflow: hidden;*/
             overflow: scroll;
