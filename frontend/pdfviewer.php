@@ -23,7 +23,8 @@ else
         #pdf-viewer {
             width: 100%;
             height: 600px;
-            overflow: hidden;
+            /*overflow: hidden;*/
+            overflow: scroll;
         }
 
         canvas {
