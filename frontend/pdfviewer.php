@@ -22,7 +22,7 @@ else
         /* Style for the PDF viewer */
         #pdf-viewer {
             width: 100%;
-            height: 600px;
+            height: auto;
             /*overflow: hidden;*/
             overflow: scroll;
         }
