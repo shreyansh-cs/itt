@@ -7,7 +7,7 @@ body {
 }
 
 header {
-    background-color: #1abc9c;
+    background-color: #007bff;
     color: white;
     padding: 10px 0px;
     display: flex;
@@ -59,7 +59,7 @@ main {
 }
 
 footer {
-    background-color: #1abc9c;
+    background-color: #007bff;
     color: white;
     text-align: center;
     padding: 10px;
@@ -222,7 +222,7 @@ table.courses td a.course-link:hover {
     display: inline-block;
     font-size: 18px;
     color: #fff;
-    background-color: #1abc9c;
+    background-color: #007bff;
     padding: 15px 30px;
     margin: 10px 15px;
     text-decoration: none;
@@ -231,7 +231,7 @@ table.courses td a.course-link:hover {
 }
 
 .home a:hover {
-    background-color: #16a085;
+    background-color: #0056b3;
     transform: translateY(-3px);
 }
 /*index page css end*/
@@ -388,7 +388,7 @@ table.courses td a.course-link:hover {
     display: inline-block;
     font-size: 18px;
     color: #fff;
-    background-color: #1abc9c;
+    background-color: #007bff;
     padding: 15px 30px;
     margin: 10px 15px;
     text-decoration: none;
@@ -407,7 +407,7 @@ table.courses td a.course-link:hover {
         display: none;
         flex-direction: column;
         width: 100%;
-        background-color: #1abc9c;
+        background-color: #007bff;
         position: absolute;
         top: 60px;
         left: 0;
