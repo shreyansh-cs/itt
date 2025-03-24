@@ -16,7 +16,12 @@ $title = "Notes & Video";
     if(!empty($chapter))
     {
         $rows = getNotesForChapter($class,$stream,$subject,$chapter);
-        echo "<table border='$border'><th>Title</th><th>Notes Download</th><th>Action</th>";//table and headers start
+        echo "<table border='$border'><th>Title</th><th>Notes Download</th>";
+        //Action column is only for admin
+        if(isAdminLoggedIn())
+        {
+            echo "<th>Action</th>";//table and headers start
+        }
         //Each row
         foreach ($rows as $row) {
             echo "<tr>"; //row start
@@ -30,23 +35,42 @@ $title = "Notes & Video";
             // echo "</td>";
 
             echo "<td>";
-            echo "<a target='_blank' href='download.php?noteid=".$row['ID']."'>DOWNLOAD PDF</a>";
+
+            if(doesUserHasSubscription($error))
+            { 
+                echo "<a target='_blank' href='download.php?noteid=".$row['ID']."'>DOWNLOAD PDF</a>";   
+            }
+            else
+            {
+                echo "<a target='_blank' href='receipts.php'>Buy Package</a>";
+            }
             echo "</td>";
 
-            echo "<td>";
-            echo "<a target='_blank' href='delete.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter&noteid=".$row['ID']."'>Delete</a>";
-            echo "</td>";
+            if(isAdminLoggedIn())
+            {
+                echo "<td>";
+                echo "<a target='_blank' href='delete.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter&noteid=".$row['ID']."'>Delete</a>";
+                echo "</td>";
+            }
 
             echo "</tr>"; //row end
         }
         echo "</table>";//end table
+
+        echo "<br/>";
 
         //Start video section
         echo "<table  border='$border'>";
         echo "<tr>";
         echo "<td id='videocolumn'>";
         $rows = getVideoForChapter($class,$stream,$subject,$chapter);
-        echo "<table  border='$border'><th>Video Title</th><th>Link</th><th>Action</th>";
+        echo "<table  border='$border'><th>Video Title</th><th>Link</th>";
+        
+        //action only for admin
+        if(isAdminLoggedIn())
+        {
+            echo "<th>Action</th>";
+        }
         foreach ($rows as $row) {
             echo "<tr>";
 
@@ -55,14 +79,24 @@ $title = "Notes & Video";
             echo "</td>";
 
             echo "<td>";
-            $link = $row['LINK'];
-            echo "<a target='_blank' href='$link'>Video</a>"; 
+            if(doesUserHasSubscription($error))
+            { 
+                $link = $row['LINK'];
+                echo "<a target='_blank' href='$link'>Video</a>"; 
+            }
+            else
+            {
+                echo "<a target='_blank' href='receipts.php'>Buy Package</a>";
+            }
             echo "</td>";
 
-            echo "<td>";
-            echo "<a target='_blank' href='delete.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter&videoid=".$row['ID']."'>Delete</a>";
-            echo "</td>";
-
+            //action only for admin
+            if(isAdminLoggedIn())
+            {
+                echo "<td>";
+                echo "<a target='_blank' href='delete.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter&videoid=".$row['ID']."'>Delete</a>";
+                echo "</td>";
+            }
             echo "</tr>";
         }
         echo "</table>";
