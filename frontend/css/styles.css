@@ -7,7 +7,7 @@ body {
 }
 
 header {
-    background-color: #002060;
+    background-color: #1abc9c;
     color: white;
     padding: 10px 0px;
     display: flex;
@@ -59,7 +59,7 @@ main {
 }
 
 footer {
-    background-color: #002060;
+    background-color: #1abc9c;
     color: white;
     text-align: center;
     padding: 10px;
@@ -193,7 +193,7 @@ table.courses td a.course-link:hover {
 /*index page css start*/
 .home {
     padding: 60px 20px;
-    max-width: 1100px;
+    max-width: 100%;
     margin: 0 auto;
     background-color: #ffffff;
     border-radius: 10px;
@@ -407,7 +407,7 @@ table.courses td a.course-link:hover {
         display: none;
         flex-direction: column;
         width: 100%;
-        background-color: #002060;
+        background-color: #1abc9c;
         position: absolute;
         top: 60px;
         left: 0;

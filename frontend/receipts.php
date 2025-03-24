@@ -138,9 +138,6 @@ else
 {
     echo "<div class='receipts_error'>{$error}</div>";
 }
-
-
-
 ?>
 </div>
 <?php 

@@ -45,8 +45,9 @@
     <!-- Header -->
     <header>
         <div class="logo">
-        <img src="../images/icon.jpeg"  alt="I.T.T Group of Education Logo">
-        <h1>I.T.T. Group of Education</h1>
+        <a href='/itt/frontend/index.php'><img src="../images/icon.jpeg"  alt="I.T.T Group of Education Logo">
+        <h1 style='color:white;padding-top:10px;'>I.T.T. Group of Education</h1>
+        </a>
         </div>
         <nav class="navbar">
             <ul>
