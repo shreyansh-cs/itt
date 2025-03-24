@@ -2,6 +2,7 @@
 include_once 'showerror.php';
 ob_start();
 include_once '../backend/handleregister.php';
+include_once '../backend/utils.php';
 $title = "Register";
 ?>
   <div id="msg" style='color:red'>
@@ -19,14 +20,10 @@ $title = "Register";
                 <td class='second'>
                     <select name='class' id='class'>
                         <?php 
-                            for($i=5;$i<13;$i++)
+                            $rows = getAllClasses(); 
+                            foreach ($rows as $row)
                             {
-                                $selected = "";
-                                if($i == $user_class)
-                                {
-                                    $selected = "selected";
-                                }
-                                echo "<option value='$i' $selected>CLASS $i</option>";
+                                echo "<option value='{$row['ID']}'".checkSelected($row['ID'],$user_class). ">{$row['NAME']}</option>";
                             }
                         ?>
                     </select>

@@ -3,7 +3,8 @@
     {
         include 'db.php';
         $rows = [];
-        $sql = "SELECT ID AS ID, NAME as NAME FROM classes";
+        //Select list of supported classes
+        $sql = "SELECT ID AS ID, NAME as NAME FROM classes where SUPPORTED=1 ORDER BY ID ASC";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
@@ -277,7 +278,7 @@
                 $ok = false;
             }
             //Generate token
-            else
+            if($ok)
             {
                 // Password is correct, generate token
                 //Check if a token already exists
