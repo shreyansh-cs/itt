@@ -386,6 +386,7 @@ table.courses td a.course-link:hover {
 .btn_init_payment
 {
     display: inline-block;
+    border-width: 0px;
     font-size: 18px;
     color: #fff;
     background-color: #007bff;
@@ -394,6 +395,11 @@ table.courses td a.course-link:hover {
     text-decoration: none;
     border-radius: 50px;
     transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.receipts_contatiner
+{
+    width: 100%;
 }
 
 /*upload page css start*/
