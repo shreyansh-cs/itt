@@ -114,7 +114,7 @@
     {
         include 'db.php';
         $rows = [];
-        $sql = "SELECT ID AS ID, NAME as NAME, DETAILS AS DETAILS, LINK AS LINK FROM videos where CHAPTER_ID=$chapter";
+        $sql = "SELECT ID AS ID, NAME as NAME, LINK AS LINK FROM videos where CHAPTER_ID=$chapter";
         //echo $sql;
         $result = $conn->query($sql);
         if ( $result && $result->num_rows > 0) {
@@ -157,6 +157,31 @@
         } 
         $conn->close();
         return $ret;
+    }
+
+    function insertVideo($video_title,$video_link,$chapter_id,&$error)
+    {
+        include 'db.php';
+        $ok = false;
+        $sql = "INSERT INTO videos(NAME,LINK,CHAPTER_ID) VALUES ('$video_title','$video_link',$chapter_id)";
+        if ($conn->query($sql) === TRUE) 
+        {
+            if($conn->affected_rows > 0)
+            {
+                $ok = true;
+            }
+            else
+            {
+                $error = "Record not inserted";
+            }
+        } 
+        else 
+        {
+            $error = "Error: " . $sql . $conn->error;
+            $ok = false;
+        } 
+        $conn->close();
+        return $ok; 
     }
 
     function deleteNote($noteid,&$error)

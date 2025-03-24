@@ -5,7 +5,7 @@ $title = "Courses";
   <table class='courses'>
   <tr>
   <td class='first'>
-  <a href="usernoteslist.php" class="course-link">Notes and Videos</a>
+  <a href="noteslist.php" class="course-link">Notes and Videos</a>
   </td>
   <td class='second'>Comprehensive courses covering all subjects.</td>
   <tr>

@@ -2,27 +2,12 @@
 include_once 'showerror.php';
 include_once '../frontend/session.php';
 include_once '../backend/utils.php';
+include_once '../frontend/restrictedpage.php'; //restricted page
 
 $id = $_SESSION['user_id'];
 $fullname = $_SESSION['full_name'];
 $user_type = $_SESSION['user_type'];
 $user_class = $_SESSION['user_class'];
-
-if(!isset($id) || empty($id))
-{
-    redirectError("Invalid Session");
-}
-
-if(!isset($user_type) || empty(($user_type)))
-{
-    redirectError("Invalid User Type");
-}
-
-//Check if it's admin
-if($user_type != "admin")
-{
-    redirectError("Invalid User Type - 2"); 
-}
 
 $noteid = "";
 if(isset($_GET['noteid']))
@@ -55,14 +40,14 @@ if(!empty($noteid) || !empty($videoid))
     $chapter=$_GET['chapter'];
 }
 
+$redirectUrl = "/itt/frontend/noteslist.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter";
 if(!empty($noteid))
 {
     $error = "";
-
     if(deleteNote($noteid,$error))
     {
         setStatusMsg($error);
-        header("Location: /itt/frontend/noteslist.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter");
+        redirect($redirectUrl);
     }
     else
     {
@@ -76,7 +61,7 @@ if(!empty($videoid))
     if(deleteVideo($videoid,$error))
     {
         setStatusMsg($error);
-        header("Location: /itt/frontend/videolist.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter");
+        redirect($redirectUrl);
     }
     else
     {

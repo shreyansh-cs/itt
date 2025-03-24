@@ -2,22 +2,20 @@
 include_once "showerror.php";
 ob_start();
 session_start();
-$title = "Upload Data (Notes & Video)";
+$title = "Upload Notes";
 
-//restrict page
-include_once 'restrictedpage.php';
-
+include_once 'restrictedpage.php';//restrict page
 include_once 'selection.php';
 $border = "1";
 //Check if we need to show the upload form
-echo "<table border='0'>";
+echo "<table border='{$border}'>";
 echo "<tr><td>";
 
 if(!empty($chapter))
 {
 ?>
     <form action="../backend/upload.php" method="POST" id="uploadnotes" name="uploadnotes" enctype="multipart/form-data" onSubmit="OnSubmit()">
-        <table class='upload' border="$border">
+        <table class='upload' border="<?php echo $border; ?>">
             <tr>
                 <td class='first'>Notes Title:</td>
                 <td class='second'>

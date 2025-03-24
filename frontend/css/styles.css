@@ -340,6 +340,28 @@ table.courses td a.course-link:hover {
 /*login page css end*/
 
 /*quick link at the bottom of the form*/
+
+.bottomlink{
+    text-align: left;
+}
+
+.bottomlink a {
+    display: inline-block;
+    font-size: 18px;
+    color: #fff;
+    background-color: #007bff;
+    padding: 15px 30px;
+    /*margin: 10px 15px;*/
+    text-decoration: none;
+    border-radius: 50px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.bottomlink a:hover {
+    background-color: #0056b3;
+    transform: translateY(-3px);
+}
+
 .bottomlink a{
     text-align: left;
 }

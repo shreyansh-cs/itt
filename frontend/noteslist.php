@@ -3,14 +3,10 @@
 include_once "showerror.php";
 ob_start();
 session_start();
-$title = "Admin Notes";
+$title = "Notes & Video";
 ?>
 
 <?php 
-
-    //restrict page
-    include_once 'restrictedpage.php';
-    
     include_once '../backend/utils.php';
     $border = "1";
     include_once 'selection.php';
@@ -20,7 +16,7 @@ $title = "Admin Notes";
     if(!empty($chapter))
     {
         $rows = getNotesForChapter($class,$stream,$subject,$chapter);
-        echo "<table border='$border'><th>Title</th><th>Text</th><th>Notes Download</th><th>Action</th>";//table and headers start
+        echo "<table border='$border'><th>Title</th><th>Notes Download</th><th>Action</th>";//table and headers start
         //Each row
         foreach ($rows as $row) {
             echo "<tr>"; //row start
@@ -29,9 +25,9 @@ $title = "Admin Notes";
             echo "<span>".$row['NAME']."</span>";
             echo "</td>";
             
-            echo "<td>";
-            echo "<p>".$row['TEXT']."</p>";
-            echo "</td>";
+            // echo "<td>";
+            // echo "<p>".$row['TEXT']."</p>";
+            // echo "</td>";
 
             echo "<td>";
             echo "<a target='_blank' href='download.php?noteid=".$row['ID']."'>DOWNLOAD PDF</a>";
@@ -44,11 +40,42 @@ $title = "Admin Notes";
             echo "</tr>"; //row end
         }
         echo "</table>";//end table
+
+        //Start video section
+        echo "<table  border='$border'>";
+        echo "<tr>";
+        echo "<td id='videocolumn'>";
+        $rows = getVideoForChapter($class,$stream,$subject,$chapter);
+        echo "<table  border='$border'><th>Video Title</th><th>Link</th><th>Action</th>";
+        foreach ($rows as $row) {
+            echo "<tr>";
+
+            echo "<td>";
+            echo "<h3>".$row['NAME']."</h3>";
+            echo "</td>";
+
+            echo "<td>";
+            $link = $row['LINK'];
+            echo "<a target='_blank' href='$link'>Video</a>"; 
+            echo "</td>";
+
+            echo "<td>";
+            echo "<a target='_blank' href='delete.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter&videoid=".$row['ID']."'>Delete</a>";
+            echo "</td>";
+
+            echo "</tr>";
+        }
+        echo "</table>";
+        echo "</td>";
+        echo "</tr>";
+        echo "</table>";
+        //End Video section
     }
     echo "</tr></td>";
     if(isAdminLoggedIn())
     {
-        echo "<tr><td class='bottomlink'><a target='_blank' href='uploadnotesvideo.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter'>Add New Notes</td></tr>";
+        echo "<tr><td class='bottomlink'><a target='_blank' href='uploadnotes.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter'>Add New Notes</td></tr>";
+        echo "<tr><td class='bottomlink'><a target='_blank' href='uploadvideo.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter'>Add New Video</a></td></tr>";
     }
     echo "</table>";
 ?>
