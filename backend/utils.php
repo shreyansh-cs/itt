@@ -680,6 +680,59 @@
         return $ok;  
     }
 
+    function activateUser($user_id,&$error)
+    {
+        include 'db.php';
+        $ok = false;
+
+        $sql = "UPDATE users set verified=1 WHERE ID = $user_id and verified=0";
+        $conn->begin_transaction();
+        try
+        {
+            if ($conn->query($sql) === FALSE) {
+                throw new Exception("Error updating users table - ".$sql);
+            }        
+            // If everything is successful, commit the transaction
+            $conn->commit();
+            $ok = true;
+        }
+        catch (Exception $e) {
+            // An error occurred, rollback the transaction
+            $conn->rollback();
+            $error = $e->getMessage();
+            $ok = false;
+        }
+        $conn->close();
+        return $ok;
+    }
+
+    function verifyRegisterFromEmailLink($verify_key,&$error)
+    {
+        include 'db.php';
+        $ok = false;
+        $sql = "SELECT ID as ID from users WHERE verify_key='$verify_key'";
+        //echo $sql;
+        $result = $conn->query($sql);
+        if($result && $result->num_rows > 0)
+        {
+            $row = $result->fetch_assoc();
+            if(activateUser($row['ID'],$error))
+            {
+                $ok = true;
+            }
+            else
+            {
+                $error = "Unable to activate user";
+            }
+        } 
+        else
+        {
+            $error = "User can't be varied, Invalid Key";
+        }
+        $conn->close();
+        return $ok; 
+    }
+
     function redirectError($error)
     {
         include '../frontend/session.php';
@@ -816,7 +869,7 @@
 
     use PHPMailer\PHPMailer\PHPMailer; 
     use PHPMailer\PHPMailer\Exception; 
-    function sendWelcomeMail($username, $email,$phone,$password,&$error)
+    function sendWelcomeMail($username, $email,$phone,$password,$verify_key,&$error)
     {
         require '../PHPMailer/src/Exception.php';
         require '..//PHPMailer/src/PHPMailer.php';
@@ -836,7 +889,8 @@
         <body>
             <h2>Dear " . htmlspecialchars($username) . ",</h2>
             <p>Thank you for registering with us. We're excited to have you on board!</p>
-            <p>After <a href='https://itticon.site/itt/frontend/login.php'>Login</a>, We encourage you to start exploring the amazing courses we offer.</p>
+            <p>Please activate your account using this <a href='https://itticon.site/itt/frontend/verifyuser.php?verify_key=$verify_key'>link</a></p>
+            <p>Post activation, You can <a href='https://itticon.site/itt/frontend/login.php'>Login</a>, We encourage you to start exploring the amazing courses we offer.</p>
             <p>If you need any help, feel free to reach out to us.</p>
             <div>Please login using below details.</div>
             <h3>UserName:$phone</h3>

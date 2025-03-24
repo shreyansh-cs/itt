@@ -88,9 +88,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Hash the password
             //$hashed_password = password_hash($password, PASSWORD_DEFAULT);
             //No hashed as of now
+            $verify_key = hash('sha256', microtime(true)); // unique key to verify users from email
             $hashed_password = $password;
-            $sql = "INSERT INTO users (full_name, father_name, email, phone, dob, photo, password, user_type, user_class) 
-                        VALUES ('$full_name','$father_name','$email','$phone','$dob','$photo_path','$password','$user_type',$user_class)";
+            $sql = "INSERT INTO users (full_name, father_name, email, phone, dob, photo, password, user_type, user_class,verify_key) 
+                        VALUES ('$full_name','$father_name','$email','$phone','$dob','$photo_path','$password','$user_type',$user_class,'$verify_key')";
 
             if($debug)
                 echo "<br/>".$sql;
@@ -108,7 +109,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $conn->close();
         }
 
-        if($ok && sendWelcomeMail($full_name,$email,$phone,$password,$error))
+        if($ok && sendWelcomeMail($full_name,$email,$phone,$password,$verify_key,$error))
         {
             //redirect to home page
             redirect("/itt/frontend/login.php");
