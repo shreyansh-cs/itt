@@ -1,8 +1,8 @@
 
 <?php 
+include_once 'session.php';
 include_once "showerror.php";
 ob_start();
-session_start();
 $title = "Notes & Video";
 ?>
 

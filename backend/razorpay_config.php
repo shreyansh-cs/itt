@@ -1,7 +1,12 @@
 <?php
+include_once 'utils.php';
 
-$keyId = 'rzp_test_NzjXyNVhzQ34GH';
-$keySecret = 'u1GWWulGvq0BZzMtbIbVsN3q';
+$keyId = "";
+$keySecret = "";
+if(!getAPIToken("stage",$keyId,$keySecret,$error))
+{
+    die("Unable to get API - ".$error);
+}
 $displayCurrency = 'INR';
 
 ?>

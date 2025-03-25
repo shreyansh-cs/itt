@@ -1,8 +1,8 @@
 <?php
+include_once 'session.php';
 include_once '../backend/razorpay_config.php';
 include_once '../backend/utils.php';
 include_once '../backend/txnutils.php';
-include_once 'session.php';
 
 if(!isSessionValid())
 {

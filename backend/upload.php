@@ -1,9 +1,9 @@
 <?php
 // login.php
+include_once '../frontend/session.php';
 include_once '../frontend/showerror.php';
 include_once 'db.php';
 include_once '../backend/utils.php';
-include_once '../frontend/session.php';
 
 //echo "<pre>".print_r($_POST)."</pre>";
 

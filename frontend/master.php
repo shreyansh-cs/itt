@@ -8,7 +8,6 @@
 </head>
 <body>
   <?php 
-   include_once 'session.php';
    include_once '../backend/utils.php';
 
    //session is not valid and 
@@ -54,6 +53,7 @@
             <li><a href="/itt/frontend/index.php">Home</a></li>
             <li><a href="/itt/frontend/about.php">About Us</a></li>
             <li><a href='/itt/frontend/courses.php'>Courses</a></li>
+            <li><a href="/itt/frontend/noteslist.php">Notes & Video</a></li>
             <li><a href="/itt/frontend/onlinetest.php">Online Test</a></li>
             <li><a href="/itt/frontend/contact.php">Contact Us</a></li> 
             <?php

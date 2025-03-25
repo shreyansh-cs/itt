@@ -1,8 +1,8 @@
 <?php 
+include_once 'session.php';
 include_once 'showerror.php';
 ob_start();
 $title = "Login";
-include_once 'session.php';
 include_once '../backend/handlelogin.php';
 ?>
 <div style='color:red'><?php echo $msg; ?></div>

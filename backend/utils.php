@@ -1,4 +1,28 @@
 <?php 
+    include_once '../frontend/session.php';
+
+    function getAPIToken($env="stage",&$apiKey,&$apiSecret,&$error)
+    {
+        include 'db.php';
+        $ok = false;
+        $sql = "SELECT api_key as API_KEY , api_secret as API_SECRET FROM razorpay where type='$env' and enabled=1";
+        $result = $conn->query($sql);
+
+        if ($result && $result->num_rows > 0) 
+        {
+            $row = $result->fetch_assoc();
+            $apiKey = trim($row['API_KEY']); //remove whitespace if any
+            $apiSecret = trim($row['API_SECRET']); //remove whitespace if any
+            $ok = true;
+        }
+        else
+        {
+            $error = "Unable to get API Key and Secret";
+        } 
+        $conn->close();
+        return $ok;
+    }
+
     function getAllClasses()
     {
         include 'db.php';
@@ -36,8 +60,6 @@
         include 'db.php';
         $rows = [];
         $sql = "SELECT ID as ID, NAME as NAME from subjects where ID IN(SELECT SUBJECT_ID FROM streamubjectmap where STREAM_ID=$stream)";
-        //$sql = "SELECT ID AS ID, NAME as NAME FROM subjects where STREAM_ID=$stream";
-        //echo $sql;
         $result = $conn->query($sql);
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
@@ -621,14 +643,12 @@
     function getClassForThisUser()
     {
         //Do we need to query DB, for now get from session
-        include_once '../frontend/session.php';
         return $_SESSION['user_class'];
     }
 
     function getUserIDForThisUser()
     {
         //Do we need to query DB, for now get from session
-        include_once '../frontend/session.php';
         return $_SESSION['user_id'];
     }
 
@@ -736,7 +756,6 @@
 
     function redirectError($error)
     {
-        include '../frontend/session.php';
         $_SESSION['error'] = $error;
         header("Location: /itt/frontend/error.php");
     }
@@ -748,7 +767,6 @@
 
     function setStatusMsg($msg)
     {
-        include '../frontend/session.php';
         $_SESSION['error'] = "";//clear error
         //set msg
         $_SESSION['msg'] = $msg;
@@ -764,14 +782,13 @@
     }
 
     function isSessionValid()
-      {
-        include '../frontend/session.php';
-        if(isset($_SESSION['user_id']) && isset($_SESSION['user_type']))
-        {
-          return true;
-        }
-        return false;
-      }
+    {
+    if(isset($_SESSION['user_id']) && isset($_SESSION['user_type']))
+    {
+        return true;
+    }
+    return false;
+    }
 
       function isProtectedPage()
       {
@@ -800,7 +817,6 @@
 
     function isAdminLoggedIn()
     {
-        include '../frontend/session.php';
         if(!isSessionValid())
             return false;
 

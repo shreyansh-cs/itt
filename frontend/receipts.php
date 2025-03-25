@@ -1,4 +1,5 @@
-<?php 
+<?php
+include_once 'session.php'; 
 include 'showerror.php';
 ob_start();
 $title = "Receipts";
@@ -6,7 +7,6 @@ $title = "Receipts";
 
 <div class='receipts_contatiner'>
 <?php
-include_once 'session.php';
 include_once '../backend/utils.php';
 include_once './paymenthandler.php';
 

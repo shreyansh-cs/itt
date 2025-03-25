@@ -1,6 +1,13 @@
 <?php
+include_once 'session.php';
 include_once "showerror.php";
 include_once '../backend/utils.php';
+
+if(!isSessionValid() || !doesUserHasSubscription($error))
+{
+    die("What's this, Are you trying without having proper subsciption?");
+}
+
 $noteid = "";
 if(isset($_GET['noteid']))
 {

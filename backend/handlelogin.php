@@ -11,6 +11,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $error = "";
     if(authUser($email_or_phone,$password,$row/*OUT*/,$error))
     {
+        //regenerate session when login
+        session_regenerate_id(true);
         $_SESSION['user_id'] = $row['ID'];
         $_SESSION['full_name'] = $row['FULL_NAME'];
         $_SESSION['user_type'] = $row['USER_TYPE'];

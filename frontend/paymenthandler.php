@@ -1,4 +1,5 @@
 <?php 
+include_once 'session.php';
 include_once '../backend/razorpay_config.php';
 include_once '../razorpay/razorpay-php/Razorpay.php';
 include_once '../backend/txnutils.php';

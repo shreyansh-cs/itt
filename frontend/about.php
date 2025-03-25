@@ -3,19 +3,6 @@ ob_start();
 $title = "About Us";
 ?>
 <div class="about">
-    <!-- English Section -->
-    <!--section class="about-section">
-      <p>Welcome to I.T.T Group of Education, where we provide quality education and coaching to help you achieve your academic goals. Our institute has a rich history of nurturing talented students with a dedicated team of experienced educators.</p>
-      <h3>Our Vision</h3>
-      <p>To empower every student with the knowledge, skills, and confidence to excel academically and in life.</p>
-      <h3>Our Mission</h3>
-      <p>We strive to create an engaging and supportive learning environment that fosters academic excellence, critical thinking, and personal growth.</p>
-      <h3>Our History</h3>
-      <p>Established in 2018, we have rapidly grown into a leading institute known for innovative teaching methods and comprehensive coaching programs.</p>
-      <h3>Our Approach</h3>
-      <p>We combine traditional teaching with modern technology, offering a well-rounded learning experience.</p>
-    </section-->
-    <!-- Hindi Section -->
     <section class="about-section">
       <p>आई.टी.टी समूह ऑफ एजुकेशन में आपका स्वागत है, जहाँ हम गुणवत्तापूर्ण शिक्षा और कोचिंग प्रदान करते हैं ताकि आप अपने शैक्षिक लक्ष्यों को प्राप्त कर सकें। </p>
       <p> हमारे संस्थान का इतिहास प्रतिभाशाली छात्रों के विकास और अनुभवी शिक्षकों की समर्पित टीम के लिए प्रसिद्ध है।</p>
