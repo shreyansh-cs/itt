@@ -112,7 +112,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if($ok && sendWelcomeMail($full_name,$email,$phone,$password,$verify_key,$error))
         {
             //redirect to home page
-            redirect("/itt/frontend/login.php");
+            header("Location: /itt/frontend/login.php");
         }
         else
         {
