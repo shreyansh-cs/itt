@@ -1,13 +1,8 @@
 <?php 
+include_once 'session.php';
 include_once 'showerror.php';
-include_once '../frontend/session.php';
 include_once '../backend/utils.php';
 include_once '../frontend/restrictedpage.php'; //restricted page
-
-$id = $_SESSION['user_id'];
-$fullname = $_SESSION['full_name'];
-$user_type = $_SESSION['user_type'];
-$user_class = $_SESSION['user_class'];
 
 $noteid = "";
 if(isset($_GET['noteid']))

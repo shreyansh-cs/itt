@@ -1,4 +1,5 @@
 <?php 
+include_once 'session.php';
 ob_start();
 $title = "Generate ID Card";
 include_once 'restrictedpage.php'

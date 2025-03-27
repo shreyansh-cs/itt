@@ -1,6 +1,4 @@
 <?php 
-    include_once '../frontend/session.php';
-
     function getAPIToken($env="stage",&$apiKey,&$apiSecret,&$error)
     {
         include 'db.php';
@@ -442,6 +440,7 @@
         include 'db.php';
         $rows = [];
         $sql = "SELECT ID as ID, NAME as NAME, PRICE as PRICE from packages where ID = (SELECT PACKAGE_ID as PACKAGE_ID from classes where ID=$class)";
+        //echo $sql;
         $ok = false;
         $result = $conn->query($sql);
         if ( $result && $result->num_rows > 0) 
@@ -640,29 +639,18 @@
         return $ok;
     }
 
-    function getClassForThisUser()
-    {
-        //Do we need to query DB, for now get from session
-        return $_SESSION['user_class'];
-    }
-
-    function getUserIDForThisUser()
-    {
-        //Do we need to query DB, for now get from session
-        return $_SESSION['user_id'];
-    }
-
+    include_once 'public_utils.php';
     function doesUserHasSubscription(&$error)
     {
         include 'db.php';
         $package_details = [];
-        if(!getPackageDetails(getClassForThisUser(),$package_details,$error))
+        if(!getPackageDetails(getUserClass(),$package_details,$error))
         {
             $error = "Unable to get package details for this class";
             return false;
         }
 
-        $user_id = getUserIDForThisUser();
+        $user_id = getUserID();
         if(empty($user_id))
         {
             $error = "user id is empty";
@@ -671,7 +659,7 @@
 
         //Try to get all receipts for this package id and see if any of them status is success or not
         $sql = "SELECT status as STATUS from pay_receipts WHERE user_id={$user_id} AND package_id={$package_details['ID']}";
-        //echo $sql;
+        
         $result = $conn->query($sql);
 
         $ok = false;
@@ -754,24 +742,6 @@
         return $ok; 
     }
 
-    function redirectError($error)
-    {
-        $_SESSION['error'] = $error;
-        header("Location: /itt/frontend/error.php");
-    }
-
-    function redirect($url)
-    {
-        header("Location: $url");
-    }
-
-    function setStatusMsg($msg)
-    {
-        $_SESSION['error'] = "";//clear error
-        //set msg
-        $_SESSION['msg'] = $msg;
-    }
-
     function GetUniqueNumber()
     {
         // Get current timestamp in microseconds
@@ -779,55 +749,6 @@
         // Convert timestamp to a unique number (combining date/time and microseconds)
         $uniqueNumber = str_replace('.', '', $timestamp);
         return $uniqueNumber;
-    }
-
-    function isSessionValid()
-    {
-    if(isset($_SESSION['user_id']) && isset($_SESSION['user_type']))
-    {
-        return true;
-    }
-    return false;
-    }
-
-      function isProtectedPage()
-      {
-        //Page accessible without login
-        $protectedURI = [
-            "login.php",
-            "register.php",
-            "index.php",
-            "about.php",
-            "contact.php",
-            "forgot.php",
-        ];
-        $currentURI = $_SERVER['REQUEST_URI'];
-        $protected = true;//default is protected
-        foreach ($protectedURI as $uri) 
-        {
-            if(strpos($currentURI,$uri))
-            {
-                $protected = false;
-                break;
-            }   
-        }
-        //protected page
-        return $protected;
-      }
-
-    function isAdminLoggedIn()
-    {
-        if(!isSessionValid())
-            return false;
-
-        $user_type = $_SESSION['user_type'];
-
-        if($user_type == "admin")
-        {
-            return true;
-        }
-
-        return false;
     }
 
     function validateRegister($name,$father_name,$email,$mobile,&$error)

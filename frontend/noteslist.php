@@ -36,7 +36,7 @@ $title = "Notes & Video";
 
             echo "<td>";
 
-            if(doesUserHasSubscription($error))
+            if(isAdminLoggedIn() || doesUserHasSubscription($error))
             { 
                 echo "<a target='_blank' href='download.php?noteid=".$row['ID']."'>DOWNLOAD PDF</a>";   
             }

@@ -1,0 +1,12 @@
+<?php 
+$secretKey = "dc82c9fca1ba48021436d1ec053cbc4d1c90b52e9a2e0bc0cad3469cfeae35cb138d3ed2ae9932180035ca0a07fb6ef170646c55235fc73996088cbdddb7b63b3ee16af22f4f344fc5e15f11178ac60abcfefb9c7bdd34a970b6bb3e66ea36079ca47b39e1bd1fc5a4ba844120db2a7f506a01ac19a5d9296d4a6dfeaf9ec4f6af8708e24051a7ab6529dee3d70fe6bca3bbcb7dc0f50e4912c7014533058a974b60d127c9129ab56b46a3f99f3e281f897fe59f0cf7ba4c6ae38fdacf36376b1cb45dab33144b9aba119ab649f9088433652c14d29430d204427e2129cc7c4c3fe832f58d5b5d085a5673fcc820cadba0064a30f37c4be4674ad18a12c0cee0";
+
+require_once '../php-jwt-main/src/JWT.php';
+require_once '../php-jwt-main/src/Key.php';
+
+$jwtAlgo = "HS256";
+
+//use Firebase\JWT\JWT;
+//use Firebase\JWT\Key;
+
+?>

@@ -1,7 +1,15 @@
 <?php 
 include_once 'session.php';
-include_once 'showerror.php';
+include_once '../backend/public_utils.php';
 ob_start();
+
+//If already logged in , go to index
+if(isSessionValid())
+{
+  header("Location: /itt/index.php");
+  exit;
+}
+
 $title = "Login";
 include_once '../backend/handlelogin.php';
 ?>

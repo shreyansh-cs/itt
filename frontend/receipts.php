@@ -1,6 +1,5 @@
 <?php
 include_once 'session.php'; 
-include 'showerror.php';
 ob_start();
 $title = "Receipts";
 ?>
@@ -10,17 +9,8 @@ $title = "Receipts";
 include_once '../backend/utils.php';
 include_once './paymenthandler.php';
 
-$class = "";
-if(isset($_SESSION['user_class']))
-{
-    $class = $_SESSION['user_class'];
-}
-
-$user_id = "";
-if(isset($_SESSION['user_id']))
-{
-    $user_id = $_SESSION['user_id'];
-}
+$class = getUserClass();
+$user_id = getUserID();
 
 $package_id = "";
 $package_name = "";
@@ -120,9 +110,9 @@ if(getReceiptsForThisUser($user_id,$rows,$error))
         $params['amount'] = $package_price;
         $params['description'] = $package_name;
         $params['image'] = $_SERVER['HTTP_HOST'] . "/itt/images/icon.jpeg";
-        $params['name'] = $_SESSION['full_name'];
-        $params['email'] = $_SESSION['email'];
-        $params['contact'] = $_SESSION['phone'];
+        $params['name'] = getUserName();
+        $params['email'] = getUserEmail();
+        $params['contact'] = getUserMobile();
         $params['address'] = "Bimal Chowk, Mundipur";
         $params['merchant_order_id'] = $receipt_id;
         createOrder($params,$json,$error);

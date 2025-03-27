@@ -1,4 +1,5 @@
 <?php 
+//include_once "session.php"; -- Don't redirect to login Page
 include_once 'showerror.php';
 include_once '../backend/db.php';
 include_once '../backend/utils.php';

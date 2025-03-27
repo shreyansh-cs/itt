@@ -1,7 +1,7 @@
 <?php 
+include_once "session.php";
 include_once "showerror.php";
 include_once '../backend/utils.php';
-include_once "session.php";
 
 $debug = 0;
 
@@ -31,16 +31,8 @@ if(isset($_GET['chapter']) && !empty($_GET['chapter']))
     $chapter=$_GET['chapter'];
 }
 
-$user_type = "";
-if(isset($_SESSION['user_type']))
-{ 
-  $user_type = $_SESSION['user_type'];
-  if($user_type == "student")
-  {
-    //extract class from session
-    $class = $_SESSION['user_class'];
-  }
-}
+$user_type = getUserType();
+$class = getUserClass();
 
 //Not look for POST values if any
 if(!isset($class))

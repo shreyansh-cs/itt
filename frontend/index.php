@@ -1,4 +1,5 @@
 <?php 
+include_once 'session.php';
 ob_start();
 $title = "I.T.T Group of Education - Home";
 ?>

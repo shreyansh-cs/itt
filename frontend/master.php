@@ -9,36 +9,12 @@
 <body>
   <?php 
    include_once '../backend/utils.php';
+   include_once '../backend/public_utils.php';
 
-   //session is not valid and 
-    if(!isSessionValid() && isProtectedPage())
-    {
-        header("Location: /itt/frontend/login.php");
-    }
-
-   $id = "";
-   if(isset($_SESSION['user_id']))
-   {
-        $id = $_SESSION['user_id'];
-   }
-   
-   $full_name = "";
-   if(isset($_SESSION['full_name']))
-   {
-        $full_name = $_SESSION['full_name'];
-   }
-
-   $class = "";
-   if(isset($_SESSION['user_class']))
-   {
-        $class = $_SESSION['user_class'];
-   }
-
-   $type = "";
-   if(isset($_SESSION['user_type']))
-   {
-        $type = $_SESSION['user_type'];
-   }
+   $id = getUserID();
+   $full_name = getUserName();
+   $class = getUserClass();
+   $type = getUserType();
    
    ?>
     <!-- Header -->
