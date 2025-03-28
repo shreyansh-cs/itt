@@ -9,6 +9,10 @@ if(isset($_GET['class']) && !empty($_GET['class']))
 {
     $class=$_GET['class'];
 }
+else
+{
+  $class = getUserClass();
+}
 
 $stream="";
 if(isset($_GET['stream']) && !empty($_GET['stream']))
@@ -35,7 +39,6 @@ if(isset($_GET['chapter']) && !empty($_GET['chapter']))
 }
 
 $user_type = getUserType();
-$class = getUserClass();
 
 $msg = "";
 if(isset($_SESSION['msg']))
