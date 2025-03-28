@@ -49,9 +49,9 @@ else
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
 </head>
 <body>
-    <div id="pdf-viewer">
+    <!--div id="pdf-viewer">
         <canvas id="pdf-canvas"></canvas>
-    </div>
+    </div-->
 
     <script>
         var url = 'https://itticon.site/itt/frontend/supplypdf.php?noteid=<?php echo $noteid; ?>';
