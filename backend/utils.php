@@ -694,7 +694,7 @@
         $ok = false;
 
         //TODO - set verified=1 when final rollout is done
-        $sql = "UPDATE users set verified=0 WHERE ID = $user_id and verified=0";
+        $sql = "UPDATE users set verified=1 WHERE ID = $user_id and verified=0";
         $conn->begin_transaction();
         try
         {
