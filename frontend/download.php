@@ -30,7 +30,7 @@ else
         #pdf-viewer {
             text-align: center;
             width: 100%;
-            height: auto;
+            height:fit-content ;
             /*overflow: hidden;*/
             overflow: scroll;
         }
