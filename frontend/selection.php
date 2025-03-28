@@ -3,29 +3,32 @@ include_once "session.php";
 include_once "showerror.php";
 include_once '../backend/utils.php';
 
-$debug = 0;
-
 //values from URL get priority
+$class = "0"; //default for admin
 if(isset($_GET['class']) && !empty($_GET['class']))
 {
     $class=$_GET['class'];
 }
 
+$stream="";
 if(isset($_GET['stream']) && !empty($_GET['stream']))
 {
     $stream=$_GET['stream'];
 }
 
+$subject = "";
 if(isset($_GET['subject']) && !empty($_GET['subject']))
 {
     $subject=$_GET['subject'];
 }
 
+$section="";
 if(isset($_GET['section']) && !empty($_GET['section']))
 {
     $section=$_GET['section'];
 }
 
+$chapter="";
 if(isset($_GET['chapter']) && !empty($_GET['chapter']))
 {
     $chapter=$_GET['chapter'];
@@ -33,53 +36,6 @@ if(isset($_GET['chapter']) && !empty($_GET['chapter']))
 
 $user_type = getUserType();
 $class = getUserClass();
-
-//Not look for POST values if any
-if(!isset($class))
-  $class = "0";
-
-if(isset($_POST['class']))
-{
-  $class = $_POST['class'];
-  if($debug)
-    echo $class.",";
-}
-
-if(!isset($stream))
-  $stream = "";
-if(isset($_POST['stream']))
-{
-  $stream = $_POST['stream'];
-  if($debug)
-    echo $stream.",";
-}
-
-if(!isset($subject))
-  $subject = "";
-if(isset($_POST['subject']))
-{
-  $subject = $_POST['subject'];
-  if($debug)
-    echo $subject.",";
-}
-
-if(!isset($section))
-  $section = "";
-if(isset($_POST['section']))
-{
-  $section = $_POST['section'];
-  if($debug)
-    echo $section.",";
-}
-
-if(!isset($chapter))
-  $chapter = "";
-if(isset($_POST['chapter']))
-{
-  $chapter = $_POST['chapter'];
-  if($debug)
-    echo $chapter.",";
-}
 
 $msg = "";
 if(isset($_SESSION['msg']))
@@ -93,11 +49,11 @@ if(!empty($msg))
   echo "<div style='color:red'>$msg</div>";
 }
 ?>
-<form action="" id="notesForm" name="notesForm" method="post">
+<form action="" id="notesForm" name="notesForm" method="get">
     <table>
       <tr>
         <td class='dropdown'> 
-          <select id="class" name="class" onchange="submitForm('notesForm')">
+          <select id="class" name="class" onchange="submitForm(this,'notesForm')">
             <option value='0'>Select</option>
           <?php
             $rows = getAllClasses(); 
@@ -120,7 +76,7 @@ if(!empty($msg))
       </tr>
       <tr>
       <td class='dropdown'> 
-          <select id="stream" name="stream" onchange="submitForm('notesForm')">
+          <select id="stream" name="stream" onchange="submitForm(this,'notesForm')">
             <option value='0'>Select</option>
           <?php
             $rows = getStreamsForClass($class); 
@@ -137,7 +93,7 @@ if(!empty($msg))
       ?>
         <tr>
         <td class='dropdown'> 
-          <select id="subject" name="subject" onchange="submitForm('notesForm')">
+          <select id="subject" name="subject" onchange="submitForm(this,'notesForm')">
             <option value='0'>Select</option>
           <?php
             $rows = getSubjectsForStream($class,$stream);
@@ -157,7 +113,7 @@ if(!empty($msg))
       ?>
         <tr>
         <td class='dropdown'> 
-          <select id="section" name="section" onchange="submitForm('notesForm')">
+          <select id="section" name="section" onchange="submitForm(this,'notesForm')">
             <option value='0'>Select</option>
           <?php
             $rows = getSectionsForSubject($class,$stream,$subject);
@@ -177,7 +133,7 @@ if(!empty($msg))
       ?>
           <tr>
           <td class='dropdown'> 
-          <select id="chapter" name="chapter" onchange="submitForm('notesForm')">
+          <select id="chapter" name="chapter" onchange="submitForm(this,'notesForm')">
             <option value='0'>Select</option>
           <?php
             $rows = getChaptersForSection($class,$stream,$subject,$section);
@@ -194,9 +150,52 @@ if(!empty($msg))
   </table>
 </form>
 <script>
-  function submitForm(id) 
+  function submitForm(obj,form_id) 
   {
-      document.getElementById(id).submit();
+      formObj = document.getElementById(form_id);
+      //alert(obj.name);
+      if(obj.name == "class")
+      {
+        //We have to put if checks becuase some of the dropdowns may not be on the DOM yet
+        //Like first time when class dropdown is changed, it will throw JS error and form will not be submitted - Check console for errors
+        if(formObj.elements['stream'])
+          formObj.elements['stream'].selectedIndex = 0;
+
+        if(formObj.elements['subject'])
+          formObj.elements['subject'].selectedIndex = 0;
+
+        if(formObj.elements['section'])
+          formObj.elements['section'].selectedIndex = 0;
+
+        if(formObj.elements['chapter'])
+          formObj.elements['chapter'].selectedIndex = 0;
+      }
+      if(obj.name == "stream")
+      {
+        if(formObj.elements['subject'])
+          formObj.elements['subject'].selectedIndex = 0;
+
+        if(formObj.elements['section'])
+          formObj.elements['section'].selectedIndex = 0;
+
+        if(formObj.elements['chapter'])
+          formObj.elements['chapter'].selectedIndex = 0;
+      }
+      if(obj.name == "subject")
+      {
+        if(formObj.elements['section'])
+          formObj.elements['section'].selectedIndex = 0;
+
+        if(formObj.elements['chapter'])
+          formObj.elements['chapter'].selectedIndex = 0;
+      }
+      if(obj.name == "section")
+      {
+        if(formObj.elements['chapter'])
+          formObj.elements['chapter'].selectedIndex = 0;
+      }
+
+      formObj.submit();
   }
 </script>
 
