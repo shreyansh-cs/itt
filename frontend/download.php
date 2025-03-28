@@ -74,7 +74,7 @@ else
 
         function renderPage(pdfDoc, pageNum) {
             pdfDoc.getPage(pageNum).then(function(page) {
-            const scale = 1.0; // Set the scale for rendering
+            const scale = 2.0; // Set the scale for rendering
             const viewport = page.getViewport({ scale: scale });
 
             // Prepare the canvas element to render the page
