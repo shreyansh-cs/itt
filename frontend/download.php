@@ -28,6 +28,7 @@ else
     <style>
         /* Style for the PDF viewer */
         #pdf-viewer {
+            margin: 0px;
             text-align: center;
             width: 100%;
             height:fit-content ;
