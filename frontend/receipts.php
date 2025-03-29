@@ -54,7 +54,6 @@ $mesg = "";
 if(isset($_GET['order_id']))
 {
     $__order_id = $_GET['order_id'];
-    echo "Processing order - {$__order_id}";
 }
 
 if(isset($_SESSION['razorpay_order_id']))
