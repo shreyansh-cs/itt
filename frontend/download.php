@@ -2,8 +2,14 @@
 include_once 'session.php';
 include_once "showerror.php";
 include_once '../backend/utils.php';
+include_once '../backend/public_utils.php';
 
-if(!isSessionValid() || !doesUserHasSubscription($error))
+if(!isSessionValid())
+{
+    die("Hey, You are not logged in, Please login first");
+}
+
+if(!isAdminLoggedIn() && !doesUserHasSubscription($error))
 {
     die("What's this, Are you trying without having proper subsciption?");
 }
