@@ -61,7 +61,7 @@ if(!empty($msg))
           <?php
             $rows = getAllClasses(); 
             foreach ($rows as $row) {
-              if(!isAdminLoggedIn())
+              if(!isAdminLoggedIn() && !isTeacherLoggedIn())
               {
                 if($row['ID'] == $class)
                 {
