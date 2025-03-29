@@ -23,7 +23,7 @@ if ($signature === $expected_signature) {
 
         // Process payment (e.g., update database, send confirmation email)
         // Example:
-        file_put_contents('../../payment_log.txt', "Payment ID: $payment_id, Amount: $amount, Email: $customer_email\n", FILE_APPEND);
+        //file_put_contents('../../payment_log.txt', "Payment ID: $payment_id, Amount: $amount, Email: $customer_email\n", FILE_APPEND);
 
         http_response_code(200); // Acknowledge the webhook
     } else {
