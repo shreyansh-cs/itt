@@ -419,9 +419,34 @@ table.courses td a.course-link:hover {
     transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
+.refresh_link
+{
+    display: inline-block;
+    border-width: 0px;
+    font-size: 12px;
+    color: #fff;
+    background-color: #007bff;
+    padding: 5px;
+    margin: 5px;
+    text-decoration: none;
+    border-radius: 50px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
 .receipts_contatiner
 {
     width: 100%;
+}
+
+.receipts
+{
+    padding: 0px;
+    border-collapse: collapse;
+}
+
+.receipts th
+{
+    padding: 10px;
 }
 
 /*upload page css start*/

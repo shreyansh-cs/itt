@@ -54,6 +54,7 @@ $mesg = "";
 if(isset($_GET['order_id']))
 {
     $__order_id = $_GET['order_id'];
+    echo "Processing order - {$__order_id}";
 }
 
 if(isset($_SESSION['razorpay_order_id']))
@@ -78,23 +79,22 @@ if(getReceiptsForThisUser($user_id,$rows,$error))
     echo "<table class='receipts' border='1'>";
     echo "<tr>";
     echo "<th>Receipt #</th>";
-    echo "<th>Package #</th>";
+    echo "<th>Order ID</th>";
     echo "<th>Package Name</th>";
     echo "<th>Price</th>";
     echo "<th>Status</th>";
-    //echo "<th>Created ON</th>";
-    echo "<th>Updated ON</th>";
+    echo "<th>Action</th>";
     echo "</tr>";
     foreach ($rows as $row){
         echo "<tr>";
         echo "<td>{$row['ID']}</td>";
-        echo "<td>{$row['PACKAGE_ID']}</td>";
+        echo "<td>{$row['ORDER_ID']}</td>";
         echo "<td>{$row['PACKAGE_NAME']}</td>";
-        echo "<td>{$row['PACKAGE_PRICE']}</td>";
+        $priceInRs = $row['AMOUNT']/100.00;
+        echo "<td>{$priceInRs}</td>";
         $status_color = getStatusColor($row['STATUS']);
         echo "<td style='background-color:$status_color'>{$row['STATUS']}</td>";
-        //echo "<td>{$row['CREATED_ON']}</td>";
-        echo "<td>{$row['UPDATED_ON']}</td>";
+        echo "<td><a href='receipts.php?order_id={$row['ORDER_ID']}' class='refresh_link'>Refresh</a></td>"; //get status link
         echo "</tr>";
     }
     echo "<tr>";
@@ -107,7 +107,7 @@ if(getReceiptsForThisUser($user_id,$rows,$error))
         //echo "Payment initiated";
         $param = array();
         $params['receipt'] = $receipt_id;
-        $params['amount'] = $package_price;
+        $params['amount'] = $package_price;//in Rs, not paise
         $params['description'] = $package_name;
         $params['image'] = $_SERVER['HTTP_HOST'] . "/itt/images/icon.jpeg";
         $params['name'] = getUserName();

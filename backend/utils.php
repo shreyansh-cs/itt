@@ -456,7 +456,7 @@
     {
         include 'db.php';
         $rows = [];
-        $sql = "SELECT r.id AS ID, r.user_id as USER_ID, r.created_on as CREATED_ON, r.updated_on as UPDATED_ON, r.package_id as PACKAGE_ID, p.NAME as PACKAGE_NAME, p.PRICE as PACKAGE_PRICE, r.status as STATUS FROM pay_receipts AS r ,packages AS p WHERE r.package_id = p.ID and r.user_id = $user_id ORDER BY r.id DESC";
+        $sql = "SELECT r.id AS ID, r.user_id as USER_ID, r.created_on as CREATED_ON, r.updated_on as UPDATED_ON, r.package_id as PACKAGE_ID, p.NAME as PACKAGE_NAME, p.PRICE as PACKAGE_PRICE, r.status as STATUS, po.id as ORDER_ID, po.amount as AMOUNT FROM pay_receipts AS r ,packages AS p, pay_orders as po WHERE r.package_id = p.ID and po.receipt_id=r.id and r.user_id = $user_id ORDER BY r.id DESC";
         $result = $conn->query($sql);
 
         $ok = true;

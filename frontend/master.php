@@ -5,7 +5,7 @@
     <link rel="icon" type="image/x-icon" href="/itt/images/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $title; ?></title>
-    <link rel="stylesheet" href="/itt/frontend/css/styles.css">
+    <link rel="stylesheet" href="/itt/frontend/css/styles.css<?php echo "?no-cache=".time(); ?>">
 </head>
 <body>
   <?php 
@@ -64,6 +64,6 @@
         <p>&copy; 2025 I.T.T. Group of Education. All Rights Reserved.</p>
     </footer>
 
-    <script src="/itt/frontend/scripts/script.js"></script>
+    <script src="/itt/frontend/scripts/script.js<?php echo "?no-cache=".time(); ?>"></script>
 </body>
 </html>
