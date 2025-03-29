@@ -79,7 +79,7 @@ $title = "Notes & Video";
             echo "</td>";
 
             echo "<td>";
-            if(doesUserHasSubscription($error))
+            if(isAdminLoggedIn() || doesUserHasSubscription($error))
             { 
                 $link = $row['LINK'];
                 echo "<a target='_blank' href='$link'>Video</a>"; 
