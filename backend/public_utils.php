@@ -153,4 +153,21 @@ function isAdminLoggedIn()
     return false;
 }
 
+function isTeacherLoggedIn()
+{
+    if (session_status() == PHP_SESSION_NONE) {session_start();}
+
+    if(!isSessionValid())
+        return false;
+    
+    $user_type = getUserType();
+
+    if($user_type == "teacher")
+    {
+        return true;
+    }
+
+    return false;
+}
+
 ?>

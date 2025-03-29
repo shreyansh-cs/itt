@@ -9,7 +9,7 @@ if(!isSessionValid())
     die("Hey, You are not logged in, Please login first");
 }
 
-if(!isAdminLoggedIn() && !doesUserHasSubscription($error))
+if(!isAdminLoggedIn() && !isTeacherLoggedIn() && !doesUserHasSubscription($error))
 {
     die("What's this, Are you trying without having proper subsciption?");
 }

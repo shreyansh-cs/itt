@@ -36,7 +36,7 @@ $title = "Notes & Video";
 
             echo "<td>";
 
-            if(isAdminLoggedIn() || doesUserHasSubscription($error))
+            if(isAdminLoggedIn() || isTeacherLoggedIn() || doesUserHasSubscription($error))
             { 
                 echo "<a target='_blank' href='download.php?noteid=".$row['ID']."'>DOWNLOAD PDF</a>";   
             }
@@ -79,7 +79,7 @@ $title = "Notes & Video";
             echo "</td>";
 
             echo "<td>";
-            if(isAdminLoggedIn() || doesUserHasSubscription($error))
+            if(isAdminLoggedIn() || isTeacherLoggedIn() || doesUserHasSubscription($error))
             { 
                 $link = $row['LINK'];
                 echo "<a target='_blank' href='$link'>Video</a>"; 
