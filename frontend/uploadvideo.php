@@ -15,7 +15,7 @@ if(!empty($chapter))
 {
 ?>
     <form action="../backend/upload.php" method="POST" id="uploadvideo" name="uploadvideo" enctype="multipart/form-data" onSubmit="OnSubmit()">
-        <table class='upload' border="$border">
+        <table class='upload_container' border="$border">
             <tr>
                 <td class='first'>Video Title:</td>
                 <td class='second'>
@@ -35,9 +35,9 @@ if(!empty($chapter))
                 </td>
             </tr>
             <tr>
-                <td class='first'>&nbsp;</td>
-                <td class='second'> 
-                    <input type="submit" value="Submit">
+                <!--td class='first'>&nbsp;</td-->
+                <td colspan="2"> 
+                    <input class='upload_button' type="submit" value="Submit">
                 </td>
             </tr>
         </table>
@@ -45,7 +45,7 @@ if(!empty($chapter))
 <?php 
 }
 echo "</tr></td>";
-echo "<tr><td class='bottomlink'><a target='_blank' href='noteslist.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter'>Notes & Video</a></td></tr>";
+echo "<tr><td class='td_bottomlink'><a class='notes_link' target='_blank' href='noteslist.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter'>Notes & Video</a></td></tr>";
 echo "</table>";
 ?>
 <script>

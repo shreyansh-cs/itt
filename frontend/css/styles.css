@@ -341,21 +341,21 @@ table.courses td a.course-link:hover {
 
 /*quick link at the bottom of the form*/
 
-.bottomlink{
+.td_bottomlink{
     text-align: left;
 }
 
+/*
 .bottomlink a {
     display: inline-block;
     font-size: 18px;
     color: #fff;
     background-color: #007bff;
     padding: 15px 30px;
-    /*margin: 10px 15px;*/
     text-decoration: none;
     border-radius: 50px;
     transition: background-color 0.3s ease, transform 0.3s ease;
-}
+}*/
 
 .bottomlink a:hover {
     background-color: #0056b3;
@@ -405,7 +405,7 @@ table.courses td a.course-link:hover {
     background-color: red;
 }
 
-.btn_init_payment
+.btn_init_payment, .upload_button
 {
     display: inline-block;
     border-width: 0px;
@@ -438,15 +438,29 @@ table.courses td a.course-link:hover {
     width: 100%;
 }
 
-.receipts
+.receipts_container, .notes_data, .video_data, .upload_container
 {
     padding: 0px;
     border-collapse: collapse;
 }
 
-.receipts th
+.receipts_container th, .notes_data th, .video_data th
 {
-    padding: 10px;
+    padding: 5px;
+}
+
+.notes_link
+{
+    display: inline-block;
+    border-width: 0px;
+    font-size: 12px;
+    color: #fff;
+    background-color: #007bff;
+    padding: 5px;
+    margin: 5px;
+    text-decoration: none;
+    border-radius: 50px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 /*upload page css start*/

@@ -8,14 +8,14 @@ include_once 'restrictedpage.php';//restrict page
 include_once 'selection.php';
 $border = "1";
 //Check if we need to show the upload form
-echo "<table border='{$border}'>";
+echo "<table border='0'>";
 echo "<tr><td>";
 
 if(!empty($chapter))
 {
 ?>
     <form action="../backend/upload.php" method="POST" id="uploadnotes" name="uploadnotes" enctype="multipart/form-data" onSubmit="OnSubmit()">
-        <table class='upload' border="<?php echo $border; ?>">
+        <table class='upload_container' border="<?php echo $border; ?>">
             <tr>
                 <td class='first'>Notes Title:</td>
                 <td class='second'>
@@ -41,9 +41,9 @@ if(!empty($chapter))
                 </td>
             </tr>
             <tr>
-                <td class='first'>&nbsp;</td>
-                <td class='second'> 
-                    <input type="submit" value="Submit">
+                <!--td class='first'>&nbsp;</td-->
+                <td colspan="2"> 
+                    <input class='upload_button' type="submit" value="Submit">
                 </td>
             </tr>
         </table>
@@ -51,7 +51,7 @@ if(!empty($chapter))
 <?php 
 }
 echo "</tr></td>";
-echo "<tr><td class='bottomlink'><a target='_blank' href='noteslist.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter'>Notes List</a></td></tr>";
+echo "<tr><td class='td_bottomlink'><a class='notes_link' target='_blank' href='noteslist.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter'>Notes List</a></td></tr>";
 echo "</table>";
 ?>
 <script>

@@ -10,13 +10,13 @@ $title = "Notes & Video";
     include_once '../backend/utils.php';
     $border = "1";
     include_once 'selection.php';
-    echo "<table border='0'>";
+    echo "<table border='0' class='notes_container'>";
     echo "<tr><td>";
 
     if(!empty($chapter))
     {
         $rows = getNotesForChapter($class,$stream,$subject,$chapter);
-        echo "<table border='$border'><th>Title</th><th>Notes Download</th>";
+        echo "<table border='$border' class='notes_data'><th>Title</th><th>Notes Download</th>";
         //Action column is only for admin
         if(isAdminLoggedIn())
         {
@@ -38,18 +38,18 @@ $title = "Notes & Video";
 
             if(isAdminLoggedIn() || isTeacherLoggedIn() || doesUserHasSubscription($error))
             { 
-                echo "<a target='_blank' href='download.php?noteid=".$row['ID']."'>DOWNLOAD PDF</a>";   
+                echo "<a class='notes_link' target='_blank' href='download.php?noteid=".$row['ID']."'>DOWNLOAD PDF</a>";   
             }
             else
             {
-                echo "<a target='_blank' href='receipts.php'>Buy Package</a>";
+                echo "<a class='notes_link' target='_blank' href='receipts.php'>Buy Package</a>";
             }
             echo "</td>";
 
             if(isAdminLoggedIn())
             {
                 echo "<td>";
-                echo "<a target='_blank' href='delete.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter&noteid=".$row['ID']."'>Delete</a>";
+                echo "<a class='notes_link' target='_blank' href='delete.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter&noteid=".$row['ID']."'>Delete</a>";
                 echo "</td>";
             }
 
@@ -60,11 +60,11 @@ $title = "Notes & Video";
         echo "<br/>";
 
         //Start video section
-        echo "<table  border='$border'>";
+        echo "<table  border='0'>";
         echo "<tr>";
         echo "<td id='videocolumn'>";
         $rows = getVideoForChapter($class,$stream,$subject,$chapter);
-        echo "<table  border='$border'><th>Video Title</th><th>Link</th>";
+        echo "<table  border='$border' class='video_data'><th>Video Title</th><th>Link</th>";
         
         //action only for admin
         if(isAdminLoggedIn())
@@ -82,11 +82,11 @@ $title = "Notes & Video";
             if(isAdminLoggedIn() || isTeacherLoggedIn() || doesUserHasSubscription($error))
             { 
                 $link = $row['LINK'];
-                echo "<a target='_blank' href='$link'>Video</a>"; 
+                echo "<a class='notes_link' target='_blank' href='$link'>Video</a>"; 
             }
             else
             {
-                echo "<a target='_blank' href='receipts.php'>Buy Package</a>";
+                echo "<a class='notes_link' target='_blank' href='receipts.php'>Buy Package</a>";
             }
             echo "</td>";
 
@@ -94,7 +94,7 @@ $title = "Notes & Video";
             if(isAdminLoggedIn())
             {
                 echo "<td>";
-                echo "<a target='_blank' href='delete.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter&videoid=".$row['ID']."'>Delete</a>";
+                echo "<a class='notes_link' target='_blank' href='delete.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter&videoid=".$row['ID']."'>Delete</a>";
                 echo "</td>";
             }
             echo "</tr>";
@@ -108,8 +108,8 @@ $title = "Notes & Video";
     echo "</tr></td>";
     if(isAdminLoggedIn())
     {
-        echo "<tr><td class='bottomlink'><a target='_blank' href='uploadnotes.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter'>Add New Notes</td></tr>";
-        echo "<tr><td class='bottomlink'><a target='_blank' href='uploadvideo.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter'>Add New Video</a></td></tr>";
+        echo "<tr><td class='td_bottomlink'><a class='notes_link' target='_blank' href='uploadnotes.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter'>Add New Notes</td></tr>";
+        echo "<tr><td class='td_bottomlink'><a class='notes_link' target='_blank' href='uploadvideo.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter'>Add New Video</a></td></tr>";
     }
     echo "</table>";
 ?>

@@ -75,7 +75,7 @@ $init_form_display = "block";
 //Don't delete any package from packages table - Anyway foreigh key won't allow it
 if(getReceiptsForThisUser($user_id,$rows,$error))
 {
-    echo "<table class='receipts' border='1'>";
+    echo "<table class='receipts_container' border='1'>";
     echo "<tr>";
     echo "<th>Receipt #</th>";
     echo "<th>Order ID</th>";
