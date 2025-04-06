@@ -23,7 +23,7 @@ function setStatusMsg($msg)
 function getSessionData()
 {
     if (session_status() == PHP_SESSION_NONE) {session_start();}
-    include 'secret.php';
+    include 'jw_utils.php';
     if(!isset($_SESSION['token']))
     {
         return []; //return empty payload

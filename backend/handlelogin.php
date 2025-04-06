@@ -12,7 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $error = "";
     if(authUser($email_or_phone,$password,$row/*OUT*/,$error))
     {
-        include_once 'secret.php';
+        include_once 'jw_utils.php';
         //regenerate session when login
         session_regenerate_id(true);
         $payload = [

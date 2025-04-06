@@ -1,5 +1,5 @@
 <?php
-include_once '../backend/secret.php';
+include_once '../backend/jw_utils.php';
 $logoutHours = 2;
 //Ensure this file has no dependency
 session_set_cookie_params([
