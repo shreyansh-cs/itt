@@ -276,6 +276,18 @@ table.courses td a.course-link:hover {
     width: 70%;
   }
 
+  .second span{
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    color: white;
+    box-sizing: border-box;
+    background-color: #007bff;
+    user-select: none;/*no highlight on select*/
+  }
+
   .second input{
     width: 100%;
     padding: 10px;

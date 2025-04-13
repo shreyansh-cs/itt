@@ -28,7 +28,14 @@ include_once '../backend/handlelogin.php';
         </tr>
         <tr>
           <!--td class='first'>Password</td-->
-          <td class='second'> <input type="password" name="password" placeholder="Password" required></td>
+          <td class='second'> 
+          <input id='password' type="password" name="password" placeholder="Password" required>
+          </td>
+        </tr>
+        <tr>
+          <td class='second'> 
+            <span id='showPassword'>Show Password</span>
+          </td>
         </tr>
         <tr>
           <!--td class='first'>&nbsp;</td-->
@@ -49,6 +56,21 @@ include_once '../backend/handlelogin.php';
       </table>
     </form>
   </div>
+  <script>
+    const passwordInput = document.getElementById("password");
+    const showPasswordCheckbox = document.getElementById("showPassword");
+
+    showPasswordCheckbox.addEventListener("click", function () {
+      if(passwordInput.type == "password"){
+        passwordInput.type = "text";
+        showPasswordCheckbox.innerHTML = "Hide Password";
+      }
+      else {
+        passwordInput.type = "password";
+        showPasswordCheckbox.innerHTML = "Show Password"
+      }
+    });
+  </script>
   
   <?php 
   $content = ob_get_contents();
