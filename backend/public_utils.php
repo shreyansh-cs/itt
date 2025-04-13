@@ -29,10 +29,19 @@ function getSessionData()
         return []; //return empty payload
     }
     $jwt = $_SESSION['token'];
-    $decoded = \Firebase\JWT\JWT::decode($jwt, new \Firebase\JWT\Key($secretKey, $jwtAlgo));
-    $payload = (array) $decoded;
 
-    return $payload;
+    try
+    {
+        $decoded = \Firebase\JWT\JWT::decode($jwt, new \Firebase\JWT\Key($secretKey, $jwtAlgo));
+        $payload = (array) $decoded;
+        return $payload;
+    }
+    //Exeception when secret or something has changed
+    catch (Exception $e) 
+    {
+        header("Location: /itt/backend/logout.php");
+        exit;
+    }
 }
 
 function getUserID()
