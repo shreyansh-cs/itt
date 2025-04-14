@@ -2,7 +2,11 @@
 
 function redirect($url)
 {
-    header("Location : ".$url);
+    if (headers_sent($file, $line)) {
+        die("Headers already sent in $file on line $line");
+    }
+    header("Location: $url");
+    exit;
 }
 
 function redirectError($error)

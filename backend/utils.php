@@ -1,4 +1,5 @@
 <?php 
+    /*
     function getAPIToken($env="stage",&$apiKey,&$apiSecret,&$error)
     {
         include 'db.php';
@@ -20,6 +21,7 @@
         $conn->close();
         return $ok;
     }
+    */
 
     function getAllClasses()
     {

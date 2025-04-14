@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $subject=$_POST['subject'];
     $section=$_POST['section'];
     $chapter=$_POST['chapter'];
-    $redirectLink = "/itt/frontend/noteslist.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter";
+    $redirectLink = htmlspecialchars("/itt/frontend/noteslist.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter");
 
     //upload notes was submitted
     if(isset($_POST['notes_title']))
