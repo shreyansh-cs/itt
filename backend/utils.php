@@ -23,129 +23,167 @@
 
     function getAllClasses()
     {
-        include 'db.php';
+        include 'db.php'; // Make sure this creates a $pdo instance (not $conn) using PDO
         $rows = [];
-        //Select list of supported classes
-        $sql = "SELECT ID AS ID, NAME as NAME FROM classes where SUPPORTED=1 ORDER BY ID ASC";
-        $result = $conn->query($sql);
-
-        if ($result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
-                array_push($rows,$row);
-            }
-        } 
-        $conn->close();
-        return $rows; 
-    }
-    function getStreamsForClass($class)
-    {
-        include 'db.php';
-        $rows = [];
-        $sql = "SELECT ID AS ID, NAME as NAME FROM streams where CLASS_ID=$class";
-        $result = $conn->query($sql);
-
-        if ($result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
-                array_push($rows,$row);
-            }
-        } 
-        $conn->close();
-        return $rows;
-    }
-
-    function getSubjectsForStream($class,$stream)
-    {
-        include 'db.php';
-        $rows = [];
-        $sql = "SELECT ID as ID, NAME as NAME from subjects where ID IN(SELECT SUBJECT_ID FROM streamubjectmap where STREAM_ID=$stream)";
-        $result = $conn->query($sql);
-        if ($result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
-                array_push($rows,$row);
-            }
-        } 
-        $conn->close();
-        return $rows;
-    }
-
-    function getSectionsForSubject($class,$stream,$subject)
-    {
-        include 'db.php';
-        $rows = [];
-        $sql = "SELECT ID as ID, NAME as NAME from sections where SUBJECT_ID=$subject";
-        echo $sql;
-        $result = $conn->query($sql);
-        if ($result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
-                array_push($rows,$row);
-            }
-        } 
-        $conn->close();
-        return $rows;
-    }
-
-    function getChaptersForSection($class,$stream,$subject,$section)
-    {
-        include 'db.php';
-        $rows = [];
-        $sql = "SELECT ID AS ID, NAME as NAME FROM chapters where SECTION_ID=$section";
-        $result = $conn->query($sql);
-        if ($result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
-                array_push($rows,$row);
-            }
-        } 
-        $conn->close();
-        return $rows;
-    }
-
-    function getNotesForChapter($class,$stream,$subject,$chapter)
-    {
-        include 'db.php';
-        $rows = [];
-        $sql = "SELECT ID AS ID, NAME as NAME, PDF AS PDF, TEXT AS TEXT FROM notes where CHAPTER_ID=$chapter";
-        //echo $sql;
-        $result = $conn->query($sql);
-        if ( $result && $result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
-                array_push($rows,$row);
-            }
+        try {
+            $stmt = $pdo->prepare("SELECT ID, NAME FROM classes WHERE SUPPORTED = 1 ORDER BY ID ASC");
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            // Handle error or log it
+            error_log("Database error: " . $e->getMessage());
         }
-        $conn->close(); 
-        return $rows; 
-    }
 
-    function getPDFPathFromNote($note)
-    {
-        include 'db.php';
-        $rows = [];
-        $sql = "SELECT PDF AS PDF, NAME AS NAME FROM notes where ID=$note";
-        //echo $sql;
-        $result = $conn->query($sql);
-        if ( $result && $result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
-                array_push($rows,$row);
-            }
-        } 
-        $conn->close();
-        return $rows; 
+        return $rows;
     }
-
-    function getVideoForChapter($class,$stream,$subject,$chapter)
+    function getStreamsForClass($class) 
     {
-        include 'db.php';
+        include 'db.php'; // This should define $pdo using PDO
+    
         $rows = [];
-        $sql = "SELECT ID AS ID, NAME as NAME, LINK AS LINK FROM videos where CHAPTER_ID=$chapter";
-        //echo $sql;
-        $result = $conn->query($sql);
-        if ( $result && $result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
-                array_push($rows,$row);
-            }
+        try {
+            $stmt = $pdo->prepare("SELECT ID, NAME FROM streams WHERE CLASS_ID = :class");
+            $stmt->bindParam(':class', $class, PDO::PARAM_INT);
+            $stmt->execute();
+    
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("DB Error: " . $e->getMessage());
         }
-        $conn->close(); 
-        return $rows; 
+    
+        return $rows;
     }
+    
+
+    function getSubjectsForStream($class, $stream) 
+    {
+        include 'db.php'; // Assumes $pdo is defined here
+    
+        $rows = [];
+        try {
+            $sql = "SELECT ID, NAME 
+                    FROM subjects 
+                    WHERE ID IN (
+                        SELECT SUBJECT_ID 
+                        FROM streamubjectmap 
+                        WHERE STREAM_ID = :stream
+                    )";
+    
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':stream', $stream, PDO::PARAM_INT);
+            $stmt->execute();
+    
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Database error: " . $e->getMessage());
+        }
+    
+        return $rows;
+    }
+    
+
+    function getSectionsForSubject($class, $stream, $subject) 
+    {
+        include 'db.php'; // Should set up $pdo
+    
+        $rows = [];
+        try {
+            $sql = "SELECT ID, NAME FROM sections WHERE SUBJECT_ID = :subject";
+            echo $sql; // Optional: keep this for debugging
+    
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':subject', $subject, PDO::PARAM_INT);
+            $stmt->execute();
+    
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Database error: " . $e->getMessage());
+        }
+    
+        return $rows;
+    }    
+
+    function getChaptersForSection($class, $stream, $subject, $section) {
+        include 'db.php'; // This should define $pdo
+    
+        $rows = [];
+        try {
+            $sql = "SELECT ID, NAME FROM chapters WHERE SECTION_ID = :section";
+    
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':section', $section, PDO::PARAM_INT);
+            $stmt->execute();
+    
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Database error: " . $e->getMessage());
+        }
+    
+        return $rows;
+    }    
+
+    function getNotesForChapter($class, $stream, $subject, $chapter) {
+        include 'db.php'; // $pdo should be defined here
+    
+        $rows = [];
+        try {
+            $sql = "SELECT ID, NAME, PDF, TEXT 
+                    FROM notes 
+                    WHERE CHAPTER_ID = :chapter";
+    
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':chapter', $chapter, PDO::PARAM_INT);
+            $stmt->execute();
+    
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Database error: " . $e->getMessage());
+        }
+    
+        return $rows;
+    }    
+
+    function getPDFPathFromNote($note) {
+        include 'db.php'; // Assumes $pdo is set up here
+    
+        $rows = [];
+        try {
+            $sql = "SELECT PDF, NAME FROM notes WHERE ID = :note";
+            
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':note', $note, PDO::PARAM_INT);
+            $stmt->execute();
+    
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Database error: " . $e->getMessage());
+        }
+    
+        return $rows;
+    }
+    
+
+    function getVideoForChapter($class, $stream, $subject, $chapter) {
+        include 'db.php'; // Assumes $pdo is defined here
+    
+        $rows = [];
+        try {
+            $sql = "SELECT ID, NAME, LINK 
+                    FROM videos 
+                    WHERE CHAPTER_ID = :chapter";
+    
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':chapter', $chapter, PDO::PARAM_INT);
+            $stmt->execute();
+    
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Database error: " . $e->getMessage());
+        }
+    
+        return $rows;
+    }
+    
 
     //Check if this option in dropdown is selected or not
     function checkSelected($thisOptionValue,$selectedValue)
@@ -160,99 +198,128 @@
         }
     }
 
-    function insertNotes($chapter_id,$notes_title,$notesText,$pdf_file_path,&$error/*OUT*/ )
-    {
-        include 'db.php';
+    function insertNotes($chapter_id, $notes_title, $notesText, $pdf_file_path, &$error) {
+        include 'db.php'; // Assumes $pdo is set up here
+    
         $ret = false;
-        $sql = "INSERT INTO notes(NAME,TEXT,PDF,CHAPTER_ID) VALUES ('$notes_title','$notesText', '$pdf_file_path',$chapter_id)";
-        // Execute the query
-        if ($conn->query($sql) === TRUE) 
-        {
-            $error = "New record created successfully";
-            $ret = true;
-        } 
-        else 
-        {
-            $error = "Error: " . $sql . $conn->error;
+        try {
+            $sql = "INSERT INTO notes (NAME, TEXT, PDF, CHAPTER_ID) 
+                    VALUES (:notes_title, :notesText, :pdf_file_path, :chapter_id)";
+    
+            $stmt = $pdo->prepare($sql);
+            
+            // Bind the parameters safely
+            $stmt->bindParam(':notes_title', $notes_title, PDO::PARAM_STR);
+            $stmt->bindParam(':notesText', $notesText, PDO::PARAM_STR);
+            $stmt->bindParam(':pdf_file_path', $pdf_file_path, PDO::PARAM_STR);
+            $stmt->bindParam(':chapter_id', $chapter_id, PDO::PARAM_INT);
+    
+            if ($stmt->execute()) {
+                $error = "New record created successfully";
+                $ret = true;
+            } else {
+                $error = "Error: " . $stmt->errorInfo()[2]; // More detailed error info
+                $ret = false;
+            }
+        } catch (PDOException $e) {
+            $error = "Database error: " . $e->getMessage();
             $ret = false;
-        } 
-        $conn->close();
+        }
+    
         return $ret;
-    }
+    }    
 
-    function insertVideo($video_title,$video_link,$chapter_id,&$error)
-    {
-        include 'db.php';
+    function insertVideo($video_title, $video_link, $chapter_id, &$error) {
+        include 'db.php'; // Assumes $pdo is defined here
+    
         $ok = false;
-        $sql = "INSERT INTO videos(NAME,LINK,CHAPTER_ID) VALUES ('$video_title','$video_link',$chapter_id)";
-        if ($conn->query($sql) === TRUE) 
-        {
-            if($conn->affected_rows > 0)
-            {
-                $ok = true;
+        try {
+            $sql = "INSERT INTO videos (NAME, LINK, CHAPTER_ID) 
+                    VALUES (:video_title, :video_link, :chapter_id)";
+    
+            $stmt = $pdo->prepare($sql);
+            
+            // Bind parameters securely
+            $stmt->bindParam(':video_title', $video_title, PDO::PARAM_STR);
+            $stmt->bindParam(':video_link', $video_link, PDO::PARAM_STR);
+            $stmt->bindParam(':chapter_id', $chapter_id, PDO::PARAM_INT);
+    
+            // Execute the query
+            if ($stmt->execute()) {
+                if ($stmt->rowCount() > 0) {
+                    $ok = true;
+                } else {
+                    $error = "Record not inserted";
+                }
+            } else {
+                $error = "Error: " . $stmt->errorInfo()[2]; // More detailed error message
+                $ok = false;
             }
-            else
-            {
-                $error = "Record not inserted";
-            }
-        } 
-        else 
-        {
-            $error = "Error: " . $sql . $conn->error;
+        } catch (PDOException $e) {
+            $error = "Database error: " . $e->getMessage();
             $ok = false;
-        } 
-        $conn->close();
-        return $ok; 
-    }
+        }
+    
+        return $ok;
+    }    
 
-    function deleteNote($noteid,&$error)
-    {
-        include 'db.php';
+    function deleteNote($noteid, &$error) {
+        include 'db.php'; // Assumes $pdo is defined here
+    
         $ret = false;
-        $sql = "delete from notes where ID=$noteid";
-        if ($conn->query($sql) === TRUE) 
-        {
-            $error = "Record deleted successfully";
-            if($conn->affected_rows == 0)
-            {
-                $error = "No record updated"; 
+        try {
+            $sql = "DELETE FROM notes WHERE ID = :noteid";
+            
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':noteid', $noteid, PDO::PARAM_INT);
+            
+            if ($stmt->execute()) {
+                if ($stmt->rowCount() > 0) {
+                    $error = "Record deleted successfully";
+                    $ret = true;
+                } else {
+                    $error = "No record found to delete";
+                }
+            } else {
+                $error = "Error: " . $stmt->errorInfo()[2]; // Detailed error info
+                $ret = false;
             }
-
-            $ret = true;
-        } 
-        else 
-        {
-            $error = "Error: " . $sql . $conn->error;
+        } catch (PDOException $e) {
+            $error = "Database error: " . $e->getMessage();
             $ret = false;
-        } 
-        $conn->close();
+        }
+    
         return $ret;
-    }
+    }    
 
-    function deleteVideo($videoid,&$error)
-    {
-        include 'db.php';
+    function deleteVideo($videoid, &$error) {
+        include 'db.php'; // Assumes $pdo is defined here
+    
         $ret = false;
-        $sql = "delete from videos where ID=$videoid";
-        if ($conn->query($sql) === TRUE) 
-        {
-            $error = "Record deleted successfully";
-            if($conn->affected_rows == 0)
-            {
-                $error = "No record updated"; 
+        try {
+            $sql = "DELETE FROM videos WHERE ID = :videoid";
+            
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':videoid', $videoid, PDO::PARAM_INT);
+    
+            if ($stmt->execute()) {
+                if ($stmt->rowCount() > 0) {
+                    $error = "Record deleted successfully";
+                    $ret = true;
+                } else {
+                    $error = "No record found to delete";
+                }
+            } else {
+                $error = "Error: " . $stmt->errorInfo()[2]; // Detailed error info
+                $ret = false;
             }
-
-            $ret = true;
-        } 
-        else 
-        {
-            $error = "Error: " . $sql . $conn->error;
+        } catch (PDOException $e) {
+            $error = "Database error: " . $e->getMessage();
             $ret = false;
-        } 
-        $conn->close();
+        }
+    
         return $ret;
-    }
-
+    }    
         // Function to generate token
     function generateToken($length = 64) 
     {
@@ -263,11 +330,8 @@
     {
         include 'db.php';
         $ok = false;
-        $pdo = new PDO("mysql:host=$servername;dbname=$dbname", $username, $db_password);
         try 
         {
-            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        
             $sql = "UPDATE users SET password= :password where ID= :id";
             //$sql = "UPDATE users SET name = :name, email = :email WHERE id = :id";
             $stmt = $pdo->prepare($sql);
@@ -294,78 +358,48 @@
     }
 
     //Both param can be email or phone
-    function authUser($email_or_phone,$password,&$row/*OUT*/,&$error)
-    {
-        include 'db.php';
-        $sql = "SELECT id as ID, full_name as FULL_NAME, password as PASSWORD, user_type as USER_TYPE, user_class as USER_CLASS, verified AS VERIFIED, email as EMAIL, phone as PHONE from users where email='$email_or_phone' OR phone='$email_or_phone'";
-        //echo $sql;
-        $ok = false;
-        $result = $conn->query($sql);
-        if ($result && $result->num_rows == 1) 
-        {
-            //only one row of user
-            $row = $result->fetch_assoc();
-            //echo '<pre>'; print_r($row); echo '</pre>';
-            $ok = true;
-        }
-        else if($result && $result->num_rows == 0)
-        {
-            $error = "No such user exists"; 
-        }
-        else
-        {
-            $error = "Unknown Error ". $conn->error;
-        }
-
-        if($ok)
-        {
-            $ok=true; //by default matched
-            if($row['VERIFIED'] == 0)
-            {
-                $error = "UserID is not verified"; 
-                $ok=false;
-            }
+    function authUser($email_or_phone, $password, &$row, &$error) {
+        include 'db.php'; // Assumes $pdo is defined here
+    
+        $sql = "SELECT id AS ID, full_name AS FULL_NAME, password AS PASSWORD, user_type AS USER_TYPE, user_class AS USER_CLASS, verified AS VERIFIED, email AS EMAIL, phone AS PHONE 
+                FROM users WHERE email = :email_or_phone OR phone = :email_or_phone";
+        
+        try {
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':email_or_phone', $email_or_phone, PDO::PARAM_STR);
+            $stmt->execute();
             
-            if($ok && $row['PASSWORD'] != $password)
-            {
-                $error = "Username / Password not matching"; 
-                $ok = false;
+            if ($stmt->rowCount() == 1) {
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                // Check if user is verified
+                if ($row['VERIFIED'] == 0) {
+                    $error = "UserID is not verified";
+                    return false;
+                }
+    
+                // Verify password securely
+                //echo $password,$row['PASSWORD'];
+                //if (!password_verify($password, $row['PASSWORD'])) {
+                if($password != $row['PASSWORD']){
+                    $error = "Username / Password not matching";
+                    return false;
+                }
+    
+                // Successful login
+                return true;
+            } elseif ($stmt->rowCount() == 0) {
+                $error = "No such user exists";
+                return false;
+            } else {
+                $error = "Unknown error";
+                return false;
             }
-            //Generate token
-            /*if($ok)
-            {
-                // Password is correct, generate token
-                //Check if a token already exists
-                $token = "";
-                clearExpiredTokens($row['ID'],$error); //clear expired tokens
-                if(getValidToken($row['ID'],$token,$error))
-                {
-                    $row['TOKEN']=$token; //return the token
-                }
-                else
-                {
-                    $token = generateToken();
-
-                    // Save token in the database
-                    $userId = $row['ID'];
-                    $expiry_interval = "1";//1 hour
-                    $sql = "INSERT INTO api_tokens (user_id, token, expires_at) VALUES ($userId, '$token', ADDDATE(NOW(), INTERVAL {$expiry_interval} HOUR))";
-                    $result = $conn->query($sql);
-                    if($result && $conn->affected_rows > 0)
-                    {
-                        $row['TOKEN']=$token; //return the token
-                    }
-                    else
-                    {
-                        $ok=false;
-                        $error = "Unable to generate new token";
-                    }
-                }
-            }*/
+        } catch (PDOException $e) {
+            $error = "Database error: " . $e->getMessage();
+            return false;
         }
-        $conn->close();
-        return $ok;
-    }
+    }    
 
     function clearExpiredTokens($userid,&$error)
     {
@@ -379,6 +413,7 @@
         $error =  "Expired Tokens: " . $affectedRows;
     }
 
+    /*
     function getValidToken($userid,&$token,&$error)
     {
         include 'db.php';
@@ -417,190 +452,248 @@
         $error = "Invalid Token";
         return false;
     }
+    */
 
     //Both param can be email or phone
-    function doesEmailExist($email,&$username,&$password,&$error)
-    {
-        include 'db.php';
-        $sql = "SELECT email as EMAIL, phone as PHONE, password as PASSWORD from users where email='$email'";
-        //echo $sql;
-        $ok = false;
-        $result = $conn->query($sql);
-        if ( $result && $result->num_rows > 0) 
-        {
-                $ok = true;
-                $row = $result->fetch_assoc();
-                $username = $row['PHONE'];//get phone to send email
-                $password = $row['PASSWORD'];
-
+    function doesEmailExist($email, &$username, &$password, &$error) {
+        include 'db.php'; // Assumes $pdo is defined here
+    
+        $sql = "SELECT email AS EMAIL, phone AS PHONE, password AS PASSWORD 
+                FROM users WHERE email = :email";
+    
+        try {
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+            $stmt->execute();
+    
+            if ($stmt->rowCount() > 0) {
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                $username = $row['PHONE'];  // Get phone to send email
+                $password = $row['PASSWORD']; // Retrieve the hashed password
+                return true;
+            } else {
+                $error = "User does not exist";
+                return false;
+            }
+        } catch (PDOException $e) {
+            $error = "Database error: " . $e->getMessage();
+            return false;
         }
-        else
-        {
-            $error = "User does not exist";
-        } 
-        $conn->close();   
+    }    
+
+    //Both param can be email or phone
+    function doesUserAlreadyExist($param1, $param2, &$error) {
+        include 'db.php'; // Assumes $pdo is defined here
+        $ok = false;
+        try {
+            // Prepare the first query
+            $sql1 = "SELECT email AS EMAIL, phone AS PHONE FROM users WHERE email = :param1 OR phone = :param1";
+            $stmt1 = $pdo->prepare($sql1);
+            $stmt1->bindParam(':param1', $param1, PDO::PARAM_STR);
+            $stmt1->execute();
+    
+            if ($stmt1->rowCount() > 0) {
+                $ok = true; // Match found for param1
+            }
+    
+            // If no match for param1, check param2
+            if (!$ok) {
+                $sql2 = "SELECT email AS EMAIL, phone AS PHONE FROM users WHERE email = :param2 OR phone = :param2";
+                $stmt2 = $pdo->prepare($sql2);
+                $stmt2->bindParam(':param2', $param2, PDO::PARAM_STR);
+                $stmt2->execute();
+    
+                if ($stmt2->rowCount() > 0) {
+                    $ok = true; // Match found for param2
+                }
+            }
+    
+        } catch (PDOException $e) {
+            $error = "Database error: " . $e->getMessage();
+            return false;
+        }
         return $ok;
     }
-
-    //Both param can be email or phone
-    function doesUserAlreadyExist($param1,$param2,&$error)
-    {
-        include 'db.php';
-        $rows = [];
-        $sql1 = "SELECT email as EMAIL, phone as PHONE from users where email='$param1' OR phone='$param1'";
-        $sql2 = "SELECT email as EMAIL, phone as PHONE from users where email='$param2' OR phone='$param2'";
+    
+    function getPackageDetails($class, &$row, &$error) {
+        include 'db.php'; // Assumes $pdo is defined here
+    
         $ok = false;
-        $result = $conn->query($sql1);
-        if ( $result && $result->num_rows > 0) 
-        {
-                $ok = true;
+        try {
+            // Prepare the query
+            $sql = "SELECT ID AS ID, NAME AS NAME, PRICE AS PRICE 
+                    FROM packages 
+                    WHERE ID = (SELECT PACKAGE_ID FROM classes WHERE ID = :class)";
+            
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':class', $class, PDO::PARAM_INT);
+            $stmt->execute();
+    
+            if ($stmt->rowCount() > 0) {
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                $ok = true; // If a row is found, set ok to true
+            }
+    
+        } catch (PDOException $e) {
+            $error = "Database error: " . $e->getMessage();
+            return false;
         }
+    
+        return $ok;
+    }    
+
+    function getReceiptsForThisUser($user_id, &$rows, &$error) {
+        include 'db.php'; // Assumes $pdo is defined here
         
-        //param 1 did not match, check for param2
-        if(!$ok)
-        {
-            $result = $conn->query($sql2);
-            if ( $result && $result->num_rows > 0) 
-            {
-                    $ok = true;
-            }
-        }
-        $conn->close();
-        return $ok;
-    }
-
-    function getPackageDetails($class,&$row,&$error)
-    {
-        include 'db.php';
         $rows = [];
-        $sql = "SELECT ID as ID, NAME as NAME, PRICE as PRICE from packages where ID = (SELECT PACKAGE_ID as PACKAGE_ID from classes where ID=$class)";
-        //echo $sql;
         $ok = false;
-        $result = $conn->query($sql);
-        if ( $result && $result->num_rows > 0) 
-        {
-                $row = $result->fetch_assoc();
+    
+        try {
+            // Prepare the query
+            $sql = "SELECT r.id AS ID, r.user_id AS USER_ID, r.created_on AS CREATED_ON, r.updated_on AS UPDATED_ON, 
+                           r.package_id AS PACKAGE_ID, p.NAME AS PACKAGE_NAME, p.PRICE AS PACKAGE_PRICE, 
+                           r.status AS STATUS, po.id AS ORDER_ID, po.amount AS AMOUNT 
+                    FROM pay_receipts AS r 
+                    JOIN packages AS p ON r.package_id = p.ID 
+                    JOIN pay_orders AS po ON po.receipt_id = r.id 
+                    WHERE r.user_id = :user_id 
+                    ORDER BY r.id DESC";
+            
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            $stmt->execute();
+    
+            if ($stmt->rowCount() > 0) {
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $rows[] = $row;
+                }
+                $ok = true;  // Success if rows are fetched
+            } else {
+                $error = "No receipts found for the user.";
+            }
+    
+        } catch (PDOException $e) {
+            $error = "Error executing query: " . $e->getMessage();
+        }
+    
+        return $ok;
+    }    
+
+    function createReceipt($user_id, $package_id, &$row, &$error) {
+        include 'db.php'; // Assumes $pdo is defined here
+    
+        $ok = false;
+        try {
+            // Prepare the query
+            $sql = "INSERT INTO pay_receipts (user_id, package_id, status) 
+                    VALUES (:user_id, :package_id, 'initiated')";
+    
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            $stmt->bindParam(':package_id', $package_id, PDO::PARAM_INT);
+    
+            // Execute the query
+            if ($stmt->execute()) {
                 $ok = true;
-        }
-        $conn->close();
-        return $ok;
-    }
-
-    function getReceiptsForThisUser($user_id,&$rows,&$error)
-    {
-        include 'db.php';
-        $rows = [];
-        $sql = "SELECT r.id AS ID, r.user_id as USER_ID, r.created_on as CREATED_ON, r.updated_on as UPDATED_ON, r.package_id as PACKAGE_ID, p.NAME as PACKAGE_NAME, p.PRICE as PACKAGE_PRICE, r.status as STATUS, po.id as ORDER_ID, po.amount as AMOUNT FROM pay_receipts AS r ,packages AS p, pay_orders as po WHERE r.package_id = p.ID and po.receipt_id=r.id and r.user_id = $user_id ORDER BY r.id DESC";
-        $result = $conn->query($sql);
-
-        $ok = true;
-        if($result == false)
-        {
-            $ok = false;
-            $error = "Error executing - ".$sql;
-        }
-
-
-        if ($ok && $result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
-                array_push($rows,$row);
+                $last_id = $pdo->lastInsertId();  // Get the last inserted ID
+                $row['ID'] = $last_id;
+            } else {
+                $error = "Error executing query.";
             }
-        } 
-        $conn->close();
-        return $ok;  
-    }
-
-    function createReceipt($user_id,$package_id,&$row,&$error)
-    {
-        include 'db.php';
-        $ok = false;
-        $sql = "INSERT INTO pay_receipts(user_id,package_id,status) VALUES ($user_id,$package_id,'initiated')";
-        // Execute the query
-        if ($conn->query($sql) === TRUE) 
-        {
-            $ok = true;
-            $last_id = $conn->insert_id;//last inserted id
-            $row['ID'] = $last_id;
-        } 
-        else 
-        {
-            $error = "Error: " . $sql . $conn->error;
-            $ok = false;
-        } 
-        $conn->close();
-        return $ok;
-    }
-
-    function createNewOrderInDB($order_id,$order_amount,$order_receipt,&$error)
-    {
-        include 'db.php';
-        $ok = false;
-        $sql_order = "INSERT into pay_orders(id,amount,receipt_id,status) values('$order_id',$order_amount,$order_receipt,'created')";
-
-        //echo $sql_order;
-
-        $conn->begin_transaction();
-
-        try
-        {
-            if ($conn->query($sql_order) === FALSE) {
-                throw new Exception("Error creating entry into pay_orders table".$sql_order);
-            }
-            $conn->commit();
-            $ok = true;
+    
+        } catch (PDOException $e) {
+            $error = "Error: " . $e->getMessage();
         }
-        catch (Exception $e) 
-        {
+    
+        return $ok;
+    }    
+
+    function createNewOrderInDB($order_id, $order_amount, $order_receipt, &$error) {
+        include 'db.php'; // Assumes $pdo is defined here
+    
+        $ok = false;
+        $sql_order = "INSERT INTO pay_orders (id, amount, receipt_id, status) 
+                      VALUES (:order_id, :order_amount, :order_receipt, 'created')";
+    
+        // Start transaction
+        $pdo->beginTransaction();
+    
+        try {
+            // Prepare and bind parameters
+            $stmt = $pdo->prepare($sql_order);
+            $stmt->bindParam(':order_id', $order_id, PDO::PARAM_STR);
+            $stmt->bindParam(':order_amount', $order_amount, PDO::PARAM_STR); // assuming it's a decimal
+            $stmt->bindParam(':order_receipt', $order_receipt, PDO::PARAM_INT);
+    
+            // Execute the query
+            if (!$stmt->execute()) {
+                throw new Exception("Error creating entry into pay_orders table.");
+            }
+    
+            // Commit the transaction if successful
+            $pdo->commit();
+            $ok = true;
+    
+        } catch (PDOException $e) {
             // An error occurred, rollback the transaction
-            $conn->rollback();
+            $pdo->rollBack();
+            $error = "Database Error: " . $e->getMessage();
+        } catch (Exception $e) {
+            // Catch any other errors
+            $pdo->rollBack();
             $error = $e->getMessage();
-            $ok = false;
         }
-        $conn->close();
+    
         return $ok;
+    }    
 
-    }
-
-    function doesTransactionAlreadyExist($payment_id,&$error)
-    {
-        include 'db.php';
-        $rows = [];
-        $sql = "select * from pay_transactions where id='$payment_id'";
+    function doesTransactionAlreadyExist($payment_id, &$error) {
+        include 'db.php'; // Assumes $pdo is defined here
         $ok = false;
-        $result = $conn->query($sql);
-        if ($result && $result->num_rows > 0) 
-        {
-            //$row = $result->fetch_assoc();
-            $ok = true;
+    
+        try {
+            $sql = "SELECT * FROM pay_transactions WHERE id = :payment_id";
+            // Prepare the query
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':payment_id', $payment_id, PDO::PARAM_STR);
+            
+            // Execute the query
+            $stmt->execute();
+            
+            // Check if any rows are returned
+            if ($stmt->rowCount() > 0) {
+                $ok = true; // Transaction exists
+            }
+        } catch (PDOException $e) {
+            $error = "Database Error: " . $e->getMessage();
         }
-        $conn->close();
+    
         return $ok;
-    }
+    }    
 
-    function savePaymentDetailsDB($arr,&$error)
+    function savePaymentDetailsDB($arr, &$error)
     {
-        include 'db.php';
+        include 'db.php'; // Assumes $pdo is defined here
         $ok = false;
-        //1. update status into pay_orders
-        //2. Create entry into pay_transactions
-        //3. update status in pay_receipts 
+        
+        // 1. Update status into pay_orders
+        // 2. Create entry into pay_transactions
+        // 3. Update status in pay_receipts 
         $order = $arr['order'];
         $order_id = $order['id'];
         $order_amount = $order['amount'];
         $order_receipt = $order['receipt'];
         $order_status = $order['status'];
 
-        //Should we reconcile amount, receipt from existing order_id
+        // Should we reconcile amount, receipt from existing order_id
+        $sql_order = "UPDATE pay_orders SET status = :status WHERE id = :order_id";
 
-        $sql_order = "UPDATE pay_orders set status='$order_status' where id = '$order_id'";
-        //(id,amount,receipt_id,status) values('$order_id',$order_amount,$order_receipt,'$order_status')";
-
-        //There was no trasaction for order
+        // Payment details
         $payment_status = "";
         $payment_merchant_id = "";
-        $update_txn = false; // when we don't have transaction details, only orders is what we have
-        if($arr['payment']['count'] > 0)
-        {
+        $update_txn = false; // When we don't have transaction details, only orders are updated
+        
+        if ($arr['payment']['count'] > 0) {
             $update_txn = true;
             $payment = $arr['payment']['items'][0];
             $payment_id = $payment['id'];
@@ -610,171 +703,221 @@
             $payment_error_code = $payment['error_code'];
             $payment_merchant_id = $payment['notes']['merchant_order_id'];
 
-            //If it already exist update it's status
-            if(doesTransactionAlreadyExist($payment_id,$error))
-            {
-                $sql_transaction = "UPDATE pay_transactions set status='$payment_status' where id='$payment_id'";
-            }
-            else
-            {
-                $sql_transaction = "INSERT into pay_transactions(id,amount,status,order_id,error_code,notes_merchant_order_id) values('$payment_id',$payment_amount,'$payment_status','$payment_order_id','$payment_error_code',$payment_merchant_id)";
+            // If transaction already exists, update it
+            if (doesTransactionAlreadyExist($payment_id, $error)) {
+                $sql_transaction = "UPDATE pay_transactions SET status = :status WHERE id = :payment_id";
+            } else {
+                $sql_transaction = "INSERT INTO pay_transactions (id, amount, status, order_id, error_code, notes_merchant_order_id)
+                                    VALUES (:payment_id, :payment_amount, :payment_status, :payment_order_id, :payment_error_code, :payment_merchant_id)";
             }
         }
 
+        // Set the receipt status based on the order and payment status
         $receipt_status = "unknown";
-        
-        //success
-        if($order_status == "paid" && $payment_status == "captured")
-        {
+        if ($order_status == "paid" && $payment_status == "captured") {
             $receipt_status = "success";
-        }
-        else if(!empty($payment_status))
-        {
-            $receipt_status = $payment_status; 
-        }
-        else if(!empty($order_status))
-        {
-            $receipt_status = $order_status; 
-        }
-        else
-        {
-            //unlikely to have this case
+        } else if (!empty($payment_status)) {
+            $receipt_status = $payment_status;
+        } else if (!empty($order_status)) {
+            $receipt_status = $order_status;
         }
 
-        $sql_receipt = "UPDATE pay_receipts set status='$receipt_status' WHERE id = $order_receipt";
+        $sql_receipt = "UPDATE pay_receipts SET status = :receipt_status WHERE id = :order_receipt";
 
-        $conn->begin_transaction();
+        // Begin PDO transaction
+        $pdo->beginTransaction();
 
-        try
-        {
-            if ($conn->query($sql_order) === FALSE) {
-                throw new Exception("Error updating pay_orders table".$sql_order);
+        try {
+            // Prepare and execute the order update
+            $stmt_order = $pdo->prepare($sql_order);
+            $stmt_order->bindParam(':status', $order_status, PDO::PARAM_STR);
+            $stmt_order->bindParam(':order_id', $order_id, PDO::PARAM_STR);
+            if (!$stmt_order->execute()) {
+                throw new Exception("Error updating pay_orders table: " . $sql_order);
             }
 
-            if ($update_txn && $conn->query($sql_transaction) === FALSE) {
-                throw new Exception("Error updating pay_transactions table".$sql_transaction);
+            // If there is a transaction, update or insert the transaction
+            if ($update_txn) {
+                $stmt_transaction = $pdo->prepare($sql_transaction);
+                $stmt_transaction->bindParam(':payment_status', $payment_status, PDO::PARAM_STR);
+                $stmt_transaction->bindParam(':payment_id', $payment_id, PDO::PARAM_STR);
+                $stmt_transaction->bindParam(':payment_amount', $payment_amount, PDO::PARAM_STR);
+                $stmt_transaction->bindParam(':payment_order_id', $payment_order_id, PDO::PARAM_STR);
+                $stmt_transaction->bindParam(':payment_error_code', $payment_error_code, PDO::PARAM_STR);
+                $stmt_transaction->bindParam(':payment_merchant_id', $payment_merchant_id, PDO::PARAM_STR);
+
+                if (!$stmt_transaction->execute()) {
+                    throw new Exception("Error updating or inserting into pay_transactions table: " . $sql_transaction);
+                }
             }
 
-            if ($conn->query($sql_receipt) === FALSE) {
-                throw new Exception("Error updating pay_receipts table".$sql_receipt);
+            // Update the receipt status
+            $stmt_receipt = $pdo->prepare($sql_receipt);
+            $stmt_receipt->bindParam(':receipt_status', $receipt_status, PDO::PARAM_STR);
+            $stmt_receipt->bindParam(':order_receipt', $order_receipt, PDO::PARAM_INT);
+            if (!$stmt_receipt->execute()) {
+                throw new Exception("Error updating pay_receipts table: " . $sql_receipt);
             }
-        
-            // If everything is successful, commit the transaction
-            $conn->commit();
+
+            // If all queries are successful, commit the transaction
+            $pdo->commit();
             $ok = true;
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             // An error occurred, rollback the transaction
-            $conn->rollback();
+            $pdo->rollBack();
             $error = $e->getMessage();
+
+            //+++++++++++++debug
+            // $errorMessage = $e->getMessage();  // The message of the exception
+            // $errorFile = $e->getFile();        // The file where the exception was thrown
+            // $errorLine = $e->getLine();        // The line number where the exception was thrown
+            // $stackTrace = $e->getTraceAsString();
+            
+            // // Display the details
+            // echo "Error: $errorMessage in file $errorFile on line $errorLine";
+            // echo "SQL: " . $stmt_transaction->queryString;
+            // echo "Stack trace:\n$stackTrace";
+            //+++++++++++++debug
+
+
             $ok = false;
         }
-        $conn->close();
+
         return $ok;
     }
+
 
     include_once 'public_utils.php';
     function doesUserHasSubscription(&$error)
     {
-        include 'db.php';
+        include 'db.php'; // Assumes $pdo is defined here
+
+        // Get package details
         $package_details = [];
-        if(!getPackageDetails(getUserClass(),$package_details,$error))
-        {
+        if (!getPackageDetails(getUserClass(), $package_details, $error)) {
             $error = "Unable to get package details for this class";
             return false;
         }
 
+        // Get user ID
         $user_id = getUserID();
-        if(empty($user_id))
-        {
-            $error = "user id is empty";
+        if (empty($user_id)) {
+            $error = "User ID is empty";
             return false;
         }
 
-        //Try to get all receipts for this package id and see if any of them status is success or not
-        $sql = "SELECT status as STATUS from pay_receipts WHERE user_id={$user_id} AND package_id={$package_details['ID']}";
-        
-        $result = $conn->query($sql);
+        // Prepare the SQL query to check for successful transactions
+        $sql = "SELECT status FROM pay_receipts WHERE user_id = :user_id AND package_id = :package_id";
+        try {
+            // Prepare the statement
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            $stmt->bindParam(':package_id', $package_details['ID'], PDO::PARAM_INT);
 
-        $ok = false;
-        if(!$result || $result->num_rows <= 0)
-        {
-            $error = "No valid packages in receipts";
-            return false;
-        }
+            // Execute the query
+            $stmt->execute();
 
-        while($row = $result->fetch_assoc()) 
-        {
-            //check if any row is success
-            if($row['STATUS'] == "success")
-            {
-                $ok = true;
-                break;
-            }
-        }
-
-        if($ok == false)
-        {
-            $error = "No matching success trxn for this package";
-        }
-
-        $conn->close();
-        return $ok;  
-    }
-
-    function activateUser($user_id,&$error)
-    {
-        include 'db.php';
-        $ok = false;
-
-        //TODO - set verified=1 when final rollout is done
-        $sql = "UPDATE users set verified=1 WHERE ID = $user_id and verified=0";
-        $conn->begin_transaction();
-        try
-        {
-            if ($conn->query($sql) === FALSE) {
-                throw new Exception("Error updating users table - ".$sql);
-            }        
-            // If everything is successful, commit the transaction
-            $conn->commit();
-            $ok = true;
-        }
-        catch (Exception $e) {
-            // An error occurred, rollback the transaction
-            $conn->rollback();
-            $error = $e->getMessage();
             $ok = false;
+            // Loop through the results and check if any status is 'success'
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                if ($row['status'] == "success") {
+                    $ok = true;
+                    break;
+                }
+            }
+
+            if (!$ok) {
+                $error = "No matching success transaction for this package";
+            }
+
+        } catch (PDOException $e) {
+            // Handle error
+            $error = "Database Error: " . $e->getMessage();
+            return false;
         }
-        $conn->close();
+
         return $ok;
     }
 
-    function verifyRegisterFromEmailLink($verify_key,&$error)
+    function activateUser($user_id, &$error)
     {
-        include 'db.php';
+        include 'db.php'; // Assumes $pdo is defined here
+
         $ok = false;
-        $sql = "SELECT ID as ID from users WHERE verify_key='$verify_key'";
-        //echo $sql;
-        $result = $conn->query($sql);
-        if($result && $result->num_rows > 0)
-        {
-            $row = $result->fetch_assoc();
-            if(activateUser($row['ID'],$error))
-            {
-                $ok = true;
+
+        // Prepare the SQL query for updating the user verification status
+        $sql = "UPDATE users SET verified = 1 WHERE ID = :user_id AND verified = 0";
+
+        try {
+            // Begin the transaction
+            $pdo->beginTransaction();
+
+            // Prepare the statement
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+
+            // Execute the statement
+            if ($stmt->execute() === false) {
+                throw new Exception("Error updating users table");
             }
-            else
-            {
-                $error = "Unable to activate user";
-            }
-        } 
-        else
-        {
-            $error = "User can't be varied, Invalid Key";
+
+            // Commit the transaction
+            $pdo->commit();
+            $ok = true;
+        } catch (PDOException $e) {
+            // An error occurred, rollback the transaction
+            $pdo->rollBack();
+            $error = "Database Error: " . $e->getMessage();
+            $ok = false;
+        } catch (Exception $e) {
+            // Handle other exceptions
+            $pdo->rollBack();
+            $error = $e->getMessage();
+            $ok = false;
         }
-        $conn->close();
-        return $ok; 
+
+        return $ok;
     }
+
+
+    function verifyRegisterFromEmailLink($verify_key, &$error)
+    {
+        include 'db.php'; // Assumes $pdo is defined here
+        $ok = false;
+
+        // Prepare the SQL query to find the user by verify_key
+        $sql = "SELECT ID as ID FROM users WHERE verify_key = :verify_key";
+
+        try {
+            // Prepare the statement
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':verify_key', $verify_key, PDO::PARAM_STR);
+
+            // Execute the statement
+            $stmt->execute();
+
+            // Check if a user is found
+            if ($stmt->rowCount() > 0) {
+                // Fetch the user data
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                // Try to activate the user
+                if (activateUser($row['ID'], $error)) {
+                    $ok = true;
+                } else {
+                    $error = "Unable to activate user";
+                }
+            } else {
+                $error = "User can't be verified, Invalid Key";
+            }
+        } catch (PDOException $e) {
+            // Handle errors with PDO
+            $error = "Database Error: " . $e->getMessage();
+        }
+
+        return $ok;
+    }
+
 
     function GetUniqueNumber()
     {
