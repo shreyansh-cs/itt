@@ -130,6 +130,7 @@ function isProtectedPage()
         "about.php",
         "contact.php",
         "forgot.php",
+        "change_password.php",
     ];
     $currentURI = $_SERVER['REQUEST_URI'];
     $protected = true;//default is protected

@@ -53,6 +53,12 @@ include_once '../backend/handlelogin.php';
           New User? <a href='register.php'>Sign Up</a>
           </td>
         </tr>
+        <tr>
+          <!--td class='first'>&nbsp;</td-->
+          <td class='second'>
+          <a href='change_password.php'>Change Password</a>
+          </td>
+        </tr>
       </table>
     </form>
   </div>

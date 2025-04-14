@@ -259,6 +259,40 @@
         return bin2hex(random_bytes($length));  // Generates a secure random token
     }
 
+    function changePassword($user_id,$new_password,&$error)
+    {
+        include 'db.php';
+        $ok = false;
+        $pdo = new PDO("mysql:host=$servername;dbname=$dbname", $username, $db_password);
+        try 
+        {
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
+            $sql = "UPDATE users SET password= :password where ID= :id";
+            //$sql = "UPDATE users SET name = :name, email = :email WHERE id = :id";
+            $stmt = $pdo->prepare($sql);
+            // Start transaction
+            $pdo->beginTransaction();
+            // Bind and sanitize input
+            $stmt->bindParam(':password', $new_password, PDO::PARAM_STR);
+            $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
+        
+            $stmt->execute();
+            // Commit if all good
+            $pdo->commit();
+            $ok = true;
+        } 
+        catch (PDOException $e) 
+        {
+            // Roll back if anything goes wrong
+            $pdo->rollBack();
+            $error =  "Error: " . $e->getMessage();
+            $ok = false;
+        }
+
+        return $ok;
+    }
+
     //Both param can be email or phone
     function authUser($email_or_phone,$password,&$row/*OUT*/,&$error)
     {
@@ -298,7 +332,7 @@
                 $ok = false;
             }
             //Generate token
-            if($ok)
+            /*if($ok)
             {
                 // Password is correct, generate token
                 //Check if a token already exists
@@ -327,7 +361,7 @@
                         $error = "Unable to generate new token";
                     }
                 }
-            }
+            }*/
         }
         $conn->close();
         return $ok;

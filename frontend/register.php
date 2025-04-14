@@ -81,6 +81,11 @@ $title = "Register";
                     Forgot Password? <a href="forgot.php"> Reset Password </a>
                 </td>
             </tr>
+            <tr>
+                <td class='second'>
+                    <a href='change_password.php'>Change Password</a>
+                </td>
+            </tr>
         </table>
         </table> 
     </form>
