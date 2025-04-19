@@ -935,10 +935,14 @@
         return $uniqueNumber;
     }
 
-    function validateRegister($name,$father_name,$email,$mobile,&$error)
+    function validateRegister($class,$name,$father_name,$email,$mobile,$dob,$password,$uploaded_tmp_file,&$error)
     {
         // Validation variables
         $errors = [];
+
+        if(empty($class)){
+            $errors[] = "No class selected";
+        }
 
         // Validate name (must be alphabetic and 3-50 characters long)
         if (empty($name)) {
@@ -974,15 +978,27 @@
             $errors[] = "Mobile number must be exactly 10 digits.";
         }
 
+        if (empty($dob)) 
+        {
+            $errors[] = "Date of birth is required.";
+        }
+
+        if (empty($password)) 
+        {
+            $errors[] = "Passowrd is required.";
+        }
+
+        if(empty($uploaded_tmp_file)){
+            $errors[] = "No files uploaded for photo";
+        }
+
         // If there are errors, display them
         if (!empty($errors)) 
         {
-            $error = "<ul>";
             foreach ($errors as $err) 
             {
-                $error .= "<li>" . htmlspecialchars($err) . "</li>";
+                $error .= "<div>" . htmlspecialchars($err) . "</div>";
             }
-            $error .= "</ul>";
             return false;
         } else {
             return true;

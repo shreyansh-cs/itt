@@ -22,11 +22,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $phone = $_POST['phone'];
     $dob = $_POST['dob'];
     $password = $_POST['password'];
+    $uploaded_tmp_file = $_FILES["photo"]["tmp_name"];
     $ok = true;
     $error = "";
 
     //validate the feilds
-    if($ok && !validateRegister($full_name,$father_name,$email,$phone,$error))
+    if($ok && !validateRegister($user_class,$full_name,$father_name,$email,$phone,$dob,$password,$uploaded_tmp_file,$error))
     {
         $msg = $error; //show list of errors
         $ok=false;

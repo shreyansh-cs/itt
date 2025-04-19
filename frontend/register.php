@@ -5,8 +5,9 @@ ob_start();
 include_once '../backend/handleregister.php';
 include_once '../backend/utils.php';
 $title = "Register";
+$required = "required";
 ?>
-  <div id="msg" style='color:red'>
+  <div id="msg" style='color:red;text-align:left;margin-bottom:10px;text-decoration:underline'>
     <?php if(isset($msg)) echo $msg; ?>
   </div>
   <!-- Sign Up Form -->
@@ -32,38 +33,38 @@ $title = "Register";
             </tr>
             <tr>
                 <td class='second'>
-                    <input type="text" name="full_name" <?php echo "value='$full_name'"; ?> placeholder="Full Name" required>
+                    <input type="text" name="full_name" <?php echo "value='$full_name'"; ?> placeholder="Full Name" <?php echo $required; ?>>
                 </td>
             </tr>
             <tr>
                 <td class='second'>
-                    <input type="text" name="father_name" <?php echo "value='$father_name'"; ?> placeholder="Father's Name" required>
+                    <input type="text" name="father_name" <?php echo "value='$father_name'"; ?> placeholder="Father's Name" <?php echo $required; ?>>
                 </td>
             </tr>
             <tr>
                 <td class='second'>
-                    <input type="email" name="email" <?php echo "value='$email'"; ?> placeholder="Email" required> 
+                    <input type="email" name="email" <?php echo "value='$email'"; ?> placeholder="Email" <?php echo $required; ?>> 
                 </td>
             </tr>
             <tr>
                 <td class='second'>
-                    <input type="text" name="phone" <?php echo "value='$phone'"; ?> placeholder="Phone Number" required>
+                    <input type="text" name="phone" <?php echo "value='$phone'"; ?> placeholder="Phone Number" <?php echo $required; ?>>
                 </td>
             </tr>
             <tr>
                 <td class='second'>
-                    <input type="date" name="dob" <?php echo "value='$dob'"; ?> placeholder="Date of Birth" required>
+                    <input type="date" name="dob" <?php echo "value='$dob'"; ?> placeholder="Date of Birth" <?php echo $required; ?>>
                 </td>
             </tr>
             <tr>
                 <td class='second'>
                     <!--label>Upload Photo:</label-->
-                    <input type="file" name="photo" accept="image/*" required>
+                    <input type="file" name="photo" accept="image/*" <?php echo $required; ?>>
                 </td>
             </tr>
             <tr>
                 <td class='second'>
-                    <input type="password" name="password" placeholder="Password" required>
+                    <input type="password" name="password" placeholder="Password" <?php echo $required; ?>>
                 </td>
             </tr>
             <tr>
