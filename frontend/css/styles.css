@@ -475,6 +475,11 @@ table.courses td a.course-link:hover {
     transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
+.txnlist_form_container {
+    text-align: left;
+    padding-bottom: 10px;
+}
+
 /*upload page css start*/
 
 /*upload page css end*/

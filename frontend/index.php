@@ -1,5 +1,6 @@
 <?php 
 include_once 'session.php';
+include_once '../backend/public_utils.php';
 ob_start();
 $title = "I.T.T Group of Education - Home";
 ?>
@@ -17,6 +18,7 @@ $title = "I.T.T Group of Education - Home";
     <a href="noteslist.php" class="home_link">Notes & Video</a>
     <a href="onlinetest.php" class="home_link">Online Tests</a>
     <a href="receipts.php" class="home_link">Buy Package</a>
+    <?php if(isAdminLoggedIn()) echo "<a href='gettransactions.php' class='home_link'>Transactions</a>";  ?>
 </div>
 
   <?php 

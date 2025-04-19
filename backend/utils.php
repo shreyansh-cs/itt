@@ -38,6 +38,31 @@
 
         return $rows;
     }
+
+    function getUserDetailsForClass($class,&$error)
+    {
+        include 'db.php'; // Make sure this creates a $pdo instance (not $conn) using PDO
+        $rows = [];
+        $sql = "";
+        try {
+            if(!empty($class)){
+                $sql = "SELECT ID as ID, full_name as NAME FROM users where user_class= :class";
+                $stmt = $pdo->prepare($sql);
+                $stmt->bindParam(':class', $class, PDO::PARAM_INT);    
+            }
+            else {
+                $sql = "SELECT ID as ID, full_name as NAME FROM users";
+                $stmt = $pdo->prepare($sql);
+            }
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            // Handle error or log it
+            $error = "Database error: " . $e->getMessage();
+        }
+        return $rows;
+    }
+
     function getStreamsForClass($class) 
     {
         include 'db.php'; // This should define $pdo using PDO
@@ -542,7 +567,87 @@
         }
     
         return $ok;
-    }    
+    } 
+    
+    function getReceiptsForAdmin($class, $user_id, $status, &$error) {
+        include 'db.php'; // Assumes $pdo is defined here
+
+        $rows = [];
+        try {
+
+            $sql = "SELECT u.user_class as CLASS,u.full_name as NAME, c.NAME as CLASS_NAME, r.id AS ID, r.user_id AS USER_ID, r.created_on AS CREATED_ON, r.updated_on AS UPDATED_ON, 
+                           r.package_id AS PACKAGE_ID, p.NAME AS PACKAGE_NAME, p.PRICE AS PACKAGE_PRICE, 
+                           r.status AS STATUS, po.id AS ORDER_ID, po.amount AS AMOUNT 
+                    FROM pay_receipts AS r 
+                    JOIN packages AS p ON r.package_id = p.ID 
+                    JOIN pay_orders AS po ON po.receipt_id = r.id  
+                    JOIN users as u ON u.ID = r.user_id 
+                    JOIN classes as c ON c.ID = u.user_class";
+
+            if(!empty($class) || !empty($user_id) || !empty($status)){
+                $sql .= " WHERE ";
+            }
+            if(!empty($class)){
+                $sql .= " u.user_class = :class ";
+            }
+            
+            if(!empty($user_id) && !empty($status)){
+                if(!empty($class)){
+                    $sql .= " and ";
+                }
+                $sql .= " r.user_id = :user_id and r.status= :status ";
+                $stmt = $pdo->prepare($sql);
+                $stmt->bindParam(':class', $class, PDO::PARAM_INT);
+                $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+                $stmt->bindParam(':status', $status, PDO::PARAM_STR);
+            }
+            else if(!empty($user_id)){
+                if(!empty($class)){
+                    $sql .= " and ";
+                }
+                $sql .= " r.user_id = :user_id ";
+                $stmt = $pdo->prepare($sql);
+                if(!empty($class)){
+                    $stmt->bindParam(':class', $class, PDO::PARAM_INT);
+                }
+                $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            }
+            else if(!empty($status)){
+                if(!empty($class)){
+                    $sql .= " and ";
+                }
+                $sql .= " r.status = :status ";
+                $stmt = $pdo->prepare($sql);
+                if(!empty($class)){
+                    $stmt->bindParam(':class', $class, PDO::PARAM_INT);
+                }
+                $stmt->bindParam(':status', $status, PDO::PARAM_STR);
+            }
+            else {
+                $stmt = $pdo->prepare($sql);
+                if(!empty($class)){
+                    $stmt->bindParam(':class', $class, PDO::PARAM_INT);
+                }
+            }
+            // Prepare the query
+            //echo $sql;
+            $stmt->execute();
+    
+            if ($stmt->rowCount() > 0) {
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $rows[] = $row;
+                }
+            }
+            else
+            {
+                $error = "No transactions for this selection";
+            } 
+        } catch (PDOException $e) {
+            $error = "Error executing query: " . $e->getMessage();
+        }
+    
+        return $rows;
+    } 
 
     function getReceiptsForThisUser($user_id, &$rows, &$error) {
         include 'db.php'; // Assumes $pdo is defined here
