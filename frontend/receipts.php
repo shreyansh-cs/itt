@@ -29,7 +29,7 @@ if(getPackageDetails($class,$row,$error))
 if(isset($_POST['init_payment']))
 {
     //Create receipt based on current package for this class
-    if(createReceipt($user_id,$package_id,$row,$error))
+    if(createReceipt($user_id,$class,$package_id,$row,$error))
     {
         $receipt_id = $row['ID'];
         //TRICKY --- clickRazorPayButton will programatically click hidden razorpaybutton

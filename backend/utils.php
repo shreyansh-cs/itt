@@ -582,7 +582,7 @@
                     JOIN packages AS p ON r.package_id = p.ID 
                     JOIN pay_orders AS po ON po.receipt_id = r.id  
                     JOIN users as u ON u.ID = r.user_id 
-                    JOIN classes as c ON c.ID = u.user_class";
+                    JOIN classes as c ON c.ID = r.class_id";
 
             if(!empty($class) || !empty($user_id) || !empty($status)){
                 $sql .= " WHERE ";
@@ -629,6 +629,7 @@
                     $stmt->bindParam(':class', $class, PDO::PARAM_INT);
                 }
             }
+
             // Prepare the query
             //echo $sql;
             $stmt->execute();
@@ -691,18 +692,19 @@
         return $ok;
     }    
 
-    function createReceipt($user_id, $package_id, &$row, &$error) {
+    function createReceipt($user_id, $class, $package_id, &$row, &$error) {
         include 'db.php'; // Assumes $pdo is defined here
     
         $ok = false;
         try {
             // Prepare the query
-            $sql = "INSERT INTO pay_receipts (user_id, package_id, status) 
-                    VALUES (:user_id, :package_id, 'initiated')";
+            $sql = "INSERT INTO pay_receipts (user_id, package_id, status,class_id) 
+                    VALUES (:user_id, :package_id, 'initiated', :class_id)";
     
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
             $stmt->bindParam(':package_id', $package_id, PDO::PARAM_INT);
+            $stmt->bindParam(':class_id', $class, PDO::PARAM_INT);
     
             // Execute the query
             if ($stmt->execute()) {
