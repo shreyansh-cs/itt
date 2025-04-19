@@ -569,10 +569,15 @@
                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                     $rows[] = $row;
                 }
-                $ok = true;  // Success if rows are fetched
-            } else {
+            } 
+            /*
+            else {
                 $error = "No receipts found for the user.";
             }
+            */
+            //We have to return success even if there are no previous receipts so that new receipts can be created
+            //If we return error then no new receipts can be created
+            $ok = true; 
     
         } catch (PDOException $e) {
             $error = "Error executing query: " . $e->getMessage();
