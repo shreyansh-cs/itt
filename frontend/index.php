@@ -18,7 +18,11 @@ $title = "I.T.T Group of Education - Home";
     <a href="noteslist.php" class="home_link">Notes & Video</a>
     <a href="onlinetest.php" class="home_link">Online Tests</a>
     <a href="receipts.php" class="home_link">Buy Package</a>
-    <?php if(isAdminLoggedIn()) echo "<a href='gettransactions.php' class='home_link'>Transactions</a>";  ?>
+    <?php if(isAdminLoggedIn()) { 
+      echo "<a href='gettransactions.php' class='home_link'>Transactions</a>";  
+      echo "<a href='database_dump.php' class='home_link'>Database Dump</a>";  
+    }
+    ?>
 </div>
 
   <?php 

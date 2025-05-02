@@ -99,18 +99,119 @@ function generateDatabaseDump() {
     return false;
 }
 
+// Function to create uploads folder backup
+function createUploadsBackup() {
+    $uploads_dir = "../../uploads";
+    $backup_dir = "uploads_backup_" . date('Y-m-d_H-i-s');
+    
+    if (!is_dir($uploads_dir)) {
+        return false;
+    }
+    
+    // Create backup directory
+    if (!mkdir($backup_dir)) {
+        return false;
+    }
+    
+    // Copy all files and directories recursively
+    $dir = new RecursiveDirectoryIterator($uploads_dir, RecursiveDirectoryIterator::SKIP_DOTS);
+    $files = new RecursiveIteratorIterator($dir, RecursiveIteratorIterator::SELF_FIRST);
+    
+    foreach ($files as $file) {
+        $target = $backup_dir . DIRECTORY_SEPARATOR . $files->getSubPathName();
+        if ($file->isDir()) {
+            mkdir($target);
+        } else {
+            copy($file, $target);
+        }
+    }
+    
+    // Create zip file
+    $zip = new ZipArchive();
+    $zipname = $backup_dir . '.zip';
+    
+    if ($zip->open($zipname, ZipArchive::CREATE) === TRUE) {
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($backup_dir),
+            RecursiveIteratorIterator::LEAVES_ONLY
+        );
+        
+        foreach ($files as $file) {
+            if (!$file->isDir()) {
+                $filePath = $file->getRealPath();
+                $relativePath = substr($filePath, strlen($backup_dir) + 1);
+                $zip->addFile($filePath, $relativePath);
+            }
+        }
+        
+        $zip->close();
+        
+        // Clean up the temporary directory
+        array_map('unlink', glob("$backup_dir/*.*"));
+        rmdir($backup_dir);
+        
+        return $zipname;
+    }
+    
+    return false;
+}
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $filename = generateDatabaseDump();
+    $download_files = [];
     
-    if ($filename) {
+    // Generate database dump if requested
+    if (isset($_POST['dump_database']) && $_POST['dump_database'] === '1') {
+        $db_file = generateDatabaseDump();
+        if ($db_file) {
+            $download_files[] = $db_file;
+        } else {
+            $error = "Failed to generate database dump.";
+        }
+    }
+    
+    // Create uploads backup if requested
+    if (isset($_POST['dump_uploads']) && $_POST['dump_uploads'] === '1') {
+        $uploads_file = createUploadsBackup();
+        if ($uploads_file) {
+            $download_files[] = $uploads_file;
+        } else {
+            $error = "Failed to create uploads backup.";
+        }
+    }
+    
+    // If only one file, download it directly
+    if (count($download_files) === 1) {
+        $file = $download_files[0];
         header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-        readfile($filename);
-        unlink($filename); // Delete the file after download
+        header('Content-Disposition: attachment; filename="' . basename($file) . '"');
+        readfile($file);
+        unlink($file);
         exit;
-    } else {
-        $error = "Failed to generate database dump. Please check your server configuration.";
+    }
+    // If multiple files, create a zip
+    elseif (count($download_files) > 1) {
+        $zipname = "backup_" . date('Y-m-d_H-i-s') . ".zip";
+        $zip = new ZipArchive();
+        
+        if ($zip->open($zipname, ZipArchive::CREATE) === TRUE) {
+            foreach ($download_files as $file) {
+                $zip->addFile($file, basename($file));
+            }
+            $zip->close();
+            
+            // Download the zip file
+            header('Content-Type: application/zip');
+            header('Content-Disposition: attachment; filename="' . $zipname . '"');
+            readfile($zipname);
+            
+            // Clean up
+            unlink($zipname);
+            foreach ($download_files as $file) {
+                unlink($file);
+            }
+            exit;
+        }
     }
 }
 ?>
@@ -118,18 +219,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Database Dump Generator</title>
+    <title>Backup Generator</title>
 </head>
 <body>
-    <h1>Database Dump Generator</h1>
+    <h1>Backup Generator</h1>
     
     <?php if (isset($error)): ?>
         <div><?php echo htmlspecialchars($error); ?></div>
     <?php endif; ?>
     
     <form method="POST">
-        <button type="submit">Generate Database Dump</button>
+        <div>
+            <input type="checkbox" id="dump_database" name="dump_database" value="1" checked>
+            <label for="dump_database">Dump Database</label>
+        </div>
+        <div>
+            <input type="checkbox" id="dump_uploads" name="dump_uploads" value="1">
+            <label for="dump_uploads">Backup Uploads Folder</label>
+        </div>
+        <button type="submit">Generate Backup</button>
     </form>
 </body>
-</html> 
 </html> 
