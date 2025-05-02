@@ -11,7 +11,12 @@ if (!isAdminLoggedIn()) {
 function generateDatabaseDump() {
     global $pdo;
     
-    $filename = "database_dump_" . date('Y-m-d_H-i-s') . ".sql";
+    $backup_dir = "../../../backups/itt_backup_" . date('Y-m-d_H-i-s');
+    if (!is_dir($backup_dir)) {
+        mkdir($backup_dir, 0777, true);
+    }
+    
+    $filename = $backup_dir . "/database_dump.sql";
     $sql_content = "-- Database Dump\n";
     $sql_content .= "-- Generated on: " . date('Y-m-d H:i:s') . "\n\n";
     
@@ -90,7 +95,7 @@ function generateDatabaseDump() {
         
         // Write to file
         if (file_put_contents($filename, $sql_content) !== false) {
-            return $filename;
+            return $backup_dir;
         }
     } catch (PDOException $e) {
         return false;
@@ -100,16 +105,16 @@ function generateDatabaseDump() {
 }
 
 // Function to create uploads folder backup
-function createUploadsBackup() {
+function createUploadsBackup($backup_dir) {
     $uploads_dir = "../../uploads";
-    $backup_dir = "uploads_backup_" . date('Y-m-d_H-i-s');
     
     if (!is_dir($uploads_dir)) {
         return false;
     }
     
-    // Create backup directory
-    if (!mkdir($backup_dir)) {
+    // Create uploads backup directory
+    $uploads_backup_dir = $backup_dir . "/uploads";
+    if (!mkdir($uploads_backup_dir)) {
         return false;
     }
     
@@ -117,99 +122,106 @@ function createUploadsBackup() {
     $dir = new RecursiveDirectoryIterator($uploads_dir, RecursiveDirectoryIterator::SKIP_DOTS);
     $files = new RecursiveIteratorIterator($dir, RecursiveIteratorIterator::SELF_FIRST);
     
+    $current_zip = null;
+    $current_zip_size = 0;
+    $zip_index = 1;
+    $max_zip_size = 50 * 1024 * 1024; // 50MB per zip file
+    
     foreach ($files as $file) {
-        $target = $backup_dir . DIRECTORY_SEPARATOR . $files->getSubPathName();
         if ($file->isDir()) {
+            $target = $uploads_backup_dir . DIRECTORY_SEPARATOR . $files->getSubPathName();
             mkdir($target);
         } else {
-            copy($file, $target);
-        }
-    }
-    
-    // Create zip file
-    $zip = new ZipArchive();
-    $zipname = $backup_dir . '.zip';
-    
-    if ($zip->open($zipname, ZipArchive::CREATE) === TRUE) {
-        $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($backup_dir),
-            RecursiveIteratorIterator::LEAVES_ONLY
-        );
-        
-        foreach ($files as $file) {
-            if (!$file->isDir()) {
-                $filePath = $file->getRealPath();
-                $relativePath = substr($filePath, strlen($backup_dir) + 1);
-                $zip->addFile($filePath, $relativePath);
+            $file_size = $file->getSize();
+            
+            // If current zip is too large or doesn't exist, create a new one
+            if ($current_zip === null || $current_zip_size + $file_size > $max_zip_size) {
+                if ($current_zip !== null) {
+                    $current_zip->close();
+                }
+                
+                $zipname = $uploads_backup_dir . "/uploads_part_" . $zip_index . ".zip";
+                $current_zip = new ZipArchive();
+                if ($current_zip->open($zipname, ZipArchive::CREATE) !== TRUE) {
+                    return false;
+                }
+                $current_zip_size = 0;
+                $zip_index++;
             }
+            
+            $filePath = $file->getRealPath();
+            $relativePath = substr($filePath, strlen($uploads_dir) + 1);
+            $current_zip->addFile($filePath, $relativePath);
+            $current_zip_size += $file_size;
         }
-        
-        $zip->close();
-        
-        // Clean up the temporary directory
-        array_map('unlink', glob("$backup_dir/*.*"));
-        rmdir($backup_dir);
-        
-        return $zipname;
     }
     
-    return false;
+    // Close the last zip file if it exists
+    if ($current_zip !== null) {
+        $current_zip->close();
+    }
+    
+    return true;
 }
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $download_files = [];
+    $backup_dir = "../../../backups/itt_backup_" . date('Y-m-d_H-i-s');
+    
+    // Create backup directory
+    if (!is_dir($backup_dir)) {
+        mkdir($backup_dir, 0777, true);
+    }
+    
+    $success = true;
+    $error = "";
     
     // Generate database dump if requested
     if (isset($_POST['dump_database']) && $_POST['dump_database'] === '1') {
-        $db_file = generateDatabaseDump();
-        if ($db_file) {
-            $download_files[] = $db_file;
-        } else {
-            $error = "Failed to generate database dump.";
+        if (!generateDatabaseDump()) {
+            $success = false;
+            $error .= "Failed to generate database dump. ";
         }
     }
     
     // Create uploads backup if requested
     if (isset($_POST['dump_uploads']) && $_POST['dump_uploads'] === '1') {
-        $uploads_file = createUploadsBackup();
-        if ($uploads_file) {
-            $download_files[] = $uploads_file;
-        } else {
-            $error = "Failed to create uploads backup.";
+        if (!createUploadsBackup($backup_dir)) {
+            $success = false;
+            $error .= "Failed to create uploads backup. ";
         }
     }
     
-    // If only one file, download it directly
-    if (count($download_files) === 1) {
-        $file = $download_files[0];
-        header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="' . basename($file) . '"');
-        readfile($file);
-        unlink($file);
-        exit;
-    }
-    // If multiple files, create a zip
-    elseif (count($download_files) > 1) {
-        $zipname = "backup_" . date('Y-m-d_H-i-s') . ".zip";
+    if ($success) {
+        // Create a zip of the backup directory
+        $zipname = $backup_dir . ".zip";
         $zip = new ZipArchive();
         
         if ($zip->open($zipname, ZipArchive::CREATE) === TRUE) {
-            foreach ($download_files as $file) {
-                $zip->addFile($file, basename($file));
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($backup_dir),
+                RecursiveIteratorIterator::LEAVES_ONLY
+            );
+            
+            foreach ($files as $file) {
+                if (!$file->isDir()) {
+                    $filePath = $file->getRealPath();
+                    $relativePath = substr($filePath, strlen($backup_dir) + 1);
+                    $zip->addFile($filePath, $relativePath);
+                }
             }
+            
             $zip->close();
             
             // Download the zip file
             header('Content-Type: application/zip');
-            header('Content-Disposition: attachment; filename="' . $zipname . '"');
+            header('Content-Disposition: attachment; filename="' . basename($zipname) . '"');
             readfile($zipname);
             
             // Clean up
             unlink($zipname);
-            foreach ($download_files as $file) {
-                unlink($file);
-            }
+            array_map('unlink', glob("$backup_dir/*.*"));
+            rmdir($backup_dir);
             exit;
         }
     }
