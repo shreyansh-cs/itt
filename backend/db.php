@@ -1,5 +1,5 @@
 <?php
-include '../../secrets.php'; // Use include instead of include_once, otherwise variables will not be available in some scropes
+include __DIR__.'/../../secrets.php'; // Use include instead of include_once, otherwise variables will not be available in some scropes
 $conn = new mysqli($servername, $username, $db_password, $dbname);
 
 // Check connection

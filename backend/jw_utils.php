@@ -1,9 +1,9 @@
 <?php 
-include '../../secrets.php';
+include __DIR__.'/../../secrets.php';
 
-require_once '../php-jwt-main/src/JWT.php';
-require_once '../php-jwt-main/src/Key.php';
-require_once '../php-jwt-main/src/SignatureInvalidException.php';
+require_once __DIR__.'/../php-jwt-main/src/JWT.php';
+require_once __DIR__.'/../php-jwt-main/src/Key.php';
+require_once __DIR__.'/../php-jwt-main/src/SignatureInvalidException.php';
 
 $jwtAlgo = "HS256";
 

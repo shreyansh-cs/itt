@@ -19,6 +19,10 @@ $title = "I.T.T Group of Education - Home";
     <a href="onlinetest.php" class="home_link">Online Tests</a>
     <a href="receipts.php" class="home_link">Buy Package</a>
     <?php if(isAdminLoggedIn()) echo "<a href='gettransactions.php' class='home_link'>Transactions</a>";  ?>
+    <?php if(isAdminLoggedIn()) echo "<a href='test/create_test.php' class='home_link'>Create Test</a>";  ?>
+    <?php if(isAdminLoggedIn()) echo "<a href='test/upload_questions.php' class='home_link'>Upload Questions</a>";  ?>
+    <?php if(isAdminLoggedIn()) echo "<a href='test/map_test_to_class.php' class='home_link'>Map test to Class</a>";  ?>
+    <?php if(isAdminLoggedIn()) echo "<a href='test/edit_test_map.php' class='home_link'>Edit Test Map</a>";  ?>
 </div>
 
   <?php 

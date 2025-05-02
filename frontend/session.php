@@ -1,5 +1,6 @@
 <?php
-include_once '../backend/jw_utils.php';
+include_once __DIR__.'/showerror.php';
+include_once __DIR__.'/../backend/jw_utils.php';
 $logoutHours = 2;
 //Ensure this file has no dependency
 session_set_cookie_params([
@@ -30,7 +31,7 @@ elseif (time() - $_SESSION['last_regeneration'] > 60*60*$logoutHours)
   $_SESSION['last_regeneration'] = time();
 }
 
-include_once '../backend/public_utils.php';
+include_once __DIR__.'/../backend/public_utils.php';
 
 //Redirect if not logged in
 if(isProtectedPage() && !isSessionValid())

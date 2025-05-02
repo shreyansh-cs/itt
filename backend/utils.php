@@ -582,7 +582,7 @@
                     JOIN packages AS p ON r.package_id = p.ID 
                     JOIN pay_orders AS po ON po.receipt_id = r.id  
                     JOIN users as u ON u.ID = r.user_id 
-                    JOIN classes as c ON c.ID = r.class_id";
+                    JOIN classes as c ON  c.ID = r.class_id ";
 
             if(!empty($class) || !empty($user_id) || !empty($status)){
                 $sql .= " WHERE ";

@@ -6,11 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $title; ?></title>
     <link rel="stylesheet" href="/itt/frontend/css/styles.css<?php echo "?no-cache=".time(); ?>">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
   <?php 
-   include_once '../backend/utils.php';
-   include_once '../backend/public_utils.php';
+   include_once __DIR__.'/../backend/utils.php';
+   include_once __DIR__.'/../backend/public_utils.php';
 
    $id = getUserID();
    $full_name = getUserName();
