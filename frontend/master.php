@@ -22,7 +22,7 @@
     <!-- Header -->
     <header>
         <div class="logo">
-        <a href='/itt/frontend/index.php'><img src="../images/icon.png"  alt="I.T.T Group of Education Logo">
+        <a href='/itt/frontend/index.php'><img src="/itt/images/icon.png"  alt="I.T.T Group of Education Logo">
         <h1 style='color:white;padding-top:10px;'>I.T.T. Group of Education</h1>
         </a>
         </div>

@@ -16,7 +16,7 @@ $title = "I.T.T Group of Education - Home";
 
     <a href="courses.php" class="home_link">Courses</a>
     <a href="noteslist.php" class="home_link">Notes & Video</a>
-    <a href="onlinetest.php" class="home_link">Online Tests</a>
+    <a href="test/onlinetest.php" class="home_link">Online Tests</a>
     <a href="receipts.php" class="home_link">Buy Package</a>
     <?php if(isAdminLoggedIn()) { 
       echo "<a href='gettransactions.php' class='home_link'>Transactions</a>"; 
