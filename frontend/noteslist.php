@@ -1,4 +1,3 @@
-
 <?php 
 include_once 'session.php';
 include_once "showerror.php";
@@ -10,18 +9,21 @@ $title = "Notes & Video";
     include_once '../backend/utils.php';
     $border = "1";
     include_once 'selection.php';
-    echo "<table border='0' class='notes_container'>";
-    echo "<tr><td>";
+    echo "<div class='container mt-4'>";
+    echo "<div class='table-responsive'>";
 
     if(!empty($chapter))
     {
         $rows = getNotesForChapter($class,$stream,$subject,$chapter);
-        echo "<table border='$border' class='notes_data'><th>Title</th><th>Notes Download</th>";
+        echo "<table class='table table-bordered table-hover'>";
+        echo "<thead class='table-primary'>";
+        echo "<tr><th>Title</th><th>Notes Download</th>";
         //Action column is only for admin
         if(isAdminLoggedIn())
         {
             echo "<th>Action</th>";//table and headers start
         }
+        echo "</tr></thead><tbody>";
         //Each row
         foreach ($rows as $row) {
             echo "<tr>"; //row start
@@ -38,24 +40,24 @@ $title = "Notes & Video";
 
             if(isAdminLoggedIn() || isTeacherLoggedIn() || doesUserHasSubscription($error))
             { 
-                echo "<a class='notes_link' target='_blank' href='download.php?noteid=".$row['ID']."'>DOWNLOAD PDF</a>";   
+                echo "<a class='btn btn-primary rounded-pill px-4' target='_blank' href='download.php?noteid=".$row['ID']."'>DOWNLOAD PDF</a>";   
             }
             else
             {
-                echo "<a class='notes_link' target='_blank' href='receipts.php'>Buy Package</a>";
+                echo "<a class='btn btn-primary rounded-pill px-4' target='_blank' href='receipts.php'>Buy Package</a>";
             }
             echo "</td>";
 
             if(isAdminLoggedIn())
             {
                 echo "<td>";
-                echo "<a class='notes_link' target='_blank' href='delete.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter&noteid=".$row['ID']."'>Delete</a>";
+                echo "<a class='btn btn-danger rounded-pill px-4' href='delete_note.php?noteid=".$row['ID']."'>Delete</a>";
                 echo "</td>";
             }
 
             echo "</tr>"; //row end
         }
-        echo "</table>";//end table
+        echo "</tbody></table>";
 
         echo "<br/>";
 
@@ -105,13 +107,15 @@ $title = "Notes & Video";
         echo "</table>";
         //End Video section
     }
-    echo "</tr></td>";
+    echo "</div></div>";
     if(isAdminLoggedIn())
     {
-        echo "<tr><td class='td_bottomlink'><a class='notes_link' target='_blank' href='uploadnotes.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter'>Add New Notes</td></tr>";
-        echo "<tr><td class='td_bottomlink'><a class='notes_link' target='_blank' href='uploadvideo.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter'>Add New Video</a></td></tr>";
+        echo "<div class='container text-start mt-4'>";
+        echo "<div class='d-flex flex-wrap gap-3'>";
+        echo "<a class='btn btn-primary rounded-pill px-4' target='_blank' href='uploadnotes.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter'>Add New Notes</a>";
+        echo "<a class='btn btn-primary rounded-pill px-4' target='_blank' href='uploadvideo.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter'>Add New Video</a>";
+        echo "</div></div>";
     }
-    echo "</table>";
 ?>
 
 <?php 
