@@ -4,7 +4,7 @@ ob_start();
 $title = "Receipts";
 ?>
 
-<div class='receipts_contatiner'>
+<div class="container-fluid p-4">
 <?php
 include_once '../backend/utils.php';
 include_once './paymenthandler.php';
@@ -75,7 +75,14 @@ $init_form_display = "block";
 //Don't delete any package from packages table - Anyway foreigh key won't allow it
 if(getReceiptsForThisUser($user_id,$rows,$error))
 {
-    echo "<table class='receipts_container' border='1'>";
+    echo "<div class='card shadow mb-4'>";
+    echo "<div class='card-header bg-primary text-white'>";
+    echo "<h5 class='mb-0'>Payment History</h5>";
+    echo "</div>";
+    echo "<div class='card-body'>";
+    echo "<div class='table-responsive'>";
+    echo "<table class='table table-striped table-hover'>";
+    echo "<thead class='table-light'>";
     echo "<tr>";
     echo "<th>Receipt #</th>";
     echo "<th>Order ID</th>";
@@ -84,26 +91,31 @@ if(getReceiptsForThisUser($user_id,$rows,$error))
     echo "<th>Status</th>";
     echo "<th>Action</th>";
     echo "</tr>";
+    echo "</thead>";
+    echo "<tbody>";
     foreach ($rows as $row){
         echo "<tr>";
         echo "<td>{$row['ID']}</td>";
         echo "<td>{$row['ORDER_ID']}</td>";
         echo "<td>{$row['PACKAGE_NAME']}</td>";
         $priceInRs = $row['AMOUNT']/100.00;
-        echo "<td>{$priceInRs}</td>";
+        echo "<td>₹{$priceInRs}</td>";
         $status_color = getStatusColor($row['STATUS']);
-        echo "<td style='background-color:$status_color'>{$row['STATUS']}</td>";
-        echo "<td><a href='receipts.php?order_id={$row['ORDER_ID']}' class='refresh_link'>Refresh</a></td>"; //get status link
+        echo "<td><span class='badge text-dark' style='background-color:$status_color'>{$row['STATUS']}</span></td>";
+        echo "<td><a href='receipts.php?order_id={$row['ORDER_ID']}' class='btn btn-sm btn-outline-primary'>Refresh</a></td>";
         echo "</tr>";
     }
-    echo "<tr>";
-    echo "<td colspan='6' align='left'>";
+    echo "</tbody>";
+    echo "</table>";
+    echo "</div>"; // table-responsive
+
+    echo "<div class='mt-4'>";
     echo "<form method='post' style='display:{$init_form_display}'>";
-    echo "<button class='btn_init_payment' id='init_payment' name='init_payment'>Pay {$package_price}</button>";
+    echo "<button class='btn btn-primary btn-lg' id='init_payment' name='init_payment'>Pay ₹{$package_price}</button>";
     echo "</form>";
+    
     if($payment_initiated)
     {
-        //echo "Payment initiated";
         $param = array();
         $params['receipt'] = $receipt_id;
         $params['amount'] = $package_price;//in Rs, not paise
@@ -118,17 +130,20 @@ if(getReceiptsForThisUser($user_id,$rows,$error))
         //provide the form with hidden button
         echo getForm($json);
     }
-    echo $mesg;
-    echo "</td>";
-    echo "</tr>";
-    echo "</table>";
+    if(!empty($mesg)) {
+        echo "<div class='alert alert-info mt-3'>$mesg</div>";
+    }
+    echo "</div>"; // mt-4
+    echo "</div>"; // card-body
+    echo "</div>"; // card
 }
 else
 {
-    echo "<div class='receipts_error'>{$error}</div>";
+    echo "<div class='alert alert-danger'>{$error}</div>";
 }
 ?>
 </div>
+
 <?php 
 $content = ob_get_contents();
 ob_end_clean();
