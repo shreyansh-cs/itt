@@ -26,7 +26,7 @@
         <h1 style='color:white;padding-top:10px;'>I.T.T. Group of Education</h1>
         </a>
         </div>
-        <nav class="navbar">
+        <nav class="custom-nav">
             <ul>
             <li><a href="/itt/frontend/index.php">Home</a></li>
             <li><a href="/itt/frontend/about.php">About Us</a></li>
