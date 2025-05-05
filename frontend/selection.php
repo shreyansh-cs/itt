@@ -53,104 +53,103 @@ if(!empty($msg))
 }
 ?>
 <form action="" id="notesForm" name="notesForm" method="get">
-    <table>
-      <tr>
-        <td class='dropdown'> 
-          <select id="class" name="class" onchange="submitForm(this,'notesForm')">
-            <option value='0'>Select</option>
-          <?php
-            $rows = getAllClasses(); 
-            foreach ($rows as $row) {
-              if(!isAdminLoggedIn() && !isTeacherLoggedIn())
-              {
-                if($row['ID'] == $class)
-                {
-                  echo "<option value='".$row['ID']."'". checkSelected($row['ID'],$class) .">".$row['NAME']."</option>";
+    <div class='container-fluid'>
+        <div class='row g-3'>
+            <div class='col-12'>
+                <div class='form-group'>
+                    <label class='form-label'>Class</label>
+                    <select class='form-select' name='class' onchange="submitForm(this,'notesForm')">
+                        <option value=''>-- Choose Class --</option>
+                        <?php
+                        //Get all classes
+                        $rows = getAllClasses();
+                        foreach ($rows as $row) {
+                            if(!isAdminLoggedIn() && !isTeacherLoggedIn()) {
+                                if($row['ID'] == $class) {
+                                    echo "<option value='".$row['ID']."' ".checkSelected($row['ID'],$class).">".$row['NAME']."</option>";
+                                }
+                            } else {
+                                echo "<option value='".$row['ID']."' ".checkSelected($row['ID'],$class).">".$row['NAME']."</option>";
+                            }
+                        }
+                        ?>
+                    </select>
+                </div>
+            </div>
+            <?php
+            if(!empty($class))
+            {
+                //Get all streams
+                $rows = getStreamsForClass($class);
+                echo "<div class='col-12'>";
+                echo "<div class='form-group'>";
+                echo "<label class='form-label'>Stream</label>";
+                echo "<select class='form-select' name='stream' onchange=\"submitForm(this,'notesForm')\">";
+                echo "<option value=''>-- Choose Stream --</option>";
+                foreach ($rows as $row) {
+                    echo "<option value='".$row['ID']."' ".checkSelected($row['ID'],$stream).">".$row['NAME']."</option>";
                 }
-              }
-              else
-              {
-                echo "<option value='".$row['ID']."'". checkSelected($row['ID'],$class) .">".$row['NAME']."</option>";
-              }
+                echo "</select>";
+                echo "</div>";
+                echo "</div>";
             }
-          ?>
-          </select>
-        </td>
-      </tr>
-      <tr>
-      <td class='dropdown'> 
-          <select id="stream" name="stream" onchange="submitForm(this,'notesForm')">
-            <option value='0'>Select</option>
-          <?php
-            $rows = getStreamsForClass($class); 
-            foreach ($rows as $row) {
-              echo "<option value='".$row['ID']."'". checkSelected($row['ID'],$stream) .">".$row['NAME']."</option>";
+            ?>
+            <?php
+            if(!empty($stream))
+            {
+                //Get all subjects
+                $rows = getSubjectsForStream($class,$stream);
+                echo "<div class='col-12'>";
+                echo "<div class='form-group'>";
+                echo "<label class='form-label'>Subject</label>";
+                echo "<select class='form-select' name='subject' onchange=\"submitForm(this,'notesForm')\">";
+                echo "<option value=''>-- Choose Subject --</option>";
+                foreach ($rows as $row) {
+                    echo "<option value='".$row['ID']."' ".checkSelected($row['ID'],$subject).">".$row['NAME']."</option>";
+                }
+                echo "</select>";
+                echo "</div>";
+                echo "</div>";
             }
-          ?>
-          </select>
-      </td>
-      </tr>
-      <?php
-      if(!empty($stream))
-      { 
-      ?>
-        <tr>
-        <td class='dropdown'> 
-          <select id="subject" name="subject" onchange="submitForm(this,'notesForm')">
-            <option value='0'>Select</option>
-          <?php
-            $rows = getSubjectsForStream($class,$stream);
-            foreach ($rows as $row) {
-              echo "<option value='".$row['ID']."'". checkSelected($row['ID'],$subject) .">".$row['NAME']."</option>";
+            ?>
+            <?php
+            if(!empty($subject))
+            {
+                //Get all sections
+                $rows = getSectionsForSubject($class,$stream,$subject);
+                echo "<div class='col-12'>";
+                echo "<div class='form-group'>";
+                echo "<label class='form-label'>Section</label>";
+                echo "<select class='form-select' name='section' onchange=\"submitForm(this,'notesForm')\">";
+                echo "<option value=''>-- Choose Section --</option>";
+                foreach ($rows as $row) {
+                    echo "<option value='".$row['ID']."' ".checkSelected($row['ID'],$section).">".$row['NAME']."</option>";
+                }
+                echo "</select>";
+                echo "</div>";
+                echo "</div>";
             }
-          ?>
-          </select>
-        </td>
-        </tr>
-      <?php 
-      }
-      ?>
-      <?php
-      if(!empty($subject))
-      { 
-      ?>
-        <tr>
-        <td class='dropdown'> 
-          <select id="section" name="section" onchange="submitForm(this,'notesForm')">
-            <option value='0'>Select</option>
-          <?php
-            $rows = getSectionsForSubject($class,$stream,$subject);
-            foreach ($rows as $row) {
-              echo "<option value='".$row['ID']."'". checkSelected($row['ID'],$section) .">".$row['NAME']."</option>";
+            ?>
+            <?php
+            if(!empty($section))
+            {
+                //Get all chapters
+                $rows = getChaptersForSection($class,$stream,$subject,$section);
+                echo "<div class='col-12'>";
+                echo "<div class='form-group'>";
+                echo "<label class='form-label'>Chapter</label>";
+                echo "<select class='form-select' name='chapter' onchange=\"submitForm(this,'notesForm')\">";
+                echo "<option value=''>-- Choose Chapter --</option>";
+                foreach ($rows as $row) {
+                    echo "<option value='".$row['ID']."' ".checkSelected($row['ID'],$chapter).">".$row['NAME']."</option>";
+                }
+                echo "</select>";
+                echo "</div>";
+                echo "</div>";
             }
-          ?>
-          </select>
-        </td>
-        </tr>
-      <?php 
-      }
-      ?>
-      <?php
-      if(!empty($section))
-      { 
-      ?>
-          <tr>
-          <td class='dropdown'> 
-          <select id="chapter" name="chapter" onchange="submitForm(this,'notesForm')">
-            <option value='0'>Select</option>
-          <?php
-            $rows = getChaptersForSection($class,$stream,$subject,$section);
-            foreach ($rows as $row) {
-              echo "<option value='".$row['ID']."'". checkSelected($row['ID'],$chapter) .">".$row['NAME']."</option>";
-            }
-          ?>
-          </select>
-          </td>
-          </tr>
-      <?php 
-      }
-      ?>
-  </table>
+            ?>
+        </div>
+    </div>
 </form>
 <script>
   function submitForm(obj,form_id) 

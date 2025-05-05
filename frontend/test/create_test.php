@@ -12,6 +12,10 @@ $title = '';
 $duration_minutes = '';
 $total_questions = '';
 
+// Fetch all tests
+$stmt = $pdo->query("SELECT test_id, title FROM tests ORDER BY test_id DESC");
+$tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'];
     $duration_minutes = $_POST['duration_minutes'];
@@ -46,7 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
 
         if ($success) {
-            $message = "✅ Test created successfully!";
+            $test_id = $pdo->lastInsertId();
+            $message = "✅ Test created successfully! <a href='view_test.php?test_id=" . $test_id . "' class='btn btn-primary ms-2'>View Test</a>";
         } else {
             $message = "❌ Failed to create test.";
         }
@@ -57,9 +62,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="container-fluid w-50 p-0">
     <div class="card shadow p-4">
         <h2 class="mb-4">Create New Test</h2>
+        
+        <div class="d-flex justify-content-end mb-4">
+            <select class="form-select me-2" id="testSelect" onchange="viewSelectedTest()">
+                <option value="">Select Previous Test</option>
+                <?php foreach ($tests as $test): ?>
+                    <option value="<?= $test['test_id'] ?>"><?= htmlspecialchars($test['title']) ?></option>
+                <?php endforeach; ?>
+            </select>
+            <button class="btn btn-primary" onclick="viewSelectedTest()">View Test</button>
+        </div>
 
         <?php if (!empty($message)): ?>
-            <div class="alert alert-info"><?= htmlspecialchars($message) ?></div>
+            <div class="alert alert-info"><?= $message ?></div>
         <?php endif; ?>
 
         <form method="POST" action="">
@@ -81,6 +96,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
     </div>
 </div>
+
+<script>
+function viewSelectedTest() {
+    const testId = document.getElementById('testSelect').value;
+    if (testId) {
+        window.location.href = `view_test.php?test_id=${testId}`;
+    }
+}
+</script>
 
 <?php 
 $content = ob_get_contents();

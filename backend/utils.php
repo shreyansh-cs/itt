@@ -116,7 +116,7 @@
         $rows = [];
         try {
             $sql = "SELECT ID, NAME FROM sections WHERE SUBJECT_ID = :subject";
-            echo $sql; // Optional: keep this for debugging
+            //echo $sql; // Optional: keep this for debugging
     
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(':subject', $subject, PDO::PARAM_INT);
