@@ -202,12 +202,14 @@ const totalDuration = <?= $total_duration ?> * 1000; // Convert to milliseconds
 let timeLeft = Math.max(0, totalDuration - (serverCurrentTime - serverStartTime));
 
 // Debug information
+/*
 alert(`Debug Info:
 Start Time (PHP): ${new Date(serverStartTime).toLocaleString()}
 Current Time (PHP): ${new Date(serverCurrentTime).toLocaleString()}
 Elapsed: ${(serverCurrentTime - serverStartTime)/1000} seconds
 Total Duration: ${totalDuration/1000} seconds
 Time Left: ${timeLeft/1000} seconds`);
+*/
 
 function updateTimer() {
     const now = new Date().getTime();

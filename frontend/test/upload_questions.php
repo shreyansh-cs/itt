@@ -19,7 +19,7 @@ $tests = $pdo->query("SELECT test_id, title FROM tests")->fetchAll(PDO::FETCH_AS
 
 $error = "";
 $mesg = "";
-$test_id = "";
+$test_id = $_GET['test_id'] ?? ""; // Get test_id from URL if present
 $question = "";
 $optA = "";
 $optB = "";
@@ -50,6 +50,8 @@ if(isset($_POST['test_id'])) {
         $stmt = $pdo->prepare("SELECT COUNT(*) as question_count FROM questions WHERE test_id = ?");
         $stmt->execute([$test_id]);
         $count = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        //echo $count['question_count'].' '.$test['total_questions'].' '.$test_id;
 
         if ($count['question_count'] >= $test['total_questions']) {
             throw new Exception("Cannot add more questions. Test already has maximum number of questions (" . $test['total_questions'] . ").");
@@ -100,7 +102,12 @@ if(isset($_POST['test_id'])) {
                 </select>
             </div>
             <div class="col-md-3">
-                <a href="#" id="viewLink" class="btn btn-outline-primary w-100">View Questions</a>
+                <a href="<?= !empty($test_id) ? 'view_questions.php?test_id=' . $test_id : '#' ?>" 
+                   id="viewLink" 
+                   class="btn btn-outline-primary w-100 <?= empty($test_id) ? 'disabled' : '' ?>"
+                   <?= !empty($test_id) ? 'target="_blank"' : '' ?>>
+                    View Questions
+                </a>
             </div>
         </div>
 
