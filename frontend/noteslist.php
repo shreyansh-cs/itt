@@ -100,6 +100,60 @@ $title = "Notes & Video";
         echo "</tbody></table>";
         echo "</div>";
         //End Video section
+
+        // Start Tests section
+        echo "<div class='table-responsive mt-4'>";
+        echo "<h4 class='mb-3'>Available Tests</h4>";
+        
+        // Get tests mapped to this class
+        include __DIR__.'/../backend/db.php';
+        $stmt = $pdo->prepare("
+            SELECT t.test_id, t.title, t.duration_minutes, t.total_questions,
+                   (SELECT COUNT(*) FROM questions WHERE test_id = t.test_id) as questions_added
+            FROM tests t
+            INNER JOIN test_classes_map tcm ON t.test_id = tcm.test_id
+            WHERE tcm.class_id = ?
+        ");
+        $stmt->execute([$class]);
+        $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (!empty($tests)) {
+            echo "<table class='table table-bordered table-hover'>";
+            echo "<thead class='table-primary'>";
+            echo "<tr>
+                    <th>Test Title</th>
+                    <th>Duration</th>
+                    <th>Questions</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>";
+            echo "</thead><tbody>";
+            
+            foreach ($tests as $test) {
+                $status = $test['questions_added'] == $test['total_questions'] ? 
+                    '<span class="badge bg-success">Complete</span>' : 
+                    '<span class="badge bg-warning">Incomplete</span>';
+                
+                echo "<tr>";
+                echo "<td>" . htmlspecialchars($test['title']) . "</td>";
+                echo "<td>" . $test['duration_minutes'] . " minutes</td>";
+                echo "<td>" . $test['questions_added'] . "/" . $test['total_questions'] . "</td>";
+                echo "<td>" . $status . "</td>";
+                echo "<td>";
+                if (isAdminLoggedIn() || isTeacherLoggedIn() || doesUserHasSubscription($error)) {
+                    echo "<a href='test/take_test.php?test_id=" . $test['test_id'] . "' class='btn btn-primary btn-sm rounded-pill px-3'>Take Test</a>";
+                } else {
+                    echo "<a href='receipts.php' class='btn btn-primary btn-sm rounded-pill px-3'>Buy Package</a>";
+                }
+                echo "</td>";
+                echo "</tr>";
+            }
+            echo "</tbody></table>";
+        } else {
+            echo "<div class='alert alert-info'>No tests available for this class.</div>";
+        }
+        echo "</div>";
+        // End Tests section
     }
     echo "</div></div>";
     if(isAdminLoggedIn())
