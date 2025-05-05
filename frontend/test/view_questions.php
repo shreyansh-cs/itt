@@ -46,11 +46,12 @@ if ($selected_test_id) {
                         <th>C</th>
                         <th>D</th>
                         <th>Correct</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($questions as $index => $q): ?>
-                        <tr>
+                        <tr id="question-row-<?= $q['question_id'] ?>">
                             <td><?= $index + 1 ?></td>
                             <td><?= htmlspecialchars($q['question_text']) ?></td>
                             <td><?= htmlspecialchars($q['option_a']) ?></td>
@@ -58,6 +59,11 @@ if ($selected_test_id) {
                             <td><?= htmlspecialchars($q['option_c']) ?></td>
                             <td><?= htmlspecialchars($q['option_d']) ?></td>
                             <td><strong><?= $q['correct_option'] ?></strong></td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" onclick="deleteQuestion(<?= $q['question_id'] ?>)">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -67,6 +73,34 @@ if ($selected_test_id) {
         <?php endif; ?>
     </div>
 </div>
+
+<script>
+function deleteQuestion(questionId) {
+    if (confirm('Are you sure you want to delete this question?')) {
+        fetch('delete_question.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'question_id=' + questionId
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Remove the row from the table
+                document.getElementById('question-row-' + questionId).remove();
+                alert('Question deleted successfully');
+            } else {
+                alert(data.message || 'Error deleting question');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting question');
+        });
+    }
+}
+</script>
 
 <?php 
 $content = ob_get_contents();

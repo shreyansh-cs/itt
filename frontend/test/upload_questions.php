@@ -2,24 +2,87 @@
 include_once __DIR__.'/../session.php';
 ob_start();
 $title = "Online Test";
-include_once __DIR__.'/testshandler.php';
 include_once __DIR__.'/../restrictedpage.php'; // only for admin page
 
-$tests = getTests($error);
+require_once __DIR__.'/../../backend/db.php';
+
+// Helper function for select options
+function selected($current, $input) {
+    if($current == $input) {
+        return "selected";
+    }
+    return "";
+}
+
+// Fetch available tests
+$tests = $pdo->query("SELECT test_id, title FROM tests")->fetchAll(PDO::FETCH_ASSOC);
+
+$error = "";
+$mesg = "";
+$test_id = "";
+$question = "";
+$optA = "";
+$optB = "";
+$optC = "";
+$optD = "";
+$correct = "";
+
+if(isset($_POST['test_id'])) {
+    $test_id = $_POST['test_id'];
+    $question = $_POST['question_text'];
+    $optA = $_POST['option_a'];
+    $optB = $_POST['option_b'];
+    $optC = $_POST['option_c'];
+    $optD = $_POST['option_d'];
+    $correct = $_POST['correct_option'];
+
+    try {
+        // First check if we've reached the question limit
+        $stmt = $pdo->prepare("SELECT total_questions FROM tests WHERE test_id = ?");
+        $stmt->execute([$test_id]);
+        $test = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$test) {
+            throw new Exception("Test not found!");
+        }
+
+        // Count existing questions
+        $stmt = $pdo->prepare("SELECT COUNT(*) as question_count FROM questions WHERE test_id = ?");
+        $stmt->execute([$test_id]);
+        $count = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($count['question_count'] >= $test['total_questions']) {
+            throw new Exception("Cannot add more questions. Test already has maximum number of questions (" . $test['total_questions'] . ").");
+        }
+
+        // If we haven't reached the limit, proceed with insertion
+        $stmt = $pdo->prepare("INSERT INTO questions 
+        (test_id, question_text, option_a, option_b, option_c, option_d, correct_option)
+        VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$test_id, $question, $optA, $optB, $optC, $optD, $correct]);
+        
+        $mesg = "Question uploaded successfully!";
+    }
+    catch(Exception $e) {
+        $error = $e->getMessage();
+    }
+}
 ?>
+
 <?php 
-    if(!empty($mesg)){
+    if(!empty($mesg)) {
         echo '<div class="alert alert-success w-50 mx-auto" role="alert">';
         echo $mesg;
         echo "</div>";
     }
 
-    if(!empty($error)){
+    if(!empty($error)) {
         echo '<div class="alert alert-danger w-50 mx-auto" role="alert">';
-        echo $mesg;
+        echo $error;
         echo "</div>";
     }
 ?>
+
 <div class="container-fluid">
     <div class="card shadow p-4">
         <h3 class="mb-4">Add New Question</h3>
@@ -69,6 +132,7 @@ $tests = getTests($error);
         </form>
     </div>
 </div>
+
 <script>
 document.getElementById('test_id').addEventListener('change', function() {
     const testId = this.value;
@@ -83,6 +147,7 @@ document.getElementById('test_id').addEventListener('change', function() {
     }
 });
 </script>
+
 <?php 
 $content = ob_get_contents();
 ob_end_clean();
