@@ -58,8 +58,17 @@ $time_remaining = max(0, $total_duration - $elapsed_seconds);
 
 // If time has expired, update status
 if ($time_remaining <= 0) {
-    $stmt = $pdo->prepare("UPDATE test_sessions SET status = 'expired', end_time = NOW() WHERE user_id = :user_id AND test_id = :test_id");
-    $stmt->execute([':user_id' => $user_id, ':test_id' => $test_id]);
+    // Update status to expired using update_test_status.php
+    $ch = curl_init('update_test_status.php');
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
+        'test_id' => $test_id,
+        'status' => 'expired'
+    ]));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec($ch);
+    curl_close($ch);
+    
     die("Test time has expired.");
 }
 
@@ -201,15 +210,47 @@ const serverCurrentTime = <?= $current_timestamp_ms ?>; // PHP timestamp in mill
 const totalDuration = <?= $total_duration ?> * 1000; // Convert to milliseconds
 let timeLeft = Math.max(0, totalDuration - (serverCurrentTime - serverStartTime));
 
-// Debug information
-/*
-alert(`Debug Info:
-Start Time (PHP): ${new Date(serverStartTime).toLocaleString()}
-Current Time (PHP): ${new Date(serverCurrentTime).toLocaleString()}
-Elapsed: ${(serverCurrentTime - serverStartTime)/1000} seconds
-Total Duration: ${totalDuration/1000} seconds
-Time Left: ${timeLeft/1000} seconds`);
-*/
+// Function to save all answers
+function saveAllAnswers() {
+    const answers = {};
+    document.querySelectorAll('input[type="radio"]:checked').forEach(input => {
+        const questionId = input.name.match(/\[(\d+)\]/)[1];
+        answers[questionId] = input.value;
+    });
+
+    // Save answers to server
+    fetch('save_answer.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            test_id: <?= $test_id ?>,
+            answers: answers
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            console.error('Error saving answers:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error saving answers:', error);
+    });
+}
+
+// Save answers every 30 seconds
+setInterval(saveAllAnswers, 30000);
+
+// Save answers when user leaves the page
+window.addEventListener('beforeunload', function(e) {
+    if (timeLeft > 0) {
+        e.preventDefault();
+        e.returnValue = '';
+        saveAllAnswers();
+    }
+});
 
 function updateTimer() {
     const now = new Date().getTime();
@@ -223,7 +264,6 @@ function updateTimer() {
     timerElement.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     
     if (timeLeft <= 0) {
-        alert('Time is up! Submitting test...');
         clearInterval(timerInterval);
         // Save all answers one final time before submitting
         saveAllAnswers();
@@ -323,12 +363,12 @@ function submitTest() {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: `test_id=<?= $test_id ?>`
+        body: `test_id=<?= $test_id ?>&status=completed`
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            window.location.href = 'test_results.php?test_id=<?= $test_id ?>';
+            window.location.href = 'test_analysis.php?test_id=<?= $test_id ?>';
         } else {
             alert('Error submitting test: ' + data.message);
         }
@@ -343,7 +383,16 @@ document.getElementById('confirmSubmit').addEventListener('click', submitTest);
 
 // Update unanswered count
 function updateUnansweredCount() {
-    const unanswered = document.querySelectorAll('input[type="radio"]:not(:checked)').length;
+    const questions = document.querySelectorAll('.question');
+    let unanswered = 0;
+    
+    questions.forEach(question => {
+        const checkedOption = question.querySelector('input[type="radio"]:checked');
+        if (!checkedOption) {
+            unanswered++;
+        }
+    });
+    
     document.getElementById('unansweredCount').textContent = unanswered;
 }
 
