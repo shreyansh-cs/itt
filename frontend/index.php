@@ -24,7 +24,7 @@ $title = "I.T.T Group of Education - Home";
             echo '<a href="test/create_test.php" class="btn btn-primary rounded-pill px-4">Create Test</a>';
             echo '<a href="test/upload_questions.php" class="btn btn-primary rounded-pill px-4">Upload Questions</a>';
             echo '<a href="test/map_test_to_class.php" class="btn btn-primary rounded-pill px-4">Map test to Class</a>';
-            echo '<a href="database_dump.php" class="btn btn-primary rounded-pill px-4">Database Dump</a>';
+            //echo '<a href="database_dump.php" class="btn btn-primary rounded-pill px-4">Database Dump</a>';
             echo '<a href="test/edit_test_map.php" class="btn btn-primary rounded-pill px-4">Edit Test Map</a>';
         }
         ?>
