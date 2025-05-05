@@ -142,6 +142,7 @@ $title = "Notes & Video";
                 echo "<td>";
                 if (isAdminLoggedIn() || isTeacherLoggedIn() || doesUserHasSubscription($error)) {
                     echo "<a href='test/take_test.php?test_id=" . $test['test_id'] . "' class='btn btn-primary btn-sm rounded-pill px-3'>Take Test</a>";
+                    echo " <a href='test/test_analysis.php?test_id=" . $test['test_id'] . "' class='btn btn-info btn-sm rounded-pill px-3'>View Analysis</a>";
                 } else {
                     echo "<a href='receipts.php' class='btn btn-primary btn-sm rounded-pill px-3'>Buy Package</a>";
                 }
