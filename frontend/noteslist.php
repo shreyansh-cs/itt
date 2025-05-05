@@ -6,7 +6,8 @@ $title = "Notes & Video";
 ?>
 
 <?php 
-    include_once '../backend/utils.php';
+    include_once __DIR__.'/../backend/db.php';
+    include_once __DIR__.'/../backend/utils.php';
     $border = "1";
     include_once 'selection.php';
     echo "<div class='container text-start mt-4'>";
@@ -106,7 +107,6 @@ $title = "Notes & Video";
         echo "<h4 class='mb-3'>Available Tests</h4>";
         
         // Get tests mapped to this class
-        include __DIR__.'/../backend/db.php';
         $stmt = $pdo->prepare("
             SELECT t.test_id, t.title, t.duration_minutes, t.total_questions,
                    (SELECT COUNT(*) FROM questions WHERE test_id = t.test_id) as questions_added
