@@ -60,7 +60,7 @@ else
     </div-->
 
     <script>
-        var url = 'https://itticon.site/itt/frontend/supplypdf.php?noteid=<?php echo $noteid; ?>';
+        var url = 'https://itticon.in/itt/frontend/supplypdf.php?noteid=<?php echo $noteid; ?>';
 
         // Initialize the PDF.js library
         var pdfjsLib = window['pdfjs-dist/build/pdf'];

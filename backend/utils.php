@@ -1124,8 +1124,8 @@
         //Include PHPMailer 
         $mail = new PHPMailer(true); 
         $subject = "Welcome to ITT Icon " . htmlspecialchars($username);
-        $replyEmail = "support@itticon.site";
-        $homepage = "https://itticon.site/itt/frontend/index.php";
+        $replyEmail = "support@itticon.in";
+        $homepage = "https://itticon.in/itt/frontend/index.php";
         $message = "
         <html>
         <head>
@@ -1134,8 +1134,8 @@
         <body>
             <h2>Dear " . htmlspecialchars($username) . ",</h2>
             <p>Thank you for registering with us. We're excited to have you on board!</p>
-            <p>Please activate your account using this <a href='https://itticon.site/itt/frontend/verifyuser.php?verify_key=$verify_key'>link</a></p>
-            <p>Post activation, You can <a href='https://itticon.site/itt/frontend/login.php'>Login</a>, We encourage you to start exploring the amazing courses we offer.</p>
+            <p>Please activate your account using this <a href='https://itticon.in/itt/frontend/verifyuser.php?verify_key=$verify_key'>link</a></p>
+            <p>Post activation, You can <a href='https://itticon.in/itt/frontend/login.php'>Login</a>, We encourage you to start exploring the amazing courses we offer.</p>
             <p>If you need any help, feel free to reach out to us.</p>
             <div>Please login using below details.</div>
             <h3>UserName:$phone</h3>
@@ -1178,8 +1178,8 @@
         //Include PHPMailer 
         $mail = new PHPMailer(true); 
         $subject = "Reset Password";
-        $replyEmail = "support@itticon.site";
-        $base = "https://itticon.site/";
+        $replyEmail = "support@itticon.in";
+        $base = "https://itticon.in/";
         $homepage = $base."itt/frontend/index.php";
         $loginpage = $base."itt/frontend/login.php";
         $message = "
