@@ -35,7 +35,7 @@
 <body>
     <!-- Redirect Banner -->
     <div class="redirect-banner">
-        🚀 We're moving to <a href="https://itticon.in" target="_blank">itticon.in</a>! Please update your bookmarks.
+        🚀 We're moving to <a href="https://itticon.in">itticon.in</a>! Please update your bookmarks.
     </div>
 
     <main class="container mt-4">
