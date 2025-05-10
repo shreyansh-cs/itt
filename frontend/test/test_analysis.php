@@ -4,120 +4,159 @@ ob_start();
 $title = "Test Analysis";
 require __DIR__.'/../../backend/db.php';
 
+$test_id = $_GET['test_id'] ?? null;
 $user_id = getUserID();
-$test_id = isset($_GET['test_id']) ? (int)$_GET['test_id'] : null;
 
-// Get test details and user's performance
-$stmt = $pdo->prepare("
-    SELECT 
-        t.test_id,
-        t.title,
-        t.duration_minutes,
-        t.total_questions,
-        ts.start_time,
-        ts.end_time,
-        ts.status,
-        (SELECT COUNT(*) FROM user_answers ua 
-         WHERE ua.test_id = t.test_id 
-         AND ua.user_id = :user_id) as questions_attempted,
-        (SELECT COUNT(*) FROM user_answers ua 
-         INNER JOIN questions q ON ua.question_id = q.question_id 
-         WHERE ua.test_id = t.test_id 
-         AND ua.user_id = :user_id 
-         AND ua.selected_option = q.correct_option) as correct_answers
-    FROM test_sessions ts
-    INNER JOIN tests t ON ts.test_id = t.test_id
-    WHERE ts.user_id = :user_id
-    " . ($test_id ? "AND t.test_id = :test_id" : "") . "
-    ORDER BY ts.start_time DESC
-");
-
-$params = [':user_id' => $user_id];
-if ($test_id) {
-    $params[':test_id'] = $test_id;
+if (!$test_id) {
+    die("Test ID not provided.");
 }
-$stmt->execute($params);
-$test_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+try {
+    // Get test details
+    $stmt = $pdo->prepare("SELECT * FROM tests WHERE test_id = ?");
+    $stmt->execute([$test_id]);
+    $test = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$test) {
+        die("Test not found.");
+    }
+
+    // Get test session details
+    $stmt = $pdo->prepare("SELECT * FROM test_sessions 
+                          WHERE test_id = ? AND user_id = ? 
+                          ORDER BY start_time DESC LIMIT 1");
+    $stmt->execute([$test_id, $user_id]);
+    $test_session = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    //debug_print($test_session);
+
+    if (!$test_session) {
+        die("No test session found.");
+    }
+
+    // Get all questions and user's answers
+    $stmt = $pdo->prepare("SELECT q.*, ua.selected_option
+                          FROM questions q 
+                          JOIN user_answers ua ON q.question_id = ua.question_id 
+                          WHERE ua.test_id = ? 
+                          AND ua.user_id = ?
+                          ORDER BY q.question_id");
+    $stmt->execute([$test_id, $user_id]);
+    $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Calculate total marks and percentage
+    $total_marks = 0;
+    $obtained_marks = 0;
+    $questions_correct = 0;
+    foreach ($questions as $question) {
+        $total_marks += $question['marks'];
+        if ($question['correct_option'] == $question['selected_option']) {
+            $obtained_marks += $question['marks'];
+            $questions_correct++;
+        }
+    }
+    $percentage = $total_marks > 0 ? ($obtained_marks / $total_marks) * 100 : 0;
+
+} catch (Exception $e) {
+    die("Error: " . $e->getMessage());
+}
 ?>
 
-<div class="container-fluid">
-    <div class="card shadow p-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3>Test Analysis</h3>
-            <a href="../noteslist.php" class="btn btn-outline-primary btn-sm rounded-pill px-3">
-                <i class="fas fa-arrow-left me-1"></i> Back to Tests
-            </a>
+<div class="container-fluid p-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Test Analysis: <?= htmlspecialchars($test['title']) ?></h5>
         </div>
-        
-        <?php if (!empty($test_history)): ?>
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-primary">
-                        <tr>
-                            <th>Test Title</th>
-                            <th>Date</th>
-                            <th>Duration</th>
-                            <th>Questions</th>
-                            <th>Attempted</th>
-                            <th>Correct</th>
-                            <th>Score</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($test_history as $test): 
-                            $score = $test['total_questions'] > 0 ? 
-                                round(($test['correct_answers'] / $test['total_questions']) * 100, 2) : 0;
-                            
-                            $status_class = match($test['status']) {
-                                'completed' => 'bg-success',
-                                'expired' => 'bg-danger',
-                                'in_progress' => 'bg-warning',
-                                default => 'bg-secondary'
-                            };
-                            
-                            $start_date = new DateTime($test['start_time']);
-                            $formatted_date = $start_date->format('d M Y, h:i A');
-                        ?>
-                            <tr>
-                                <td><?= htmlspecialchars($test['title']) ?></td>
-                                <td><?= $formatted_date ?></td>
-                                <td><?= $test['duration_minutes'] ?> minutes</td>
-                                <td><?= $test['total_questions'] ?></td>
-                                <td><?= $test['questions_attempted'] ?></td>
-                                <td><?= $test['correct_answers'] ?></td>
-                                <td>
-                                    <div class="progress" style="height: 20px;">
-                                        <div class="progress-bar <?= $score >= 70 ? 'bg-success' : ($score >= 40 ? 'bg-warning' : 'bg-danger') ?>" 
-                                             role="progressbar" 
-                                             style="width: <?= $score ?>%"
-                                             aria-valuenow="<?= $score ?>" 
-                                             aria-valuemin="0" 
-                                             aria-valuemax="100">
-                                            <?= $score ?>%
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="badge <?= $status_class ?>">
-                                        <?= ucfirst($test['status']) ?>
-                                    </span>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+        <div class="card-body">
+            <!-- Test Summary -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h6 class="card-title">Score</h6>
+                            <h3 class="mb-0"><?= $obtained_marks ?>/<?= $total_marks ?></h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h6 class="card-title">Percentage</h6>
+                            <h3 class="mb-0"><?= number_format($percentage, 1) ?>%</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h6 class="card-title">Questions Correct</h6>
+                            <h3 class="mb-0"><?= $questions_correct ?>/<?= $test['total_questions'] ?></h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <h6 class="card-title">Time Taken</h6>
+                            <h3 class="mb-0">
+                                <?php
+                                $start = strtotime($test_session['start_time']);
+                                $end = strtotime($test_session['end_time']);
+                                $duration = $end - $start;
+                                echo floor($duration / 60) . 'm ' . ($duration % 60) . 's';
+                                ?>
+                            </h3>
+                        </div>
+                    </div>
+                </div>
             </div>
-        <?php else: ?>
-            <div class="alert alert-info">
-                <?php if ($test_id): ?>
-                    No test history found for this test.
-                <?php else: ?>
-                    You haven't taken any tests yet. 
-                    <a href="../noteslist.php" class="alert-link">Go to Notes & Tests</a> to start taking tests.
-                <?php endif; ?>
-            </div>
-        <?php endif; ?>
+
+            <!-- Questions Analysis -->
+            <h5 class="mb-3">Question Analysis</h5>
+            <?php foreach ($questions as $index => $question): ?>
+                <div class="card mb-3 <?= $question['selected_option'] == $question['correct_option'] ? 'border-success' : 'border-danger' ?>">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="card-title mb-0">Question <?= $index + 1 ?></h6>
+                            <span class="badge <?= $question['selected_option'] == $question['correct_option'] ? 'bg-success' : 'bg-danger' ?>">
+                                <?= $question['selected_option'] == $question['correct_option'] ? 'Correct' : 'Incorrect' ?>
+                            </span>
+                        </div>
+                        <p class="card-text"><?= htmlspecialchars($question['question_text']) ?></p>
+                        
+                        <div class="options">
+                            <?php
+                            $options = ['A', 'B', 'C', 'D'];
+                            foreach ($options as $option):
+                                $option_value = strtolower($option);
+                                $is_correct = strtoupper($question['correct_option']) === $option;
+                                $is_selected = strtoupper($question['selected_option']) === $option;
+                            ?>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" disabled
+                                           <?= $is_selected ? 'checked' : '' ?>>
+                                    <label class="form-check-label <?= $is_correct ? 'text-success fw-bold' : '' ?>">
+                                        <?= htmlspecialchars($question['option_' . $option_value]) ?>
+                                        <?php if ($is_correct): ?>
+                                            <i class="fas fa-check text-success"></i>
+                                        <?php endif; ?>
+                                    </label>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                Your Answer: <?= $question['selected_option'] ? strtoupper($question['selected_option']) : 'Not answered' ?>
+                                <?php if ($question['selected_option'] != $question['correct_option']): ?>
+                                    <br>Correct Answer: <?= strtoupper($question['correct_option']) ?>
+                                <?php endif; ?>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
     </div>
 </div>
 
