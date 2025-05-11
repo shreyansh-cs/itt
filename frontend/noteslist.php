@@ -47,7 +47,7 @@ $title = "Notes & Video";
             if(isAdminLoggedIn())
             {
                 echo "<td>";
-                echo "<a class='btn btn-danger btn-sm rounded-pill px-3' href='delete_note.php?noteid=".$row['ID']."'>Delete</a>";
+                echo "<a class='btn btn-danger btn-sm rounded-pill px-3' href='delete.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter&noteid=".$row['ID']."'>Delete</a>";
                 echo "</td>";
             }
 
