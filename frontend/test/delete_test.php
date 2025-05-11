@@ -1,50 +1,48 @@
 <?php
-include_once __DIR__.'/../session.php';
-require_once __DIR__.'/../../backend/db.php';
+require_once __DIR__.'/../../frontend/restrictedpage.php';
 
-header('Content-Type: application/json');
-
-if (!isset($_POST['test_id'])) {
-    die(json_encode(['success' => false, 'message' => 'Test ID not provided']));
+if(isset($_POST['test_id'])){
+    $test_id = $_POST['test_id'];
+}
+/*else if(isset($_GET['test_id'])){
+    $test_id = $_GET['test_id'];
+}*/
+else{
+    echo json_encode(['success' => false, 'message' => 'Test ID not provided']);
+    exit();
 }
 
-$test_id = (int)$_POST['test_id'];
-$user_id = getUserID();
-
 try {
+    include __DIR__."/../../backend/db.php";
     $pdo->beginTransaction();
 
-    // Delete all questions for this test
-    $stmt = $pdo->prepare("DELETE FROM questions WHERE test_id = :test_id");
-    $stmt->execute([':test_id' => $test_id]);
+    // 1. First delete user_answers (child of questions)
+    $stmt = $pdo->prepare("DELETE ua FROM user_answers ua 
+                          INNER JOIN questions q ON ua.question_id = q.question_id 
+                          WHERE q.test_id = ?");
+    $stmt->execute([$test_id]);
 
-    // Delete all test sessions
-    $stmt = $pdo->prepare("DELETE FROM test_sessions WHERE test_id = :test_id");
-    $stmt->execute([':test_id' => $test_id]);
+    // 2. Delete test_sessions (child of tests)
+    $stmt = $pdo->prepare("DELETE FROM test_sessions WHERE test_id = ?");
+    $stmt->execute([$test_id]);
 
-    // Delete all user answers
-    $stmt = $pdo->prepare("DELETE FROM user_answers WHERE test_id = :test_id");
-    $stmt->execute([':test_id' => $test_id]);
+    // 3. Delete test_classes_map (child of tests)
+    $stmt = $pdo->prepare("DELETE FROM test_classes_map WHERE test_id = ?");
+    $stmt->execute([$test_id]);
 
-    // Delete test-class mappings
-    $stmt = $pdo->prepare("DELETE FROM test_classes_map WHERE test_id = :test_id");
-    $stmt->execute([':test_id' => $test_id]);
+    // 4. Delete questions (child of tests)
+    $stmt = $pdo->prepare("DELETE FROM questions WHERE test_id = ?");
+    $stmt->execute([$test_id]);
 
-    // Finally, delete the test itself
-    $stmt = $pdo->prepare("DELETE FROM tests WHERE test_id = :test_id");
-    $success = $stmt->execute([':test_id' => $test_id]);
+    // 5. Finally delete the test itself
+    $stmt = $pdo->prepare("DELETE FROM tests WHERE test_id = ?");
+    $stmt->execute([$test_id]);
 
-    if ($success) {
-        $pdo->commit();
-        echo json_encode(['success' => true, 'message' => 'Test deleted successfully']);
-    } else {
-        $pdo->rollBack();
-        echo json_encode(['success' => false, 'message' => 'Failed to delete test']);
-    }
-
-} catch (PDOException $e) {
+    $pdo->commit();
+    echo json_encode(['success' => true, 'message' => 'Test deleted successfully']);
+} catch (Exception $e) {
     $pdo->rollBack();
-    error_log("Database error: " . $e->getMessage());
-    echo json_encode(['success' => false, 'message' => 'Database error occurred']);
+    error_log("Error deleting test: " . $e->getMessage());
+    echo json_encode(['success' => false, 'message' => 'Error deleting test: ' . $e->getMessage()]);
 }
 ?> 
