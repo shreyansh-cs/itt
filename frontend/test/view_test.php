@@ -111,12 +111,21 @@ function deleteTest(testId) {
             },
             body: `test_id=${testId}`
         })
-        .then(response => response.json())
+        .then(response => response.text())
         .then(data => {
-            if (data.success) {
-                window.location.href = 'create_test.php';
-            } else {
-                alert('Error deleting test: ' + data.message);
+            console.log('Raw response:', data);
+            //alert('Server response: ' + data);
+            try {
+                const jsonData = JSON.parse(data);
+                if (jsonData.success) {
+                    console.log('Test deleted successfully');
+                    window.location.href = 'create_test.php';
+                } else {
+                    alert('Error deleting test: ' + jsonData.message);
+                }
+            } catch (e) {
+                console.error('Error parsing JSON:', e);
+                alert('Error parsing server response. Raw response: ' + data);
             }
         })
         .catch(error => {
