@@ -96,7 +96,7 @@
                         <a class="nav-link" href="/itt/frontend/noteslist.php">Notes & Video</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/itt/frontend/onlinetest.php">Online Test</a>
+                        <a class="nav-link" href="/itt/frontend/noteslist.php">Online Test</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/itt/frontend/contact.php">Contact Us</a>
@@ -106,9 +106,6 @@
                             echo '<li class="nav-item"><a class="nav-link" href="/itt/frontend/login.php">Login</a></li>';
                         } else {
                             echo '<li class="nav-item"><a class="nav-link" href="/itt/backend/logout.php">Logout (' . htmlspecialchars($full_name) . ')</a></li>';
-                            if($type == "admin") {
-                                echo '<li class="nav-item"><a class="nav-link" href="/itt/frontend/noteslist.php">Admin</a></li>';
-                            }
                         }
                     ?>
                 </ul>
@@ -116,7 +113,7 @@
         </div>
     </nav>
 
-    <main class="container mt-4">
+    <main class="container-fluid px-4 mt-4">
         <?php echo $content; ?>
     </main>
 

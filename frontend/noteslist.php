@@ -10,7 +10,7 @@ $title = "Notes & Video";
     include_once __DIR__.'/../backend/utils.php';
     $border = "1";
     include_once 'selection.php';
-    echo "<div class='container text-start mt-4'>";
+    echo "<div class='container-fluid px-4 mt-4'>";
     echo "<div class='table-responsive'>";
 
     if(!empty($chapter))
@@ -159,13 +159,27 @@ $title = "Notes & Video";
     echo "</div></div>";
     if(isAdminLoggedIn())
     {
-        echo "<div class='container text-start mt-4'>";
+        echo "<div class='container-fluid px-4 mt-4'>";
         echo "<div class='d-flex flex-wrap gap-3'>";
         echo "<a class='btn btn-primary btn-sm rounded-pill px-3' target='_blank' href='uploadnotes.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter'>Add New Notes</a>";
         echo "<a class='btn btn-primary btn-sm rounded-pill px-3' target='_blank' href='uploadvideo.php?class=$class&stream=$stream&subject=$subject&section=$section&chapter=$chapter'>Add New Video</a>";
         echo "</div></div>";
     }
 ?>
+
+<style>
+.container-fluid {
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+</style>
 
 <?php 
 $content = ob_get_contents();
