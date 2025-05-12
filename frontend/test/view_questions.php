@@ -3,6 +3,7 @@ include_once __DIR__.'/../session.php';
 ob_start();
 $title = "View Questions";
 require __DIR__.'/../../backend/db.php';
+require_once __DIR__.'/../../frontend/restrictedpage.php';
 
 // Fetch all tests for dropdown
 $tests = $pdo->query("SELECT test_id, title FROM tests")->fetchAll(PDO::FETCH_ASSOC);
