@@ -35,19 +35,22 @@ try {
         throw new Exception('No test session found');
     }
 
-    // Calculate end time based on start time and duration
+    // Calculate end time based on status
+    $current_time = date('Y-m-d H:i:s');
     $start_time = strtotime($test_session['start_time']);
     $duration_seconds = $test_session['duration_minutes'] * 60;
     $calculated_end_time = date('Y-m-d H:i:s', $start_time + $duration_seconds);
-    $current_time = date('Y-m-d H:i:s');
 
     // If current time is past the calculated end time, force status to expired
     if (strtotime($current_time) > strtotime($calculated_end_time)) {
         $status = 'expired';
         $end_time = $current_time;
     } else {
-        // If status is expired or completed, use the calculated end time
-        $end_time = ($status === 'in_progress') ? null : $calculated_end_time;
+        // If status is completed, use current time (actual submission time)
+        // If status is expired, use calculated end time
+        // If status is in_progress, end_time remains null
+        $end_time = ($status === 'completed') ? $current_time : 
+                   (($status === 'expired') ? $calculated_end_time : null);
     }
 
     // Update test session status

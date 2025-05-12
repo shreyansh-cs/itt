@@ -34,6 +34,11 @@ try {
         die("No test session found.");
     }
 
+    //get sum of all marks of all questions of this test
+    $stmt = $pdo->prepare("SELECT SUM(marks) as total_marks FROM questions WHERE test_id = ?");
+    $stmt->execute([$test_id]);
+    $total_marks = $stmt->fetch(PDO::FETCH_ASSOC)['total_marks'];
+
     // Get all questions and user's answers
     $stmt = $pdo->prepare("SELECT q.*, ua.selected_option
                           FROM questions q 
@@ -44,12 +49,10 @@ try {
     $stmt->execute([$test_id, $user_id]);
     $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Calculate total marks and percentage
-    $total_marks = 0;
+    // Calculate percentage
     $obtained_marks = 0;
     $questions_correct = 0;
     foreach ($questions as $question) {
-        $total_marks += $question['marks'];
         if ($question['correct_option'] == $question['selected_option']) {
             $obtained_marks += $question['marks'];
             $questions_correct++;

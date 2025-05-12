@@ -43,6 +43,7 @@ $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <th>Assigned Classes</th>
                             <th>Created Date</th>
                             <th>Action</th>
+                            <th>Reset</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -91,6 +92,19 @@ $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         </button>
                                     <?php endif; ?>
                                 </td>
+                                <td>
+                                    <?php if ($test['questions_uploaded'] > 0): ?>
+                                        <button class="btn btn-warning btn-sm" 
+                                                onclick="resetTest(<?= $test['test_id'] ?>)"
+                                                title="Reset Test">
+                                            <i class="fas fa-redo-alt me-1"></i>Reset Test
+                                        </button>
+                                    <?php else: ?>
+                                        <button class="btn btn-secondary btn-sm" disabled>
+                                            <i class="fas fa-redo-alt me-1"></i>Reset Test
+                                        </button>
+                                    <?php endif; ?>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -100,9 +114,32 @@ $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </div>
 
-<style>
-
-</style>
+<script>
+function resetTest(testId) {
+    if (confirm('Are you sure you want to reset this test? This will delete all your answers and test session data.')) {
+        fetch('reset_test.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `test_id=${testId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Test reset successfully!');
+                location.reload();
+            } else {
+                alert('Error resetting test: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error resetting test. Please try again.');
+        });
+    }
+}
+</script>
 
 <?php 
 $content = ob_get_contents();
