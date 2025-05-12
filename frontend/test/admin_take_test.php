@@ -34,6 +34,8 @@ $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <table class="table table-hover">
                     <thead>
                         <tr>
+                            <th>S.No</th>
+                            <th>Test ID</th>
                             <th>Test Title</th>
                             <th>Duration</th>
                             <th>Total Questions</th>
@@ -44,9 +46,22 @@ $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($tests as $test): ?>
+                        <?php 
+                        $serial = 1;
+                        foreach ($tests as $test): 
+                        ?>
                             <tr>
-                                <td><?= htmlspecialchars($test['title']) ?></td>
+                                <td><?= $serial++ ?></td>
+                                <td>
+                                    <a href="view_test.php?test_id=<?= $test['test_id'] ?>" class="text-decoration-none">
+                                        <?= $test['test_id'] ?>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="view_test.php?test_id=<?= $test['test_id'] ?>" class="text-decoration-none">
+                                        <?= htmlspecialchars($test['title']) ?>
+                                    </a>
+                                </td>
                                 <td><?= $test['duration_minutes'] ?> minutes</td>
                                 <td><?= $test['total_questions'] ?></td>
                                 <td>
@@ -67,7 +82,7 @@ $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <td>
                                     <?php if ($test['questions_uploaded'] > 0): ?>
                                         <a href="take_test.php?test_id=<?= $test['test_id'] ?>" 
-                                           class="btn btn-primary btn-sm">
+                                           class="btn btn-success btn-sm">
                                             <i class="fas fa-pencil-alt me-1"></i>Attempt Test
                                         </a>
                                     <?php else: ?>
@@ -86,24 +101,7 @@ $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 <style>
-.table th {
-    background-color: #f8f9fa;
-    font-weight: 600;
-}
 
-.badge {
-    font-size: 0.9em;
-    padding: 0.5em 0.8em;
-}
-
-.btn-sm {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-}
-
-.table td {
-    vertical-align: middle;
-}
 </style>
 
 <?php 
