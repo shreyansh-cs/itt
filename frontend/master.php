@@ -42,7 +42,7 @@
         }
         @media (max-width: 768px) {
             .navbar-brand h1 {
-                font-size: 18px;
+                font-size: 16px;
             }
             .navbar-brand img {
                 width: 35px;
