@@ -90,7 +90,7 @@ $title = "Receipts";
                     $priceInRs = $row['AMOUNT']/100.00;
                     echo "<td>₹{$priceInRs}</td>";
                     $status_color = getStatusColor($row['STATUS']);
-                    echo "<td><span class='badge' style='background-color:$status_color'>{$row['STATUS']}</span></td>";
+                    echo "<td><span class='badge bg-{$status_color}'>{$row['STATUS']}</span></td>";
                     echo "</tr>";
                 }
                 echo "</tbody>";
@@ -124,7 +124,6 @@ $title = "Receipts";
 .badge {
     padding: 0.5em 0.75em;
     font-weight: 500;
-    color: white;
 }
 
 .form-select {

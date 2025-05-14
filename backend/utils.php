@@ -1223,15 +1223,15 @@
     {
         if($status == "success")
         {
-            return "green";
+            return "success";
         }
 
         if($status == "failed")
         {
-            return "red";
+            return "danger";
         }
 
-        return "yellow";
+        return "warning";
     }
 
 ?>
