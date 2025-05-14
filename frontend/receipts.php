@@ -101,7 +101,7 @@ if(getReceiptsForThisUser($user_id,$rows,$error))
         $priceInRs = $row['AMOUNT']/100.00;
         echo "<td>₹{$priceInRs}</td>";
         $status_color = getStatusColor($row['STATUS']);
-        echo "<td><span class='badge text-dark' style='background-color:$status_color'>{$row['STATUS']}</span></td>";
+        echo "<td><span class='badge text-dark bg-{$status_color}'>{$row['STATUS']}</span></td>";
         echo "<td><a href='receipts.php?order_id={$row['ORDER_ID']}' class='btn btn-sm btn-outline-primary'>Refresh</a></td>";
         echo "</tr>";
     }
