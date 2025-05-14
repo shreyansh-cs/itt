@@ -12,6 +12,15 @@
             font-family: 'Poppins', sans-serif;
             background-color: #f4f4f4;
             padding-top: 70px; /* Add padding to account for fixed navbar */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1 0 auto;
+        }
+        footer {
+            flex-shrink: 0;
         }
         .navbar-brand h1 {
             font-size: 24px;
