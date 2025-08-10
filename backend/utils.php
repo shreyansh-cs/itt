@@ -426,7 +426,124 @@
             $error = "Database error: " . $e->getMessage();
             return false;
         }
-    }    
+    }
+
+    // Single session authentication function
+    function authUserSingleSession($email_or_phone, $password, &$row, &$error) {
+        include 'db.php'; // Assumes $pdo is defined here
+    
+        $sql = "SELECT id AS ID, full_name AS FULL_NAME, password AS PASSWORD, user_type AS USER_TYPE, user_class AS USER_CLASS, verified AS VERIFIED, email AS EMAIL, phone AS PHONE, session_id AS SESSION_ID 
+                FROM users WHERE email = :email_or_phone OR phone = :email_or_phone";
+        
+        try {
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':email_or_phone', $email_or_phone, PDO::PARAM_STR);
+            $stmt->execute();
+            
+            if ($stmt->rowCount() == 1) {
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                // Check if user is verified
+                if ($row['VERIFIED'] == 0) {
+                    $error = "UserID is not verified";
+                    return false;
+                }
+    
+                // Verify password securely
+                //echo $password,$row['PASSWORD'];
+                //if (!password_verify($password, $row['PASSWORD'])) {
+                if($password != $row['PASSWORD']){
+                    $error = "Username / Password not matching";
+                    return false;
+                }
+    
+                // Check if user is already logged in from the same session
+                if (!empty($row['SESSION_ID']) && $row['SESSION_ID'] === session_id()) {
+                    // User is already logged in from the same session, no need to update session_id
+                    return true;
+                }
+                
+                // If user is logged in from a different session or not logged in, update session_id
+                // This automatically logs them out from the old session and allows the new login
+                $currentSessionId = session_id();
+                $updateSessionSql = "UPDATE users SET session_id = :session_id WHERE id = :user_id";
+                $updateStmt = $pdo->prepare($updateSessionSql);
+                $updateStmt->bindParam(':session_id', $currentSessionId, PDO::PARAM_STR);
+                $updateStmt->bindParam(':user_id', $row['ID'], PDO::PARAM_INT);
+                $updateStmt->execute();
+                
+                return true;
+            } elseif ($stmt->rowCount() == 0) {
+                $error = "No such user exists";
+                return false;
+            } else {
+                $error = "Unknown error";
+                return false;
+            }
+        } catch (PDOException $e) {
+            $error = "Database error: " . $e->getMessage();
+            return false;
+        }
+    }
+
+    // Function to clear session_id during logout
+    function clearUserSessionId($user_id, &$error) {
+        include 'db.php';
+        
+        try {
+            $sql = "UPDATE users SET session_id = NULL WHERE id = :user_id";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            $stmt->execute();
+            return true;
+        } catch (PDOException $e) {
+            $error = "Database error: " . $e->getMessage();
+            return false;
+        }
+    }
+
+    // Function to check if session_id matches database
+    function validateUserSessionId($user_id, &$error) {
+        include 'db.php';
+        
+        try {
+            $sql = "SELECT session_id FROM users WHERE id = :user_id";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            if ($stmt->rowCount() == 1) {
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                // Return true if session_id matches current session
+                return ($row['session_id'] === session_id());
+            }
+            
+            // User not found
+            $error = "User not found";
+            return false;
+        } catch (PDOException $e) {
+            $error = "Database error: " . $e->getMessage();
+            return false;
+        }
+    }
+
+    // Function to update session_id for a user (used during session regeneration)
+    function updateUserSessionId($user_id, &$error) {
+        include 'db.php';
+        
+        try {
+            $currentSessionId = session_id();
+            $sql = "UPDATE users SET session_id = :session_id WHERE id = :user_id";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':session_id', $currentSessionId, PDO::PARAM_STR);
+            $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            $stmt->execute();
+            return true;
+        } catch (PDOException $e) {
+            $error = "Database error: " . $e->getMessage();
+            return false;
+        }
+    }
 
     function clearExpiredTokens($userid,&$error)
     {
@@ -440,46 +557,7 @@
         $error =  "Expired Tokens: " . $affectedRows;
     }
 
-    /*
-    function getValidToken($userid,&$token,&$error)
-    {
-        include 'db.php';
-        $pdo = new PDO("mysql:host=$servername;dbname=$dbname", $username, $db_password);
-
-        // Check token validity
-        $query = "SELECT token as TOKEN FROM api_tokens WHERE user_id = ? AND expires_at > NOW()";
-        $stmt = $pdo->prepare($query);
-        $stmt->execute([$userid]);
-        $apiToken = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($apiToken) {
-            //echo  "<pre>".print_r($apiToken)."</pre>";
-            $token = $apiToken['TOKEN'];// Token is valid, return it
-            return true;
-        }
-
-        return false;  //token does not exist
-    }
-
-    function authenticateByToken($token,&$row,&$error) 
-    {
-        include 'db.php';
-
-        // Check token validity
-        $sql = "SELECT id as ID, expires_at as EXPIRES_AT FROM api_tokens WHERE token = '$token' and expires_at > NOW()";
-        $result = $conn->query($sql);
-
-        if ($result && $result->num_rows > 0)
-        {
-            //First one if there are multiple rows
-            //echo  "<pre>".print_r($row)."</pre>";
-            $row = $result->fetch_assoc();
-            return true;//valid token
-        }
-        $error = "Invalid Token";
-        return false;
-    }
-    */
+    
 
     //Both param can be email or phone
     function doesEmailExist($email, &$username, &$password, &$error) {

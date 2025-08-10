@@ -29,6 +29,32 @@ elseif (time() - $_SESSION['last_regeneration'] > 60*60*$logoutHours)
 { 
   session_regenerate_id(true);
   $_SESSION['last_regeneration'] = time();
+  
+  // Update session_id in database and regenerate JWT after regeneration
+  if (isset($_SESSION['token'])) {
+    include_once __DIR__.'/../backend/public_utils.php';
+    include_once __DIR__.'/../backend/utils.php';
+    include_once __DIR__.'/../backend/jw_utils.php';
+    
+    $payload = getSessionData();
+    if (isset($payload['user_id'])) {
+      $error = "";
+      updateUserSessionId($payload['user_id'], $error);
+      
+      // Regenerate JWT with updated timestamp for security
+      $newPayload = [
+        "user_id" => $payload['user_id'],
+        "full_name" => $payload['full_name'],
+        "user_type" => $payload['user_type'],
+        "user_class" => $payload['user_class'],
+        "email" => $payload['email'],
+        "phone" => $payload['phone'],
+        "session_regenerated" => time() // Add timestamp for additional security
+      ];
+      $newJwt = \Firebase\JWT\JWT::encode($newPayload, $secretKey, 'HS256');
+      $_SESSION['token'] = $newJwt; // Update with new JWT
+    }
+  }
 }
 
 include_once __DIR__.'/../backend/public_utils.php';

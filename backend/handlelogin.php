@@ -10,11 +10,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'];
     $row = [];
     $error = "";
-    if(authUser($email_or_phone,$password,$row/*OUT*/,$error))
+    
+    //regenerate session before authentication so session_id is consistent
+    session_regenerate_id(true);
+    if(authUserSingleSession($email_or_phone,$password,$row/*OUT*/,$error))
     {
         include_once 'jw_utils.php';
-        //regenerate session when login
-        session_regenerate_id(true);
         $payload = [
             "user_id" => $row['ID'],
             "full_name" =>  $row['FULL_NAME'],

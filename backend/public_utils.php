@@ -111,17 +111,36 @@ function getUserType()
 function isSessionValid()
 {
     if (session_status() == PHP_SESSION_NONE) {session_start();}
+    
+    // Debug: Check if token exists
     if(!isset($_SESSION['token']) || empty($_SESSION['token'])) //jwt token is stored here
     {
+        error_log("DEBUG: No token found in session");
         return false;
     }
     
     $payload = getSessionData();
-
-    if(isset($payload['user_id']))
-        return true;
     
-    return false;
+    // Debug: Check if payload has user_id
+    if(!isset($payload['user_id']))
+    {
+        error_log("DEBUG: No user_id in payload");
+        return false;
+    }
+
+    // Additional check: verify session_id matches the one stored in database
+    include_once 'utils.php';
+    $error = "";
+    
+    if (!validateUserSessionId($payload['user_id'], $error)) {
+        // Session doesn't match or other error, invalidate session
+        error_log("DEBUG: Session validation failed: " . $error);
+        unset($_SESSION['token']);
+        return false;
+    }
+    
+    error_log("DEBUG: Session validation successful");
+    return true;
 }
 
 function isProtectedPage()
