@@ -7,6 +7,8 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Declare $pdo as global so it's available everywhere
+global $pdo;
 $pdo = null; 
 try 
 {

@@ -14,6 +14,9 @@ function selected($current, $input) {
     return "";
 }
 
+// Make sure $pdo is available in global scope
+global $pdo;
+
 // Fetch available tests
 $tests = $pdo->query("SELECT test_id, title FROM tests")->fetchAll(PDO::FETCH_ASSOC);
 
