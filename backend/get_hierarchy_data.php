@@ -46,14 +46,7 @@ try {
             echo json_encode(['success' => true, 'data' => $subjects]);
             break;
             
-        case 'get_subjects_for_class':
-            if (!isset($_GET['class_id'])) {
-                echo json_encode(['error' => 'Class ID required']);
-                exit;
-            }
-            $subjects = getSubjectsForClass($_GET['class_id']);
-            echo json_encode(['success' => true, 'data' => $subjects]);
-            break;
+
             
         case 'get_sections':
             if (!isset($_GET['class_id']) || !isset($_GET['stream_id']) || !isset($_GET['subject_id'])) {

@@ -120,14 +120,10 @@
     
         $rows = [];
         try {
-            // Get subjects for the class that are mapped to the specific stream
-            $sql = "SELECT s.ID, s.NAME 
-                    FROM subjects s
-                    JOIN streamubjectmap som ON s.ID = som.SUBJECT_ID 
-                    WHERE s.CLASS_ID = :class AND som.STREAM_ID = :stream";
+            // Get subjects that belong directly to the stream
+            $sql = "SELECT ID, NAME FROM subjects WHERE STREAM_ID = :stream";
     
             $stmt = $pdo->prepare($sql);
-            $stmt->bindParam(':class', $class, PDO::PARAM_INT);
             $stmt->bindParam(':stream', $stream, PDO::PARAM_INT);
             $stmt->execute();
     
@@ -145,7 +141,14 @@
         
         $rows = [];
         try {
-            $stmt = $pdo->prepare("SELECT ID, NAME FROM subjects WHERE CLASS_ID = :class_id ORDER BY NAME");
+            // Get subjects that belong to streams of this class
+            $stmt = $pdo->prepare("
+                SELECT s.ID, s.NAME 
+                FROM subjects s
+                JOIN streams str ON s.STREAM_ID = str.ID
+                WHERE str.CLASS_ID = :class_id 
+                ORDER BY s.NAME
+            ");
             $stmt->bindParam(':class_id', $class_id, PDO::PARAM_INT);
             $stmt->execute();
             
@@ -1382,8 +1385,7 @@
                     FROM chapters c
                     JOIN sections s ON c.SECTION_ID = s.ID
                     JOIN subjects sub ON s.SUBJECT_ID = sub.ID
-                    JOIN streamubjectmap som ON sub.ID = som.SUBJECT_ID
-                    JOIN streams str ON som.STREAM_ID = str.ID
+                    JOIN streams str ON sub.STREAM_ID = str.ID
                     JOIN classes cl ON str.CLASS_ID = cl.ID
                     WHERE cl.SUPPORTED = 1
                     ORDER BY cl.NAME, str.NAME, sub.NAME, s.NAME, c.NAME";
@@ -1437,8 +1439,7 @@
                     FROM chapters c
                     JOIN sections s ON c.SECTION_ID = s.ID
                     JOIN subjects sub ON s.SUBJECT_ID = sub.ID
-                    JOIN streamubjectmap som ON sub.ID = som.SUBJECT_ID
-                    JOIN streams str ON som.STREAM_ID = str.ID
+                    JOIN streams str ON sub.STREAM_ID = str.ID
                     JOIN classes cl ON str.CLASS_ID = cl.ID
                     JOIN test_chapters_map tcm ON c.ID = tcm.chapter_id
                     WHERE tcm.test_id = :test_id";

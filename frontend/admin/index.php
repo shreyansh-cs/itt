@@ -524,6 +524,13 @@ ob_start();
                     </div>
                     
                     <div class="mb-3">
+                        <label for="subject_stream_select" class="form-label">Select Stream</label>
+                        <select class="form-select" id="subject_stream_select" required disabled>
+                            <option value="">-- Select Stream --</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
                         <label for="subject_name_input" class="form-label">Subject Name</label>
                         <input type="text" class="form-control" id="subject_name_input" placeholder="e.g., Physics, Mathematics, Chemistry" required>
                     </div>
@@ -841,7 +848,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let hierarchyLoadingModal = null;
     
     // Initialize class change handlers for creation modals
-    // Subject creation no longer needs stream selection
+    setupClassChangeHandler('subject_class_select', 'subject_stream_select', null, null);
     setupClassChangeHandler('section_class_select', 'section_stream_select', 'section_subject_select', null);
     setupClassChangeHandler('chapter_class_select', 'chapter_stream_select', 'chapter_subject_select', 'chapter_section_select');
     
@@ -874,13 +881,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     document.getElementById('subjectForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        const classId = document.getElementById('subject_class_select').value;
+        const streamId = document.getElementById('subject_stream_select').value;
         const subjectName = document.getElementById('subject_name_input').value.trim();
         
-        console.log('Subject form submission - classId:', classId, 'subjectName:', subjectName);
+        console.log('Subject form submission - streamId:', streamId, 'subjectName:', subjectName);
         
-        if (!classId || classId === '') {
-            showMessage('subjectMessages', 'Please select a class', 'danger');
+        if (!streamId || streamId === '') {
+            showMessage('subjectMessages', 'Please select a stream', 'danger');
             return;
         }
         
@@ -889,7 +896,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        createHierarchyItem('subject', {class_id: classId, subject_name: subjectName}, 'subjectModal', 'subjectMessages');
+        createHierarchyItem('subject', {stream_id: streamId, subject_name: subjectName}, 'subjectModal', 'subjectMessages');
     });
     
     document.getElementById('sectionForm').addEventListener('submit', function(e) {

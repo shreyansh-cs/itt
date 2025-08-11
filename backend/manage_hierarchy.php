@@ -68,16 +68,16 @@ try {
             break;
             
         case 'create_subject':
-            if (!isset($_POST['class_id']) || !isset($_POST['subject_name'])) {
-                echo json_encode(['error' => 'Class ID and subject name required']);
+            if (!isset($_POST['stream_id']) || !isset($_POST['subject_name'])) {
+                echo json_encode(['error' => 'Stream ID and subject name required']);
                 exit;
             }
             
-            $class_id = trim($_POST['class_id']);
+            $stream_id = trim($_POST['stream_id']);
             $subject_name = trim($_POST['subject_name']);
             
-            if (empty($class_id) || $class_id === '' || $class_id === '0') {
-                echo json_encode(['error' => 'Please select a valid class']);
+            if (empty($stream_id) || $stream_id === '' || $stream_id === '0') {
+                echo json_encode(['error' => 'Please select a valid stream']);
                 exit;
             }
             
@@ -86,30 +86,30 @@ try {
                 exit;
             }
             
-            // Validate that class_id is a valid integer
-            if (!filter_var($class_id, FILTER_VALIDATE_INT, ["options" => ["min_range" => 1]])) {
-                echo json_encode(['error' => 'Invalid class ID provided']);
+            // Validate that stream_id is a valid integer
+            if (!filter_var($stream_id, FILTER_VALIDATE_INT, ["options" => ["min_range" => 1]])) {
+                echo json_encode(['error' => 'Invalid stream ID provided']);
                 exit;
             }
             
-            // Check if subject already exists for this class
-            $stmt = $pdo->prepare("SELECT COUNT(*) FROM subjects WHERE NAME = ? AND CLASS_ID = ?");
-            $stmt->execute([$subject_name, $class_id]);
+            // Check if subject already exists for this stream
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM subjects WHERE NAME = ? AND STREAM_ID = ?");
+            $stmt->execute([$subject_name, $stream_id]);
             if ($stmt->fetchColumn() > 0) {
-                echo json_encode(['error' => 'Subject already exists for this class']);
+                echo json_encode(['error' => 'Subject already exists for this stream']);
                 exit;
             }
             
             // Final validation before insert
-            $class_id = (int) $class_id;
-            if ($class_id <= 0) {
-                echo json_encode(['error' => 'Invalid class ID: must be a positive integer']);
+            $stream_id = (int) $stream_id;
+            if ($stream_id <= 0) {
+                echo json_encode(['error' => 'Invalid stream ID: must be a positive integer']);
                 exit;
             }
             
-            // Create the subject with class_id
-            $stmt = $pdo->prepare("INSERT INTO subjects (NAME, CLASS_ID) VALUES (?, ?)");
-            $stmt->execute([$subject_name, $class_id]);
+            // Create the subject with stream_id
+            $stmt = $pdo->prepare("INSERT INTO subjects (NAME, STREAM_ID) VALUES (?, ?)");
+            $stmt->execute([$subject_name, $stream_id]);
             
             echo json_encode(['success' => true, 'message' => "Subject '$subject_name' created successfully!"]);
             break;
@@ -168,51 +168,6 @@ try {
             $stmt->execute([$chapter_name, $section_id]);
             
             echo json_encode(['success' => true, 'message' => "Chapter '$chapter_name' created successfully!"]);
-            break;
-            
-        case 'map_stream_subject':
-            if (!isset($_POST['stream_id']) || !isset($_POST['subject_id'])) {
-                echo json_encode(['error' => 'Stream ID and Subject ID required']);
-                exit;
-            }
-            
-            $stream_id = trim($_POST['stream_id']);
-            $subject_id = trim($_POST['subject_id']);
-            
-            // Validate inputs
-            if (!filter_var($stream_id, FILTER_VALIDATE_INT, ["options" => ["min_range" => 1]]) ||
-                !filter_var($subject_id, FILTER_VALIDATE_INT, ["options" => ["min_range" => 1]])) {
-                echo json_encode(['error' => 'Invalid stream or subject ID']);
-                exit;
-            }
-            
-            // Check if mapping already exists
-            $stmt = $pdo->prepare("SELECT COUNT(*) FROM streamubjectmap WHERE STREAM_ID = ? AND SUBJECT_ID = ?");
-            $stmt->execute([$stream_id, $subject_id]);
-            if ($stmt->fetchColumn() > 0) {
-                echo json_encode(['error' => 'Stream-Subject mapping already exists']);
-                exit;
-            }
-            
-            // Verify that stream and subject belong to the same class
-            $stmt = $pdo->prepare("
-                SELECT s.CLASS_ID as stream_class, sub.CLASS_ID as subject_class
-                FROM streams s, subjects sub 
-                WHERE s.ID = ? AND sub.ID = ?
-            ");
-            $stmt->execute([$stream_id, $subject_id]);
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            if (!$result || $result['stream_class'] != $result['subject_class']) {
-                echo json_encode(['error' => 'Stream and subject must belong to the same class']);
-                exit;
-            }
-            
-            // Create the mapping
-            $stmt = $pdo->prepare("INSERT INTO streamubjectmap (STREAM_ID, SUBJECT_ID) VALUES (?, ?)");
-            $stmt->execute([$stream_id, $subject_id]);
-            
-            echo json_encode(['success' => true, 'message' => 'Stream-Subject mapping created successfully!']);
             break;
             
         default:

@@ -47,8 +47,7 @@ $stmt = $pdo->query("
     JOIN chapters c ON c.ID = tcm.chapter_id
     JOIN sections s ON c.SECTION_ID = s.ID
     JOIN subjects sub ON s.SUBJECT_ID = sub.ID
-    JOIN streamubjectmap som ON sub.ID = som.SUBJECT_ID
-    JOIN streams str ON som.STREAM_ID = str.ID
+    JOIN streams str ON sub.STREAM_ID = str.ID
     JOIN classes cl ON str.CLASS_ID = cl.ID
     ORDER BY cl.NAME, str.NAME, sub.NAME, s.NAME, c.NAME, t.title
 ");

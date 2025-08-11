@@ -237,8 +237,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         JOIN chapters c ON c.ID = tcm.chapter_id
                         JOIN sections s ON c.SECTION_ID = s.ID
                         JOIN subjects sub ON s.SUBJECT_ID = sub.ID
-                        JOIN streamubjectmap som ON sub.ID = som.SUBJECT_ID
-                        JOIN streams str ON som.STREAM_ID = str.ID
+                        JOIN streams str ON sub.STREAM_ID = str.ID
                         JOIN classes cl ON str.CLASS_ID = cl.ID
                         ORDER BY tcm.created_at DESC
                         LIMIT 5
@@ -554,13 +553,18 @@ document.addEventListener('DOMContentLoaded', function() {
     function resetAllHierarchyDropdowns() {
         console.log('Resetting all hierarchy dropdowns due to test change');
         
-        // Reset all dropdowns to default state
-        const dropdowns = ['class_id', 'stream_id', 'subject_id', 'section_id', 'chapter_id'];
-        dropdowns.forEach(function(dropdownId) {
+        // Reset dependent dropdowns only (not class dropdown as it should keep its options)
+        const dependentDropdowns = ['stream_id', 'subject_id', 'section_id', 'chapter_id'];
+        dependentDropdowns.forEach(function(dropdownId) {
             const dropdown = document.getElementById(dropdownId);
             dropdown.innerHTML = '<option value="">-- Select --</option>';
-            dropdown.disabled = (dropdownId !== 'class_id'); // Only class dropdown should be enabled
+            dropdown.disabled = true;
         });
+        
+        // Reset class dropdown selection but keep its options
+        const classDropdown = document.getElementById('class_id');
+        classDropdown.value = '';
+        classDropdown.disabled = false;
         
         // Reset selections object
         selections.class = '';
