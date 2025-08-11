@@ -120,6 +120,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                                 </label>
                                                 <select class="form-select" id="class_id" required>
                                                     <option value="">-- Select Class --</option>
+                                                    <?php
+                                                    $classes = getAllClasses();
+                                                    foreach ($classes as $class_row) {
+                                                        echo "<option value='{$class_row['ID']}'>" . htmlspecialchars($class_row['NAME']) . "</option>";
+                                                    }
+                                                    ?>
                                                 </select>
                                                 <div class="form-text">Choose the class level</div>
                                             </div>
@@ -301,8 +307,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Load classes on page load
-    loadClasses();
     
     // Selection tracking
     let selections = {
@@ -381,50 +385,45 @@ document.addEventListener('DOMContentLoaded', function() {
     
     document.getElementById('test_id').addEventListener('change', function() {
         selections.test = this.options[this.selectedIndex].text;
+        
+        // Reset all hierarchy dropdowns when a different test is selected
+        resetAllHierarchyDropdowns();
+        
         updateSelectionPath();
         updateSubmitButton();
     });
     
     // Load functions
-    function loadClasses() {
-        showLoading();
-        fetch('../../backend/get_hierarchy_data.php?action=get_classes')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    populateDropdown('class_id', data.data, 'ID', 'NAME');
-                    document.getElementById('class_id').disabled = false;
-                } else {
-                    showError('Failed to load classes: ' + data.error);
-                }
-            })
-            .catch(error => {
-                showError('Failed to load classes');
-                console.error('Error:', error);
-            })
-            .finally(() => {
-                hideLoading();
-            });
-    }
     
     function loadStreams(classId) {
         showLoading();
-        fetch(`../../backend/get_hierarchy_data.php?action=get_streams&class_id=${classId}`)
-            .then(response => response.json())
+        const url = `../../backend/get_hierarchy_data.php?action=get_streams&class_id=${classId}`;
+        console.log('Fetching URL:', url);
+        fetch(url)
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Streams data received:', data);
                 if (data.success) {
                     populateDropdown('stream_id', data.data, 'ID', 'NAME');
                     document.getElementById('stream_id').disabled = false;
                 } else {
-                    showError('Failed to load streams: ' + data.error);
+                    showError('Failed to load streams: ' + (data.error || 'Unknown error'));
                 }
             })
             .catch(error => {
-                showError('Failed to load streams');
-                console.error('Error:', error);
+                console.error('Fetch error:', error);
+                showError('Failed to load streams: ' + error.message);
             })
             .finally(() => {
+                console.log('loadStreams finally block executing - about to hide loading');
                 hideLoading();
+                console.log('loadStreams finally block completed');
             });
     }
     
@@ -493,7 +492,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Utility functions
     function populateDropdown(elementId, data, valueField, textField) {
+        console.log(`Populating dropdown ${elementId} with data:`, data);
         const dropdown = document.getElementById(elementId);
+        if (!dropdown) {
+            console.error(`Dropdown element ${elementId} not found!`);
+            return;
+        }
+        
         dropdown.innerHTML = '<option value="">-- Select --</option>';
         
         data.forEach(function(item) {
@@ -502,6 +507,8 @@ document.addEventListener('DOMContentLoaded', function() {
             option.textContent = item[textField];
             dropdown.appendChild(option);
         });
+        
+        console.log(`Successfully populated ${elementId} with ${data.length} items`);
     }
     
     function resetDropdowns(dropdowns) {
@@ -544,20 +551,106 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    function showLoading() {
-        const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
-        loadingModal.show();
+    function resetAllHierarchyDropdowns() {
+        console.log('Resetting all hierarchy dropdowns due to test change');
+        
+        // Reset all dropdowns to default state
+        const dropdowns = ['class_id', 'stream_id', 'subject_id', 'section_id', 'chapter_id'];
+        dropdowns.forEach(function(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            dropdown.innerHTML = '<option value="">-- Select --</option>';
+            dropdown.disabled = (dropdownId !== 'class_id'); // Only class dropdown should be enabled
+        });
+        
+        // Reset selections object
+        selections.class = '';
+        selections.stream = '';
+        selections.subject = '';
+        selections.section = '';
+        selections.chapter = '';
+        
+        console.log('All hierarchy dropdowns reset');
     }
     
-    function hideLoading() {
-        const loadingModal = bootstrap.Modal.getInstance(document.getElementById('loadingModal'));
-        if (loadingModal) {
-            loadingModal.hide();
+    let currentLoadingModal = null;
+    
+    function showLoading() {
+        console.log('Showing loading modal...');
+        const modalElement = document.getElementById('loadingModal');
+        if (modalElement) {
+            currentLoadingModal = new bootstrap.Modal(modalElement);
+            currentLoadingModal.show();
+            console.log('Loading modal shown');
+        } else {
+            console.error('Loading modal element not found!');
         }
     }
     
+    function hideLoading() {
+        console.log('Hiding loading modal...');
+        
+        // First hide via Bootstrap modal
+        if (currentLoadingModal) {
+            currentLoadingModal.hide();
+            console.log('Bootstrap modal.hide() called');
+        } else {
+            // Fallback: try to get existing instance
+            const modalElement = document.getElementById('loadingModal');
+            if (modalElement) {
+                const loadingModal = bootstrap.Modal.getInstance(modalElement);
+                if (loadingModal) {
+                    loadingModal.hide();
+                    console.log('Bootstrap modal.hide() called via getInstance');
+                }
+            }
+        }
+        
+        // Force cleanup after a short delay to ensure everything is removed
+        setTimeout(() => {
+            const modalElement = document.getElementById('loadingModal');
+            if (modalElement) {
+                modalElement.classList.remove('show');
+                modalElement.style.display = 'none';
+                modalElement.setAttribute('aria-hidden', 'true');
+                modalElement.removeAttribute('aria-modal');
+            }
+            
+            // Remove modal-open class from body
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+            
+            // Remove any leftover backdrops
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => backdrop.remove());
+            
+            // Reset modal reference
+            currentLoadingModal = null;
+            
+            console.log('Loading modal force cleaned up');
+        }, 150);
+    }
+    
     function showError(message) {
-        alert('Error: ' + message);
+        console.error('Error:', message);
+        // Create and show an alert
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+        alertDiv.innerHTML = `
+            <strong>Error:</strong> ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        // Insert at the top of the form
+        const form = document.getElementById('mappingForm');
+        form.insertBefore(alertDiv, form.firstChild);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 5000);
     }
 });
 </script>
