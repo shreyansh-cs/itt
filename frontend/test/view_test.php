@@ -7,6 +7,7 @@ $title = "View Test";
 
 <?php
 require_once __DIR__.'/../../backend/db.php';
+require_once __DIR__.'/../../backend/utils.php';
 
 // Check if test_id provided
 if (!isset($_GET['test_id'])) {
@@ -31,6 +32,9 @@ $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Count total questions
 $total_questions = count($questions);
+
+// Fetch chapter mappings for this test
+$chapterMappings = getChaptersForTest($test_id);
 ?>
 
 <div class="container-fluid p-0">
@@ -39,7 +43,7 @@ $total_questions = count($questions);
             <h5 class="mb-0"><?= htmlspecialchars($test['title']) ?></h5>
             <div>
                 <a href="upload_questions.php?test_id=<?= $test_id ?>" class="btn btn-light btn-sm">Upload Questions</a>
-                <a href="map_test_to_class.php" class="btn btn-light btn-sm ms-2">Assign to Class</a>
+                <a href="map_test_to_chapter.php" class="btn btn-light btn-sm ms-2">Assign to Chapter</a>
                 <button class="btn btn-danger btn-sm ms-2" onclick="deleteTest(<?= $test_id ?>)">
                     <i class="fas fa-trash"></i> Delete Test
                 </button>
@@ -60,6 +64,41 @@ $total_questions = count($questions);
                                     <span class="badge bg-warning">Incomplete</span>
                                 <?php endif; ?>
                             </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title">Chapter Assignments</h6>
+                            <?php if (empty($chapterMappings)): ?>
+                                <div class="alert alert-info mb-0">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    This test is not assigned to any chapters yet.
+                                    <a href="map_test_to_chapter.php" class="alert-link">Assign to chapters</a>
+                                </div>
+                            <?php else: ?>
+                                <div class="row">
+                                    <?php foreach ($chapterMappings as $mapping): ?>
+                                        <div class="col-lg-6 mb-2">
+                                            <div class="border rounded p-2 bg-light">
+                                                <small class="text-muted d-block">
+                                                    <?= htmlspecialchars($mapping['class_name']) ?> → 
+                                                    <?= htmlspecialchars($mapping['stream_name']) ?> → 
+                                                    <?= htmlspecialchars($mapping['subject_name']) ?>
+                                                </small>
+                                                <strong><?= htmlspecialchars($mapping['section_name']) ?> → <?= htmlspecialchars($mapping['chapter_name']) ?></strong>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                                <div class="mt-2">
+                                    <a href="edit_test_chapter_map.php" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-edit me-1"></i>Manage Mappings
+                                    </a>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>

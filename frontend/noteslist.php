@@ -106,15 +106,15 @@ $title = "Notes & Video";
         echo "<div class='table-responsive mt-4'>";
         echo "<h4 class='mb-3'>Available Tests</h4>";
         
-        // Get tests mapped to this class
+        // Get tests mapped to this specific chapter
         $stmt = $pdo->prepare("
             SELECT t.test_id, t.title, t.duration_minutes, t.total_questions,
                    (SELECT COUNT(*) FROM questions WHERE test_id = t.test_id) as questions_added
             FROM tests t
-            INNER JOIN test_classes_map tcm ON t.test_id = tcm.test_id
-            WHERE tcm.class_id = ?
+            INNER JOIN test_chapters_map tcm ON t.test_id = tcm.test_id
+            WHERE tcm.chapter_id = ?
         ");
-        $stmt->execute([$class]);
+        $stmt->execute([$chapter]);
         $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if (!empty($tests)) {
@@ -151,7 +151,7 @@ $title = "Notes & Video";
             }
             echo "</tbody></table>";
         } else {
-            echo "<div class='alert alert-info'>No tests available for this class.</div>";
+            echo "<div class='alert alert-info'>No tests available for this chapter.</div>";
         }
         echo "</div>";
         // End Tests section

@@ -39,6 +39,22 @@
         return $rows;
     }
 
+    function getAllPackages()
+    {
+        include 'db.php'; // Make sure this creates a $pdo instance (not $conn) using PDO
+        $rows = [];
+        try {
+            $stmt = $pdo->prepare("SELECT ID, NAME, PRICE FROM packages ORDER BY ID ASC");
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            // Handle error or log it
+            error_log("Database error: " . $e->getMessage());
+        }
+
+        return $rows;
+    }
+
     function getUserDetailsForClass($class,&$error)
     {
         include 'db.php'; // Make sure this creates a $pdo instance (not $conn) using PDO
@@ -1310,6 +1326,98 @@
         }
 
         return "warning";
+    }
+
+    /**
+     * Get all chapters with their hierarchy information for test mapping
+     */
+    function getAllChaptersWithHierarchy() {
+        include 'db.php';
+        $rows = [];
+        try {
+            $sql = "SELECT 
+                        c.ID as chapter_id, 
+                        c.NAME as chapter_name,
+                        s.ID as section_id,
+                        s.NAME as section_name,
+                        sub.ID as subject_id,
+                        sub.NAME as subject_name,
+                        str.ID as stream_id,
+                        str.NAME as stream_name,
+                        cl.ID as class_id,
+                        cl.NAME as class_name
+                    FROM chapters c
+                    JOIN sections s ON c.SECTION_ID = s.ID
+                    JOIN subjects sub ON s.SUBJECT_ID = sub.ID
+                    JOIN streamubjectmap som ON sub.ID = som.SUBJECT_ID
+                    JOIN streams str ON som.STREAM_ID = str.ID
+                    JOIN classes cl ON str.CLASS_ID = cl.ID
+                    WHERE cl.SUPPORTED = 1
+                    ORDER BY cl.NAME, str.NAME, sub.NAME, s.NAME, c.NAME";
+            
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Database error: " . $e->getMessage());
+        }
+        return $rows;
+    }
+
+    /**
+     * Get tests mapped to a specific chapter
+     */
+    function getTestsForChapter($chapter_id) {
+        include 'db.php';
+        $rows = [];
+        try {
+            $sql = "SELECT t.test_id, t.title, t.duration_minutes, t.total_questions,
+                           (SELECT COUNT(*) FROM questions WHERE test_id = t.test_id) as questions_added
+                    FROM tests t
+                    INNER JOIN test_chapters_map tcm ON t.test_id = tcm.test_id
+                    WHERE tcm.chapter_id = :chapter_id";
+            
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':chapter_id', $chapter_id, PDO::PARAM_INT);
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Database error: " . $e->getMessage());
+        }
+        return $rows;
+    }
+
+    /**
+     * Get chapters that a test is mapped to
+     */
+    function getChaptersForTest($test_id) {
+        include 'db.php';
+        $rows = [];
+        try {
+            $sql = "SELECT 
+                        c.ID as chapter_id, 
+                        c.NAME as chapter_name,
+                        s.NAME as section_name,
+                        sub.NAME as subject_name,
+                        str.NAME as stream_name,
+                        cl.NAME as class_name
+                    FROM chapters c
+                    JOIN sections s ON c.SECTION_ID = s.ID
+                    JOIN subjects sub ON s.SUBJECT_ID = sub.ID
+                    JOIN streamubjectmap som ON sub.ID = som.SUBJECT_ID
+                    JOIN streams str ON som.STREAM_ID = str.ID
+                    JOIN classes cl ON str.CLASS_ID = cl.ID
+                    JOIN test_chapters_map tcm ON c.ID = tcm.chapter_id
+                    WHERE tcm.test_id = :test_id";
+            
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':test_id', $test_id, PDO::PARAM_INT);
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Database error: " . $e->getMessage());
+        }
+        return $rows;
     }
 
 ?>

@@ -89,66 +89,7 @@ $title = "I.T.T Group of Education - Home";
     </div>
 </div>
 
-<?php if(isAdminLoggedIn()): ?>
-<!-- Admin Section -->
-<div class="container-fluid px-4 mt-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-warning text-white">
-                    <h5 class="mb-0"><i class="fas fa-user-shield me-2"></i>Admin</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <div class="list-group">
-                                <a href="test/admin_take_test.php" class="list-group-item list-group-item-action">
-                                    <i class="fas fa-pencil-alt me-2"></i>Admin Test Attempt
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="list-group">
-                                <a href="test/create_test.php" class="list-group-item list-group-item-action">
-                                    <i class="fas fa-plus-circle me-2"></i>Create Test
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="list-group">
-                                <a href="test/upload_questions.php" class="list-group-item list-group-item-action">
-                                    <i class="fas fa-upload me-2"></i>Upload Questions
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="list-group">
-                                <a href="test/map_test_to_class.php" class="list-group-item list-group-item-action">
-                                    <i class="fas fa-link me-2"></i>Map Test to Class
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="list-group">
-                                <a href="test/edit_test_map.php" class="list-group-item list-group-item-action">
-                                    <i class="fas fa-edit me-2"></i>Edit Test Map
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="list-group">
-                                <a href="gettransactions.php" class="list-group-item list-group-item-action">
-                                    <i class="fas fa-money-bill-wave me-2"></i>Transactions
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<?php endif; ?>
+
 
 <style>
 .banner-section {

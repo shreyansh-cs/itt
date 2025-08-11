@@ -11,11 +11,10 @@ require_once __DIR__.'/../../backend/db.php';
 $stmt = $pdo->prepare("
     SELECT t.*, 
            COUNT(q.question_id) as questions_uploaded,
-           GROUP_CONCAT(DISTINCT c.name) as assigned_classes
+           COUNT(DISTINCT tcm.chapter_id) as assigned_chapters
     FROM tests t
     LEFT JOIN questions q ON t.test_id = q.test_id
-    LEFT JOIN test_classes_map tcm ON t.test_id = tcm.test_id
-    LEFT JOIN classes c ON tcm.class_id = c.id
+    LEFT JOIN test_chapters_map tcm ON t.test_id = tcm.test_id
     GROUP BY t.test_id
     ORDER BY t.created_at DESC
 ");
