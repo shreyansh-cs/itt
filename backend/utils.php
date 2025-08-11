@@ -39,6 +39,22 @@
         return $rows;
     }
 
+    function getAllClassesIncludingInactive()
+    {
+        include 'db.php'; // Make sure this creates a $pdo instance (not $conn) using PDO
+        $rows = [];
+        try {
+            $stmt = $pdo->prepare("SELECT ID, NAME FROM classes ORDER BY ID ASC");
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            // Handle error or log it
+            error_log("Database error: " . $e->getMessage());
+        }
+
+        return $rows;
+    }
+
     function getAllPackages()
     {
         include 'db.php'; // Make sure this creates a $pdo instance (not $conn) using PDO
@@ -104,15 +120,14 @@
     
         $rows = [];
         try {
-            $sql = "SELECT ID, NAME 
-                    FROM subjects 
-                    WHERE ID IN (
-                        SELECT SUBJECT_ID 
-                        FROM streamubjectmap 
-                        WHERE STREAM_ID = :stream
-                    )";
+            // Get subjects for the class that are mapped to the specific stream
+            $sql = "SELECT s.ID, s.NAME 
+                    FROM subjects s
+                    JOIN streamubjectmap som ON s.ID = som.SUBJECT_ID 
+                    WHERE s.CLASS_ID = :class AND som.STREAM_ID = :stream";
     
             $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':class', $class, PDO::PARAM_INT);
             $stmt->bindParam(':stream', $stream, PDO::PARAM_INT);
             $stmt->execute();
     
@@ -121,6 +136,24 @@
             die("Database error: " . $e->getMessage());
         }
     
+        return $rows;
+    }
+    
+    function getSubjectsForClass($class_id) 
+    {
+        include 'db.php';
+        
+        $rows = [];
+        try {
+            $stmt = $pdo->prepare("SELECT ID, NAME FROM subjects WHERE CLASS_ID = :class_id ORDER BY NAME");
+            $stmt->bindParam(':class_id', $class_id, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Database error: " . $e->getMessage());
+        }
+        
         return $rows;
     }
     
