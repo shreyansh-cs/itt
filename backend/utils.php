@@ -1462,8 +1462,10 @@
     /**
      * Delete all associations for given chapter IDs (test mappings, notes, videos)
      */
-    function deleteChapterAssociations($chapter_ids, &$deleted_counts) {
-        include 'db.php';
+    function deleteChapterAssociations($chapter_ids, &$deleted_counts, $pdo = null) {
+        if ($pdo === null) {
+            include 'db.php';
+        }
         
         if (empty($chapter_ids)) return;
         
@@ -1502,7 +1504,7 @@
             $deleted_counts = ['test_chapters_map' => 0, 'notes' => 0, 'videos' => 0, 'chapters' => 0];
             
             // Delete chapter associations first (test mappings, notes, videos)
-            deleteChapterAssociations($chapter_ids, $deleted_counts);
+            deleteChapterAssociations($chapter_ids, $deleted_counts, $pdo);
             
             // Delete chapters
             $placeholders = str_repeat('?,', count($chapter_ids) - 1) . '?';
@@ -1560,7 +1562,7 @@
             
             // Delete chapter associations (test mappings, notes, videos)
             if (!empty($chapter_ids)) {
-                deleteChapterAssociations($chapter_ids, $deleted_counts);
+                deleteChapterAssociations($chapter_ids, $deleted_counts, $pdo);
                 
                 // Delete chapters
                 $chapterPlaceholders = str_repeat('?,', count($chapter_ids) - 1) . '?';
@@ -1631,7 +1633,7 @@
                 
                 // Delete chapter associations (test mappings, notes, videos)
                 if (!empty($chapter_ids)) {
-                    deleteChapterAssociations($chapter_ids, $deleted_counts);
+                    deleteChapterAssociations($chapter_ids, $deleted_counts, $pdo);
                     
                     // Delete chapters
                     $chapterPlaceholders = str_repeat('?,', count($chapter_ids) - 1) . '?';
@@ -1723,7 +1725,7 @@
                     
                     // Delete chapter associations (test mappings, notes, videos)
                     if (!empty($chapter_ids)) {
-                        deleteChapterAssociations($chapter_ids, $deleted_counts);
+                        deleteChapterAssociations($chapter_ids, $deleted_counts, $pdo);
                         
                         // Delete chapters
                         $chapterPlaceholders = str_repeat('?,', count($chapter_ids) - 1) . '?';
