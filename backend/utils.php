@@ -1454,4 +1454,346 @@
         return $rows;
     }
 
+    /**
+     * Hierarchical deletion system for educational content
+     * Handles cascade deletion while preserving independent tests
+     */
+    
+    /**
+     * Delete all associations for given chapter IDs (test mappings, notes, videos)
+     */
+    function deleteChapterAssociations($chapter_ids, &$deleted_counts) {
+        include 'db.php';
+        
+        if (empty($chapter_ids)) return;
+        
+        $placeholders = str_repeat('?,', count($chapter_ids) - 1) . '?';
+        
+        // Delete test-chapter mappings
+        $stmt = $pdo->prepare("DELETE FROM test_chapters_map WHERE chapter_id IN ($placeholders)");
+        $stmt->execute($chapter_ids);
+        $deleted_counts['test_chapters_map'] += $stmt->rowCount();
+        
+        // Delete notes associated with these chapters
+        $stmt = $pdo->prepare("DELETE FROM notes WHERE CHAPTER_ID IN ($placeholders)");
+        $stmt->execute($chapter_ids);
+        $deleted_counts['notes'] += $stmt->rowCount();
+        
+        // Delete videos associated with these chapters
+        $stmt = $pdo->prepare("DELETE FROM videos WHERE CHAPTER_ID IN ($placeholders)");
+        $stmt->execute($chapter_ids);
+        $deleted_counts['videos'] += $stmt->rowCount();
+    }
+    
+    /**
+     * Delete chapters and their test mappings
+     */
+    function deleteChapters($chapter_ids, &$error) {
+        if (empty($chapter_ids)) {
+            $error = "No chapters to delete";
+            return false;
+        }
+        
+        include 'db.php';
+        
+        try {
+            $pdo->beginTransaction();
+            
+            $deleted_counts = ['test_chapters_map' => 0, 'notes' => 0, 'videos' => 0, 'chapters' => 0];
+            
+            // Delete chapter associations first (test mappings, notes, videos)
+            deleteChapterAssociations($chapter_ids, $deleted_counts);
+            
+            // Delete chapters
+            $placeholders = str_repeat('?,', count($chapter_ids) - 1) . '?';
+            $stmt = $pdo->prepare("DELETE FROM chapters WHERE ID IN ($placeholders)");
+            $stmt->execute($chapter_ids);
+            $deleted_counts['chapters'] += $stmt->rowCount();
+            
+            $pdo->commit();
+            
+            $summary = [];
+            foreach ($deleted_counts as $table => $count) {
+                if ($count > 0) {
+                    $summary[] = "$count $table";
+                }
+            }
+            
+            $error = "Chapters deleted successfully! Removed: " . implode(', ', $summary);
+            return true;
+            
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            $error = "Failed to delete chapters: " . $e->getMessage();
+            return false;
+        }
+    }
+    
+    /**
+     * Delete a single chapter by ID
+     */
+    function deleteChapter($chapter_id, &$error) {
+        return deleteChapters([$chapter_id], $error);
+    }
+    
+    /**
+     * Delete sections and all their child chapters
+     */
+    function deleteSections($section_ids, &$error) {
+        if (empty($section_ids)) {
+            $error = "No sections to delete";
+            return false;
+        }
+        
+        include 'db.php';
+        
+        try {
+            $pdo->beginTransaction();
+            
+            $deleted_counts = ['test_chapters_map' => 0, 'notes' => 0, 'videos' => 0, 'chapters' => 0, 'sections' => 0];
+            
+            // Get all chapters under these sections
+            $placeholders = str_repeat('?,', count($section_ids) - 1) . '?';
+            $stmt = $pdo->prepare("SELECT ID FROM chapters WHERE SECTION_ID IN ($placeholders)");
+            $stmt->execute($section_ids);
+            $chapter_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            
+            // Delete chapter associations (test mappings, notes, videos)
+            if (!empty($chapter_ids)) {
+                deleteChapterAssociations($chapter_ids, $deleted_counts);
+                
+                // Delete chapters
+                $chapterPlaceholders = str_repeat('?,', count($chapter_ids) - 1) . '?';
+                $stmt = $pdo->prepare("DELETE FROM chapters WHERE ID IN ($chapterPlaceholders)");
+                $stmt->execute($chapter_ids);
+                $deleted_counts['chapters'] += $stmt->rowCount();
+            }
+            
+            // Delete sections
+            $stmt = $pdo->prepare("DELETE FROM sections WHERE ID IN ($placeholders)");
+            $stmt->execute($section_ids);
+            $deleted_counts['sections'] += $stmt->rowCount();
+            
+            $pdo->commit();
+            
+            $summary = [];
+            foreach ($deleted_counts as $table => $count) {
+                if ($count > 0) {
+                    $summary[] = "$count $table";
+                }
+            }
+            
+            $error = "Sections deleted successfully! Removed: " . implode(', ', $summary);
+            return true;
+            
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            $error = "Failed to delete sections: " . $e->getMessage();
+            return false;
+        }
+    }
+    
+    /**
+     * Delete a single section by ID
+     */
+    function deleteSection($section_id, &$error) {
+        return deleteSections([$section_id], $error);
+    }
+    
+    /**
+     * Delete subjects and all their child sections and chapters
+     */
+    function deleteSubjects($subject_ids, &$error) {
+        if (empty($subject_ids)) {
+            $error = "No subjects to delete";
+            return false;
+        }
+        
+        include 'db.php';
+        
+        try {
+            $pdo->beginTransaction();
+            
+            $deleted_counts = ['test_chapters_map' => 0, 'notes' => 0, 'videos' => 0, 'chapters' => 0, 'sections' => 0, 'subjects' => 0];
+            
+            // Get all sections under these subjects
+            $placeholders = str_repeat('?,', count($subject_ids) - 1) . '?';
+            $stmt = $pdo->prepare("SELECT ID FROM sections WHERE SUBJECT_ID IN ($placeholders)");
+            $stmt->execute($subject_ids);
+            $section_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            
+            if (!empty($section_ids)) {
+                // Get all chapters under these sections
+                $sectionPlaceholders = str_repeat('?,', count($section_ids) - 1) . '?';
+                $stmt = $pdo->prepare("SELECT ID FROM chapters WHERE SECTION_ID IN ($sectionPlaceholders)");
+                $stmt->execute($section_ids);
+                $chapter_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                
+                // Delete chapter associations (test mappings, notes, videos)
+                if (!empty($chapter_ids)) {
+                    deleteChapterAssociations($chapter_ids, $deleted_counts);
+                    
+                    // Delete chapters
+                    $chapterPlaceholders = str_repeat('?,', count($chapter_ids) - 1) . '?';
+                    $stmt = $pdo->prepare("DELETE FROM chapters WHERE ID IN ($chapterPlaceholders)");
+                    $stmt->execute($chapter_ids);
+                    $deleted_counts['chapters'] += $stmt->rowCount();
+                }
+                
+                // Delete sections
+                $stmt = $pdo->prepare("DELETE FROM sections WHERE ID IN ($sectionPlaceholders)");
+                $stmt->execute($section_ids);
+                $deleted_counts['sections'] += $stmt->rowCount();
+            }
+            
+            // Delete subjects
+            $stmt = $pdo->prepare("DELETE FROM subjects WHERE ID IN ($placeholders)");
+            $stmt->execute($subject_ids);
+            $deleted_counts['subjects'] += $stmt->rowCount();
+            
+            $pdo->commit();
+            
+            $summary = [];
+            foreach ($deleted_counts as $table => $count) {
+                if ($count > 0) {
+                    $summary[] = "$count $table";
+                }
+            }
+            
+            $error = "Subjects deleted successfully! Removed: " . implode(', ', $summary);
+            return true;
+            
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            $error = "Failed to delete subjects: " . $e->getMessage();
+            return false;
+        }
+    }
+    
+    /**
+     * Delete a single subject by ID
+     */
+    function deleteSubject($subject_id, &$error) {
+        return deleteSubjects([$subject_id], $error);
+    }
+    
+    /**
+     * Delete streams and all their child hierarchy
+     */
+    function deleteStreams($stream_ids, &$error) {
+        if (empty($stream_ids)) {
+            $error = "No streams to delete";
+            return false;
+        }
+        
+        include 'db.php';
+        
+        try {
+            $pdo->beginTransaction();
+            
+            $deleted_counts = [
+                'test_chapters_map' => 0,
+                'notes' => 0,
+                'videos' => 0,
+                'chapters' => 0,
+                'sections' => 0,
+                'subjects' => 0,
+                'streams' => 0
+            ];
+            
+            // Get all subjects under these streams
+            $placeholders = str_repeat('?,', count($stream_ids) - 1) . '?';
+            $stmt = $pdo->prepare("SELECT ID FROM subjects WHERE STREAM_ID IN ($placeholders)");
+            $stmt->execute($stream_ids);
+            $subject_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            
+            if (!empty($subject_ids)) {
+                // Get all sections under these subjects
+                $subjectPlaceholders = str_repeat('?,', count($subject_ids) - 1) . '?';
+                $stmt = $pdo->prepare("SELECT ID FROM sections WHERE SUBJECT_ID IN ($subjectPlaceholders)");
+                $stmt->execute($subject_ids);
+                $section_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                
+                if (!empty($section_ids)) {
+                    // Get all chapters under these sections
+                    $sectionPlaceholders = str_repeat('?,', count($section_ids) - 1) . '?';
+                    $stmt = $pdo->prepare("SELECT ID FROM chapters WHERE SECTION_ID IN ($sectionPlaceholders)");
+                    $stmt->execute($section_ids);
+                    $chapter_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                    
+                    // Delete chapter associations (test mappings, notes, videos)
+                    if (!empty($chapter_ids)) {
+                        deleteChapterAssociations($chapter_ids, $deleted_counts);
+                        
+                        // Delete chapters
+                        $chapterPlaceholders = str_repeat('?,', count($chapter_ids) - 1) . '?';
+                        $stmt = $pdo->prepare("DELETE FROM chapters WHERE ID IN ($chapterPlaceholders)");
+                        $stmt->execute($chapter_ids);
+                        $deleted_counts['chapters'] += $stmt->rowCount();
+                    }
+                    
+                    // Delete sections
+                    $stmt = $pdo->prepare("DELETE FROM sections WHERE ID IN ($sectionPlaceholders)");
+                    $stmt->execute($section_ids);
+                    $deleted_counts['sections'] += $stmt->rowCount();
+                }
+                
+                // Delete subjects
+                $stmt = $pdo->prepare("DELETE FROM subjects WHERE ID IN ($subjectPlaceholders)");
+                $stmt->execute($subject_ids);
+                $deleted_counts['subjects'] += $stmt->rowCount();
+            }
+            
+            // Note: test_chapters_map deletion is handled by deleteChapterAssociations() when chapters are deleted
+            
+            // Delete streams
+            $stmt = $pdo->prepare("DELETE FROM streams WHERE ID IN ($placeholders)");
+            $stmt->execute($stream_ids);
+            $deleted_counts['streams'] += $stmt->rowCount();
+            
+            $pdo->commit();
+            
+            $summary = [];
+            foreach ($deleted_counts as $table => $count) {
+                if ($count > 0) {
+                    $summary[] = "$count $table";
+                }
+            }
+            
+            $error = "Streams deleted successfully! Removed: " . implode(', ', $summary);
+            return true;
+            
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            $error = "Failed to delete streams: " . $e->getMessage();
+            return false;
+        }
+    }
+    
+    /**
+     * Delete a single stream by ID (backward compatibility)
+     */
+    function deleteStream($stream_id, &$error) {
+        return deleteStreams([$stream_id], $error);
+    }
+    
+    /**
+     * Generic hierarchical deletion dispatcher
+     */
+    function deleteHierarchyItem($type, $id, &$error) {
+        switch ($type) {
+            case 'chapter':
+                return deleteChapter($id, $error);
+            case 'section':
+                return deleteSection($id, $error);
+            case 'subject':
+                return deleteSubject($id, $error);
+            case 'stream':
+                return deleteStream($id, $error);
+            default:
+                $error = "Unknown hierarchy type: $type";
+                return false;
+        }
+    }
+
 ?>

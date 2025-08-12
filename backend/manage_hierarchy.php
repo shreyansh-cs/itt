@@ -170,6 +170,63 @@ try {
             echo json_encode(['success' => true, 'message' => "Chapter '$chapter_name' created successfully!"]);
             break;
             
+        case 'delete_stream':
+        case 'delete_subject':
+        case 'delete_section':
+        case 'delete_chapter':
+            // Generic hierarchical deletion handler
+            $type = str_replace('delete_', '', $_POST['action']);
+            $id_field = $type . '_id';
+            
+            if (!isset($_POST[$id_field])) {
+                echo json_encode(['error' => ucfirst($type) . ' ID required']);
+                exit;
+            }
+            
+            $id = trim($_POST[$id_field]);
+            
+            if (empty($id) || $id === '' || $id === '0') {
+                echo json_encode(['error' => 'Please provide a valid ' . $type . ' ID']);
+                exit;
+            }
+            
+            // Validate that ID is a valid integer
+            if (!filter_var($id, FILTER_VALIDATE_INT, ["options" => ["min_range" => 1]])) {
+                echo json_encode(['error' => 'Invalid ' . $type . ' ID provided']);
+                exit;
+            }
+            
+            $id = (int) $id;
+            
+            // Check if item exists and get its name
+            $table_map = [
+                'stream' => 'streams',
+                'subject' => 'subjects', 
+                'section' => 'sections',
+                'chapter' => 'chapters'
+            ];
+            
+            $table = $table_map[$type];
+            $stmt = $pdo->prepare("SELECT NAME FROM $table WHERE ID = ?");
+            $stmt->execute([$id]);
+            $item_name = $stmt->fetchColumn();
+            
+            if (!$item_name) {
+                echo json_encode(['error' => ucfirst($type) . ' not found']);
+                exit;
+            }
+            
+            // Include utils.php for the deletion functions
+            require_once __DIR__.'/utils.php';
+            
+            $error = '';
+            if (deleteHierarchyItem($type, $id, $error)) {
+                echo json_encode(['success' => true, 'message' => $error]);
+            } else {
+                echo json_encode(['error' => $error]);
+            }
+            break;
+            
         default:
             echo json_encode(['error' => 'Invalid action']);
             break;

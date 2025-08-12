@@ -844,6 +844,524 @@ ob_start();
 </div>
 
 <script>
+// Global functions that need to be accessible from onclick handlers
+function deleteItem(event, type, id, name) {
+    // Special handling for streams with cascade delete warning
+    let confirmMessage = `Are you sure you want to delete the ${type} "${name}"?`;
+    
+    // Hierarchical deletion warnings
+    if (type === 'stream') {
+        confirmMessage = `⚠️ WARNING: Deleting stream "${name}" will also delete:\n\n` +
+                       `• All subjects in this stream\n` +
+                       `• All sections in those subjects\n` +
+                       `• All chapters in those sections\n` +
+                       `• All notes and videos in those chapters\n` +
+                       `• Test-chapter mappings (tests themselves will be preserved)\n\n` +
+                       `ℹ️ Tests, questions, and user data will NOT be deleted\n` +
+                       `Tests will remain available and can be remapped to other chapters\n\n` +
+                       `This action CANNOT be undone!\n\n` +
+                       `Are you absolutely sure you want to delete stream "${name}"?`;
+    } else if (type === 'subject') {
+        confirmMessage = `⚠️ WARNING: Deleting subject "${name}" will also delete:\n\n` +
+                       `• All sections in this subject\n` +
+                       `• All chapters in those sections\n` +
+                       `• All notes and videos in those chapters\n` +
+                       `• Test-chapter mappings (tests themselves will be preserved)\n\n` +
+                       `ℹ️ Tests, questions, and user data will NOT be deleted\n` +
+                       `Tests will remain available and can be remapped to other chapters\n\n` +
+                       `This action CANNOT be undone!\n\n` +
+                       `Are you absolutely sure you want to delete subject "${name}"?`;
+    } else if (type === 'section') {
+        confirmMessage = `⚠️ WARNING: Deleting section "${name}" will also delete:\n\n` +
+                       `• All chapters in this section\n` +
+                       `• All notes and videos in those chapters\n` +
+                       `• Test-chapter mappings (tests themselves will be preserved)\n\n` +
+                       `ℹ️ Tests, questions, and user data will NOT be deleted\n` +
+                       `Tests will remain available and can be remapped to other chapters\n\n` +
+                       `This action CANNOT be undone!\n\n` +
+                       `Are you absolutely sure you want to delete section "${name}"?`;
+    } else if (type === 'chapter') {
+        confirmMessage = `⚠️ WARNING: Deleting chapter "${name}" will also delete:\n\n` +
+                       `• All notes and videos in this chapter\n` +
+                       `• Test-chapter mappings for this chapter\n\n` +
+                       `ℹ️ Tests, questions, and user data will NOT be deleted\n` +
+                       `Tests will remain available and can be remapped to other chapters\n\n` +
+                       `This action CANNOT be undone!\n\n` +
+                       `Are you absolutely sure you want to delete chapter "${name}"?`;
+    }
+    
+    if (confirm(confirmMessage)) {
+        // Show loading state
+        const button = event.target.closest('button');
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+        button.disabled = true;
+        
+        // Prepare form data
+        const formData = new FormData();
+        formData.append('action', `delete_${type}`);
+        formData.append(`${type}_id`, id);
+        
+        // Send delete request
+        fetch('../../backend/manage_hierarchy.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Determine the appropriate message container
+                const messageContainers = {
+                    'stream': 'streamsManageMessages',
+                    'subject': 'subjectsManageMessages', 
+                    'section': 'sectionsManageMessages',
+                    'chapter': 'chaptersManageMessages'
+                };
+                
+                const messageContainer = messageContainers[type] || 'streamsManageMessages';
+                
+                // Show success message
+                showMessage(messageContainer, data.message, 'success');
+                
+                // Refresh the appropriate list
+                if (type === 'stream') {
+                    const classId = document.getElementById('manage_streams_class_select').value;
+                    if (classId) {
+                        loadManageStreams(classId);
+                    }
+                } else if (type === 'subject') {
+                    const classId = document.getElementById('manage_subjects_class_select').value;
+                    const streamId = document.getElementById('manage_subjects_stream_select').value;
+                    if (classId && streamId) {
+                        loadManageSubjects(classId, streamId);
+                    }
+                } else if (type === 'section') {
+                    const classId = document.getElementById('manage_sections_class_select').value;
+                    const streamId = document.getElementById('manage_sections_stream_select').value;
+                    const subjectId = document.getElementById('manage_sections_subject_select').value;
+                    if (classId && streamId && subjectId) {
+                        loadManageSections(classId, streamId, subjectId);
+                    }
+                } else if (type === 'chapter') {
+                    const classId = document.getElementById('manage_chapters_class_select').value;
+                    const streamId = document.getElementById('manage_chapters_stream_select').value;
+                    const subjectId = document.getElementById('manage_chapters_subject_select').value;
+                    const sectionId = document.getElementById('manage_chapters_section_select').value;
+                    if (classId && streamId && subjectId && sectionId) {
+                        loadManageChapters(classId, streamId, subjectId, sectionId);
+                    }
+                }
+            } else {
+                const messageContainers = {
+                    'stream': 'streamsManageMessages',
+                    'subject': 'subjectsManageMessages', 
+                    'section': 'sectionsManageMessages',
+                    'chapter': 'chaptersManageMessages'
+                };
+                
+                const messageContainer = messageContainers[type] || 'streamsManageMessages';
+                showMessage(messageContainer, data.error, 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Delete error:', error);
+            const messageContainers = {
+                'stream': 'streamsManageMessages',
+                'subject': 'subjectsManageMessages', 
+                'section': 'sectionsManageMessages',
+                'chapter': 'chaptersManageMessages'
+            };
+            
+            const messageContainer = messageContainers[type] || 'streamsManageMessages';
+            showMessage(messageContainer, 'Error deleting ' + type + ': ' + error.message, 'danger');
+        })
+        .finally(() => {
+            // Restore button state
+            button.innerHTML = originalText;
+            button.disabled = false;
+        });
+    }
+}
+
+// Global utility functions
+function showMessage(containerId, message, type) {
+    const container = document.getElementById(containerId);
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    container.innerHTML = '';
+    container.appendChild(alertDiv);
+    
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+
+// Global hierarchy loading functions
+let globalLoadingModal = null;
+const SHOW_LOADING_MODAL = false; // Set to false to disable loading modal
+
+function showHierarchyLoading() {
+    if (!SHOW_LOADING_MODAL) {
+        console.log('Loading modal disabled');
+        return;
+    }
+    
+    console.log('showHierarchyLoading called');
+    const modalElement = document.getElementById('hierarchyLoadingModal');
+    console.log('modalElement found:', !!modalElement);
+    
+    if (modalElement && typeof bootstrap !== 'undefined') {
+        // Get existing instance or create new one
+        globalLoadingModal = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+        globalLoadingModal.show();
+        console.log('Loading modal shown');
+    } else {
+        console.log('Bootstrap not available or modal element not found');
+    }
+}
+
+function hideHierarchyLoading() {
+    if (!SHOW_LOADING_MODAL) {
+        console.log('Loading modal disabled - nothing to hide');
+        return;
+    }
+    
+    console.log('hideHierarchyLoading called');
+    
+    // Always force hide to ensure it disappears
+    const modalElement = document.getElementById('hierarchyLoadingModal');
+    if (modalElement) {
+        // Try Bootstrap method first
+        if (globalLoadingModal) {
+            try {
+                globalLoadingModal.hide();
+                console.log('Loading modal hidden via globalLoadingModal');
+            } catch (e) {
+                console.log('Error hiding via globalLoadingModal:', e);
+            }
+        }
+        
+        // Also try getInstance method
+        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+        if (modalInstance) {
+            try {
+                modalInstance.hide();
+                console.log('Loading modal hidden via getInstance');
+            } catch (e) {
+                console.log('Error hiding via getInstance:', e);
+            }
+        }
+        
+        // Force hide with timeout to ensure it works
+        setTimeout(() => {
+            modalElement.style.display = 'none';
+            modalElement.classList.remove('show');
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+            
+            // Remove all backdrops
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => backdrop.remove());
+            
+            console.log('Loading modal force hidden with cleanup');
+        }, 100);
+        
+    } else {
+        console.log('Modal element not found');
+    }
+}
+
+// Global management functions
+function displayManageList(containerId, items, type, typeName) {
+    const container = document.getElementById(containerId);
+    if (items.length === 0) {
+        container.innerHTML = `<div class="alert alert-info">No ${type}s found</div>`;
+        return;
+    }
+    
+    let html = `<div class="table-responsive">
+        <table class="table table-striped table-sm">
+            <thead>
+                <tr>
+                    <th>${typeName} Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>`;
+    
+    items.forEach(item => {
+        html += `
+            <tr>
+                <td>${item.NAME}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteItem(event, '${type}', ${item.ID}, '${item.NAME}')">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </td>
+            </tr>`;
+    });
+    
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+}
+
+function loadManageStreams(classId) {
+    showHierarchyLoading();
+    fetch(`../../backend/get_hierarchy_data.php?action=get_streams&class_id=${classId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayManageList('streamsList', data.data, 'stream', 'Stream');
+            } else {
+                document.getElementById('streamsList').innerHTML = '<div class="alert alert-warning">No streams found for this class</div>';
+            }
+        })
+        .catch(error => {
+            document.getElementById('streamsList').innerHTML = '<div class="alert alert-danger">Error loading streams</div>';
+        })
+        .finally(() => hideHierarchyLoading());
+}
+
+function loadManageSubjects(classId, streamId) {
+    showHierarchyLoading();
+    fetch(`../../backend/get_hierarchy_data.php?action=get_subjects&class_id=${classId}&stream_id=${streamId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayManageList('subjectsList', data.data, 'subject', 'Subject');
+            } else {
+                document.getElementById('subjectsList').innerHTML = '<div class="alert alert-warning">No subjects found for this stream</div>';
+            }
+        })
+        .catch(error => {
+            document.getElementById('subjectsList').innerHTML = '<div class="alert alert-danger">Error loading subjects</div>';
+        })
+        .finally(() => hideHierarchyLoading());
+}
+
+function loadManageSections(classId, streamId, subjectId) {
+    showHierarchyLoading();
+    fetch(`../../backend/get_hierarchy_data.php?action=get_sections&class_id=${classId}&stream_id=${streamId}&subject_id=${subjectId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayManageList('sectionsList', data.data, 'section', 'Section');
+            } else {
+                document.getElementById('sectionsList').innerHTML = '<div class="alert alert-warning">No sections found for this subject</div>';
+            }
+        })
+        .catch(error => {
+            document.getElementById('sectionsList').innerHTML = '<div class="alert alert-danger">Error loading sections</div>';
+        })
+        .finally(() => hideHierarchyLoading());
+}
+
+function loadManageChapters(classId, streamId, subjectId, sectionId) {
+    showHierarchyLoading();
+    fetch(`../../backend/get_hierarchy_data.php?action=get_chapters&class_id=${classId}&stream_id=${streamId}&subject_id=${subjectId}&section_id=${sectionId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayManageList('chaptersList', data.data, 'chapter', 'Chapter');
+            } else {
+                document.getElementById('chaptersList').innerHTML = '<div class="alert alert-warning">No chapters found for this section</div>';
+            }
+        })
+        .catch(error => {
+            document.getElementById('chaptersList').innerHTML = '<div class="alert alert-danger">Error loading chapters</div>';
+        })
+        .finally(() => hideHierarchyLoading());
+}
+
+function resetManageDisplay(containerId, message) {
+    document.getElementById(containerId).innerHTML = `<p class="text-muted">${message}</p>`;
+}
+
+// Global dropdown management functions
+function loadStreams(classId, targetSelectId) {
+    console.log('loadStreams called with:', classId, targetSelectId);
+    showHierarchyLoading();
+    fetch(`../../backend/get_hierarchy_data.php?action=get_streams&class_id=${classId}`)
+        .then(response => {
+            console.log('loadStreams response received');
+            return response.json();
+        })
+        .then(data => {
+            console.log('loadStreams data:', data);
+            if (data.success) {
+                populateDropdown(targetSelectId, data.data, 'ID', 'NAME');
+                document.getElementById(targetSelectId).disabled = false;
+                console.log('Dropdown populated successfully');
+            } else {
+                console.log('loadStreams failed:', data);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading streams:', error);
+        })
+        .finally(() => {
+            console.log('loadStreams completed');
+            hideHierarchyLoading();
+        });
+}
+
+function loadSubjects(classId, streamId, targetSelectId) {
+    showHierarchyLoading();
+    fetch(`../../backend/get_hierarchy_data.php?action=get_subjects&class_id=${classId}&stream_id=${streamId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                populateDropdown(targetSelectId, data.data, 'ID', 'NAME');
+                document.getElementById(targetSelectId).disabled = false;
+            }
+        })
+        .catch(error => console.error('Error loading subjects:', error))
+        .finally(() => hideHierarchyLoading());
+}
+
+function loadSections(classId, streamId, subjectId, targetSelectId) {
+    showHierarchyLoading();
+    fetch(`../../backend/get_hierarchy_data.php?action=get_sections&class_id=${classId}&stream_id=${streamId}&subject_id=${subjectId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                populateDropdown(targetSelectId, data.data, 'ID', 'NAME');
+                document.getElementById(targetSelectId).disabled = false;
+            }
+        })
+        .catch(error => console.error('Error loading sections:', error))
+        .finally(() => hideHierarchyLoading());
+}
+
+function populateDropdown(selectId, data, valueField, textField) {
+    const select = document.getElementById(selectId);
+    select.innerHTML = '<option value="">-- Select --</option>';
+    
+    data.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item[valueField];
+        option.textContent = item[textField];
+        select.appendChild(option);
+    });
+}
+
+function resetDropdown(selectId) {
+    const select = document.getElementById(selectId);
+    select.innerHTML = '<option value="">-- Select --</option>';
+    select.disabled = true;
+}
+
+function createHierarchyItem(type, data, modalId, messagesId) {
+    console.log('createHierarchyItem called with:', {type, data, modalId, messagesId});
+    showHierarchyLoading();
+    
+    const formData = new FormData();
+    formData.append('action', 'create_' + type);
+    for (const key in data) {
+        console.log('Appending to FormData:', key, '=', data[key]);
+        formData.append(key, data[key]);
+    }
+    
+    fetch('../../backend/manage_hierarchy.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            showMessage(messagesId, result.message, 'success');
+            document.getElementById(type + 'Form').reset();
+            resetFormDropdowns(modalId);
+            // Close modal after a short delay
+            setTimeout(() => {
+                const modalElement = document.getElementById(modalId);
+                if (modalElement && typeof bootstrap !== 'undefined') {
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+                }
+            }, 1500);
+        } else {
+            showMessage(messagesId, result.error, 'danger');
+        }
+    })
+    .catch(error => {
+        showMessage(messagesId, 'Error: ' + error.message, 'danger');
+    })
+    .finally(() => hideHierarchyLoading());
+}
+
+function resetFormDropdowns(modalId) {
+    const modal = document.getElementById(modalId);
+    const selects = modal.querySelectorAll('select');
+    selects.forEach((select, index) => {
+        if (index > 0) { // Skip the first select (class)
+            resetDropdown(select.id);
+        }
+        });
+}
+
+function setupClassChangeHandler(classSelectId, streamSelectId, subjectSelectId, sectionSelectId) {
+    console.log('Setting up class change handler for:', classSelectId);
+    const classSelect = document.getElementById(classSelectId);
+    if (!classSelect) {
+        console.error('Class select element not found:', classSelectId);
+        return;
+    }
+    
+    classSelect.addEventListener('change', function() {
+        const classId = this.value;
+        console.log('Class changed:', classId, 'for', classSelectId);
+        
+        if (classId) {
+            loadStreams(classId, streamSelectId);
+        } else {
+            resetDropdown(streamSelectId);
+            if (subjectSelectId) resetDropdown(subjectSelectId);
+            if (sectionSelectId) resetDropdown(sectionSelectId);
+        }
+    });
+    
+    if (streamSelectId && subjectSelectId) {
+        document.getElementById(streamSelectId).addEventListener('change', function() {
+            const streamId = this.value;
+            const classId = document.getElementById(classSelectId).value;
+            
+            if (streamId && classId) {
+                loadSubjects(classId, streamId, subjectSelectId);
+                if (sectionSelectId) resetDropdown(sectionSelectId);
+            } else {
+                resetDropdown(subjectSelectId);
+                if (sectionSelectId) resetDropdown(sectionSelectId);
+            }
+        });
+    }
+    
+    if (subjectSelectId && sectionSelectId) {
+        document.getElementById(subjectSelectId).addEventListener('change', function() {
+            const subjectId = this.value;
+            const streamId = document.getElementById(streamSelectId).value;
+            const classId = document.getElementById(classSelectId).value;
+            
+            if (subjectId && streamId && classId) {
+                loadSections(classId, streamId, subjectId, sectionSelectId);
+            } else {
+                resetDropdown(sectionSelectId);
+            }
+        });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     let hierarchyLoadingModal = null;
     
@@ -919,19 +1437,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    function setupClassChangeHandler(classSelectId, streamSelectId, subjectSelectId, sectionSelectId) {
-        document.getElementById(classSelectId).addEventListener('change', function() {
-            const classId = this.value;
-            const streamSelect = document.getElementById(streamSelectId);
-            
-            if (classId) {
-                loadStreams(classId, streamSelectId);
-            } else {
-                resetDropdown(streamSelectId);
-                if (subjectSelectId) resetDropdown(subjectSelectId);
-                if (sectionSelectId) resetDropdown(sectionSelectId);
-            }
-        });
+    // Removed broken function remnants
+    /*
+    if (!classSelect) {
+        console.error('Class select element not found:', classSelectId);
+        return;
+    }
+    
+    classSelect.addEventListener('change', function() {
+        const classId = this.value;
+        console.log('Class changed:', classId, 'for', classSelectId);
+        const streamSelect = document.getElementById(streamSelectId);
+        
+        if (classId) {
+            loadStreams(classId, streamSelectId);
+        } else {
+            resetDropdown(streamSelectId);
+            if (subjectSelectId) resetDropdown(subjectSelectId);
+            if (sectionSelectId) resetDropdown(sectionSelectId);
+        }
+    });
         
         if (streamSelectId && subjectSelectId) {
             document.getElementById(streamSelectId).addEventListener('change', function() {
@@ -961,157 +1486,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
-    
-    function loadStreams(classId, targetSelectId) {
-        showHierarchyLoading();
-        fetch(`../../backend/get_hierarchy_data.php?action=get_streams&class_id=${classId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    populateDropdown(targetSelectId, data.data, 'ID', 'NAME');
-                    document.getElementById(targetSelectId).disabled = false;
-                }
-            })
-            .catch(error => console.error('Error loading streams:', error))
-            .finally(() => hideHierarchyLoading());
-    }
-    
-    function loadSubjects(classId, streamId, targetSelectId) {
-        showHierarchyLoading();
-        fetch(`../../backend/get_hierarchy_data.php?action=get_subjects&class_id=${classId}&stream_id=${streamId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    populateDropdown(targetSelectId, data.data, 'ID', 'NAME');
-                    document.getElementById(targetSelectId).disabled = false;
-                }
-            })
-            .catch(error => console.error('Error loading subjects:', error))
-            .finally(() => hideHierarchyLoading());
-    }
-    
-    function loadSections(classId, streamId, subjectId, targetSelectId) {
-        showHierarchyLoading();
-        fetch(`../../backend/get_hierarchy_data.php?action=get_sections&class_id=${classId}&stream_id=${streamId}&subject_id=${subjectId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    populateDropdown(targetSelectId, data.data, 'ID', 'NAME');
-                    document.getElementById(targetSelectId).disabled = false;
-                }
-            })
-            .catch(error => console.error('Error loading sections:', error))
-            .finally(() => hideHierarchyLoading());
-    }
-    
-    function createHierarchyItem(type, data, modalId, messagesId) {
-        console.log('createHierarchyItem called with:', {type, data, modalId, messagesId});
-        showHierarchyLoading();
-        
-        const formData = new FormData();
-        formData.append('action', 'create_' + type);
-        for (const key in data) {
-            console.log('Appending to FormData:', key, '=', data[key]);
-            formData.append(key, data[key]);
-        }
-        
-        fetch('../../backend/manage_hierarchy.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(result => {
-            if (result.success) {
-                showMessage(messagesId, result.message, 'success');
-                document.getElementById(type + 'Form').reset();
-                resetFormDropdowns(modalId);
-                // Close modal after a short delay
-                setTimeout(() => {
-                    bootstrap.Modal.getInstance(document.getElementById(modalId)).hide();
-                }, 1500);
-            } else {
-                showMessage(messagesId, result.error, 'danger');
-            }
-        })
-        .catch(error => {
-            showMessage(messagesId, 'Error: ' + error.message, 'danger');
-        })
-        .finally(() => hideHierarchyLoading());
-    }
-    
-    function populateDropdown(selectId, data, valueField, textField) {
-        const select = document.getElementById(selectId);
-        select.innerHTML = '<option value="">-- Select --</option>';
-        
-        data.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item[valueField];
-            option.textContent = item[textField];
-            select.appendChild(option);
-        });
-    }
-    
-    function resetDropdown(selectId) {
-        const select = document.getElementById(selectId);
-        select.innerHTML = '<option value="">-- Select --</option>';
-        select.disabled = true;
-    }
-    
-    function resetFormDropdowns(modalId) {
-        const modal = document.getElementById(modalId);
-        const selects = modal.querySelectorAll('select');
-        selects.forEach((select, index) => {
-            if (index > 0) { // Skip the first select (class)
-                resetDropdown(select.id);
-            }
-        });
-    }
-    
-    function showMessage(containerId, message, type) {
-        const container = document.getElementById(containerId);
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-        alertDiv.innerHTML = `
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-        
-        container.innerHTML = '';
-        container.appendChild(alertDiv);
-        
-        setTimeout(() => {
-            if (alertDiv.parentNode) {
-                alertDiv.remove();
-            }
-        }, 5000);
-    }
-    
-    function showHierarchyLoading() {
-        const modalElement = document.getElementById('hierarchyLoadingModal');
-        if (modalElement) {
-            hierarchyLoadingModal = new bootstrap.Modal(modalElement);
-            hierarchyLoadingModal.show();
-        }
-    }
-    
-    function hideHierarchyLoading() {
-        if (hierarchyLoadingModal) {
-            hierarchyLoadingModal.hide();
-        }
-        
-        setTimeout(() => {
-            const modalElement = document.getElementById('hierarchyLoadingModal');
-            if (modalElement) {
-                modalElement.classList.remove('show');
-                modalElement.style.display = 'none';
-            }
-            document.body.classList.remove('modal-open');
-            const backdrops = document.querySelectorAll('.modal-backdrop');
-            backdrops.forEach(backdrop => backdrop.remove());
-            hierarchyLoadingModal = null;
-        }, 150);
-    }
+    */
     
     function setupManagementHandlers() {
         // Manage Streams
@@ -1237,129 +1612,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 resetManageDisplay('chaptersList', 'Select class, stream, subject, and section to view chapters');
             }
         });
-    }
-    
-    function loadManageStreams(classId) {
-        showHierarchyLoading();
-        fetch(`../../backend/get_hierarchy_data.php?action=get_streams&class_id=${classId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    displayManageList('streamsList', data.data, 'stream', 'Stream');
-                } else {
-                    document.getElementById('streamsList').innerHTML = '<div class="alert alert-warning">No streams found for this class</div>';
-                }
-            })
-            .catch(error => {
-                document.getElementById('streamsList').innerHTML = '<div class="alert alert-danger">Error loading streams</div>';
-            })
-            .finally(() => hideHierarchyLoading());
-    }
-    
-    function loadManageSubjects(classId, streamId) {
-        showHierarchyLoading();
-        fetch(`../../backend/get_hierarchy_data.php?action=get_subjects&class_id=${classId}&stream_id=${streamId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    displayManageList('subjectsList', data.data, 'subject', 'Subject');
-                } else {
-                    document.getElementById('subjectsList').innerHTML = '<div class="alert alert-warning">No subjects found for this stream</div>';
-                }
-            })
-            .catch(error => {
-                document.getElementById('subjectsList').innerHTML = '<div class="alert alert-danger">Error loading subjects</div>';
-            })
-            .finally(() => hideHierarchyLoading());
-    }
-    
-    function loadManageSections(classId, streamId, subjectId) {
-        showHierarchyLoading();
-        fetch(`../../backend/get_hierarchy_data.php?action=get_sections&class_id=${classId}&stream_id=${streamId}&subject_id=${subjectId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    displayManageList('sectionsList', data.data, 'section', 'Section');
-                } else {
-                    document.getElementById('sectionsList').innerHTML = '<div class="alert alert-warning">No sections found for this subject</div>';
-                }
-            })
-            .catch(error => {
-                document.getElementById('sectionsList').innerHTML = '<div class="alert alert-danger">Error loading sections</div>';
-            })
-            .finally(() => hideHierarchyLoading());
-    }
-    
-    function loadManageChapters(classId, streamId, subjectId, sectionId) {
-        showHierarchyLoading();
-        fetch(`../../backend/get_hierarchy_data.php?action=get_chapters&class_id=${classId}&stream_id=${streamId}&subject_id=${subjectId}&section_id=${sectionId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    displayManageList('chaptersList', data.data, 'chapter', 'Chapter');
-                } else {
-                    document.getElementById('chaptersList').innerHTML = '<div class="alert alert-warning">No chapters found for this section</div>';
-                }
-            })
-            .catch(error => {
-                document.getElementById('chaptersList').innerHTML = '<div class="alert alert-danger">Error loading chapters</div>';
-            })
-            .finally(() => hideHierarchyLoading());
-    }
-    
-    function displayManageList(containerId, items, type, typeName) {
-        const container = document.getElementById(containerId);
-        if (items.length === 0) {
-            container.innerHTML = `<div class="alert alert-info">No ${type}s found</div>`;
-            return;
-        }
-        
-        let html = `<div class="table-responsive">
-            <table class="table table-striped table-sm">
-                <thead>
-                    <tr>
-                        <th>${typeName} Name</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>`;
-        
-        items.forEach(item => {
-            html += `
-                <tr>
-                    <td>${item.NAME}</td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editItem('${type}', ${item.ID}, '${item.NAME}')">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteItem('${type}', ${item.ID}, '${item.NAME}')">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
-                    </td>
-                </tr>`;
-        });
-        
-        html += '</tbody></table></div>';
-        container.innerHTML = html;
-    }
-    
-    function resetManageDisplay(containerId, message) {
-        document.getElementById(containerId).innerHTML = `<p class="text-muted">${message}</p>`;
-    }
-    
-    function editItem(type, id, name) {
-        const newName = prompt(`Edit ${type} name:`, name);
-        if (newName && newName.trim() !== '' && newName.trim() !== name) {
-            // Here you would implement the edit functionality
-            alert(`Edit functionality for ${type} will be implemented soon`);
-        }
-    }
-    
-    function deleteItem(type, id, name) {
-        if (confirm(`Are you sure you want to delete the ${type} "${name}"?`)) {
-            // Here you would implement the delete functionality
-            alert(`Delete functionality for ${type} will be implemented soon`);
-        }
     }
     
     function setupTabColors() {
