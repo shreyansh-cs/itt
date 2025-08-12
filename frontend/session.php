@@ -2,20 +2,22 @@
 include_once __DIR__.'/showerror.php';
 include_once __DIR__.'/../backend/jw_utils.php';
 $logoutHours = 2;
-//Ensure this file has no dependency
-session_set_cookie_params([
-  'lifetime' => 0,           // Expires when the browser closes
-  'path' => '/',             
-  'domain' => '',            // Default domain (same as the site)
-  'secure' => true,          // Only send over HTTPS
-  'httponly' => true,        // Prevent JavaScript access (XSS protection)
-  'samesite' => 'Strict'     // Prevent CSRF attacks
-]);
 
 error_reporting(E_ALL & ~E_DEPRECATED);
 ini_set('display_errors', 1);
 
+//Ensure this file has no dependency
+// Set cookie parameters only if no session is active
 if (session_status() == PHP_SESSION_NONE) {
+  session_set_cookie_params([
+    'lifetime' => 0,           // Expires when the browser closes
+    'path' => '/',             
+    'domain' => '',            // Default domain (same as the site)
+    'secure' => true,          // Only send over HTTPS
+    'httponly' => true,        // Prevent JavaScript access (XSS protection)
+    'samesite' => 'Strict'     // Prevent CSRF attacks
+  ]);
+  
   // Session has not started
   session_start();  // Start the session
 }

@@ -1,5 +1,5 @@
 <?php
-session_start();
+include_once __DIR__.'/../session.php';
 include_once __DIR__.'/../../backend/utils.php';
 include_once __DIR__.'/../../backend/public_utils.php';
 
