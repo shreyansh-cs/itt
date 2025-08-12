@@ -226,6 +226,35 @@ ob_start();
             </div>
         </div>
         
+        <!-- User Management Section -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-purple text-uppercase mb-1" style="color: #6f42c1 !important;">
+                                User Management
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">Users</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x" style="color: #6f42c1;"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="d-grid gap-2">
+                        <a href="manage_users.php" class="btn btn-sm" style="background-color: #6f42c1; color: white; border-color: #6f42c1;">
+                            <i class="fas fa-users me-1"></i>Manage Users
+                        </a>
+                        <a href="manage_users.php#export" class="btn btn-outline-purple btn-sm" style="color: #6f42c1; border-color: #6f42c1;">
+                            <i class="fas fa-file-export me-1"></i>Export Users
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Financial Management Section -->
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card h-100 shadow-sm">
