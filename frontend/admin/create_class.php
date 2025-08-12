@@ -3,7 +3,7 @@ session_start();
 include_once __DIR__.'/../../backend/utils.php';
 include_once __DIR__.'/../../backend/public_utils.php';
 
-include_once __DIR__.'/../../frontend/restricted_page.php';
+include_once __DIR__.'/../../frontend/restrictedpage.php';
 
 $title = "Create New Class - Admin Panel";
 $msg = "";
