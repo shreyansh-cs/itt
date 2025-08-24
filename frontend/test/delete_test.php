@@ -26,19 +26,15 @@ try {
     $stmt = $pdo->prepare("DELETE FROM test_sessions WHERE test_id = ?");
     $stmt->execute([$test_id]);
 
-    // 3. Delete test_classes_map (child of tests) - legacy mapping
-    $stmt = $pdo->prepare("DELETE FROM test_classes_map WHERE test_id = ?");
-    $stmt->execute([$test_id]);
-
-    // 4. Delete test_chapters_map (child of tests) - new chapter-based mapping
+    // 3. Delete test_chapters_map (child of tests) - chapter-based mapping
     $stmt = $pdo->prepare("DELETE FROM test_chapters_map WHERE test_id = ?");
     $stmt->execute([$test_id]);
 
-    // 5. Delete questions (child of tests)
+    // 4. Delete questions (child of tests)
     $stmt = $pdo->prepare("DELETE FROM questions WHERE test_id = ?");
     $stmt->execute([$test_id]);
 
-    // 6. Finally delete the test itself
+    // 5. Finally delete the test itself
     $stmt = $pdo->prepare("DELETE FROM tests WHERE test_id = ?");
     $stmt->execute([$test_id]);
 
